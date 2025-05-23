@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: ats-resume-app
+    env: docker
+    plan: free
+    region: oregon
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: OPENAI_API_KEY
+        value: your-real-api-key
+      - key: DJANGO_SETTINGS_MODULE
+        value: ats_resume_app.settings

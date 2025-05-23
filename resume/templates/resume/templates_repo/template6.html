@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Berkeley Modern Hybrid</title>
+<style>
+ /* UC Berkeley Career Center: 0.6 in, Helvetica 10.5 pt, subtle color */
+ @page{margin:0.6in}
+ body{font-family:Helvetica,Arial,sans-serif;font-size:10.5pt;margin:0.6in;color:#333}
+ h1{text-align:center;font-size:19pt;margin:0 0 8pt;color:#003262}
+ h2{font-size:11pt;margin:16pt 0 6pt;border-bottom:1px solid #003262;text-transform:uppercase}
+ h3{font-size:10.5pt;margin:2pt 0;font-weight:bold}
+ p,li{margin:0 0 3pt}
+ ul{margin-left:16px}
+ .grid{display:flex;justify-content:space-between;gap:4%}
+ .grid>section{width:48%}
+</style>
+</head>
+<body>
+<h1>{{NAME}}</h1>
+<p style="text-align:center">{{EMAIL}} · {{PHONE}} · {{LINKEDIN}}</p>
+
+<div class="grid">
+ <section>
+  <h2>Summary</h2>
+  <p>{{SUMMARY}}</p>
+
+  <h2>Skills</h2>
+  <p>{{SKILLS}}</p>
+ </section>
+
+ <section>
+  <h2>Education</h2>
+  <p><strong>{{DEGREE}}</strong>, {{UNIVERSITY}} — {{GRADUATION_YEAR}}</p>
+
+  <h2>Projects</h2>
+  {{PROJECTS}}
+ </section>
+</div>
+
+<h2>Work Experience</h2>
+{{WORK_EXPERIENCE}}
+</body>
+</html>

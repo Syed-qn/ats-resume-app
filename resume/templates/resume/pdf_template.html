@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Tailored Résumé PDF</title>
+
+    <!-- 0.45-inch all-round margin, the “sweet spot” most universities quote
+         (Harvard OCS, Stanford BEAM, MIT CAPD all suggest 0.4-0.5 in). -->
+    <style>
+        @page { size: A4; margin: 0.45in; }
+        /* lightweight base, in case the injected resume forgets something */
+        body { margin: 0; font-family: "Helvetica Neue", Arial, sans-serif; }
+        .wrapper { width: 100%; }
+    </style>
+</head>
+<body>
+    <!--  we inject **only** the inner markup -->
+    <div class="wrapper">
+        {{ final_resume|safe }}
+    </div>
+</body>
+</html>

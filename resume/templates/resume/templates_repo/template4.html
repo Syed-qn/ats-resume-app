@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Stanford Professional</title>
+<style>
+ /* Stanford BEAM style: 0.7 in margins, Georgia 11 pt */
+ @page{margin:0.7in}
+ body{font-family:Georgia,serif;font-size:11pt;margin:0.7in;color:#000}
+ h1{text-align:center;font-size:22pt;margin:0 0 8pt}
+ h2{font-size:12pt;margin:14pt 0 5pt;border-bottom:1px solid #444;text-transform:uppercase}
+ h3{font-size:11pt;margin:3pt 0;font-weight:bold}
+ p,li{margin:0 0 3pt}
+ ul{margin-left:16px}
+ .job{margin-bottom:10pt}
+</style>
+</head>
+<body>
+<h1>{{NAME}}</h1>
+<p style="text-align:center">{{EMAIL}} · {{PHONE}} · {{LINKEDIN}}</p>
+
+<h2>Professional Summary</h2>
+<p>{{SUMMARY}}</p>
+
+<h2>Work Experience</h2>
+<div class="job">
+ <h3>{{JOB_TITLE_1}} — {{COMPANY_NAME_1}}</h3><em>{{JOB_DATES_1}}</em>
+ <ul>
+  <li>{{ACHIEVEMENT_1_1}}</li><li>{{ACHIEVEMENT_1_2}}</li><li>{{ACHIEVEMENT_1_3}}</li>
+ </ul>
+</div>
+{{WORK_EXPERIENCE}}
+
+<h2>Projects</h2>
+{{PROJECTS}}
+
+<h2>Education</h2>
+<p><strong>{{DEGREE}}</strong>, {{UNIVERSITY}}</p>
+</body>
+</html>

@@ -1,0 +1,53 @@
+# Core Django and Web Framework
+Django==4.2.7
+djangorestframework==3.14.0
+
+# File Processing
+PyPDF2==3.0.1
+docx2txt==0.8
+python-docx==0.8.11
+
+# PDF Generation
+WeasyPrint==60.2
+html5lib==1.1
+
+# AI/LLM Integration
+openai>=1.3.7
+tiktoken==0.5.1
+
+# Data Processing
+pandas==2.1.3
+numpy==1.24.3
+
+# Image Processing
+Pillow==10.1.0
+
+# Database (optional for basic usage)
+# psycopg2-binary==2.9.9
+
+# Caching and Background Tasks (optional)
+# redis==5.0.1
+# celery==5.3.4
+
+# HTTP Requests
+requests==2.31.0
+urllib3==2.1.0
+
+# Environment and Configuration
+python-decouple==3.8
+python-dotenv==1.0.0
+
+# Security - use latest compatible version
+cryptography>=3.4.8
+
+# CORS Headers
+django-cors-headers==4.3.1
+
+# Web Server
+gunicorn==21.2.0
+whitenoise==6.6.0
+
+# Utilities
+chardet==5.2.0
+python-slugify==8.0.1
+beautifulsoup4

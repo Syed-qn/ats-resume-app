@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Cambridge Global Graduate</title>
+<style>
+ /* Cambridge Careers Service leaflet: 2 cm margins, Calibri 11 pt */
+ @page{margin:2cm}
+ body{font-family:Calibri,Arial,sans-serif;font-size:11pt;margin:2cm;color:#222}
+ h1{font-size:24pt;text-align:center;margin:0 0 8pt}
+ h2{font-size:12pt;margin:16pt 0 6pt;border-bottom:1px solid #bbb}
+ h3{font-size:11pt;margin:3pt 0;font-weight:bold}
+ p,li{margin:0 0 4pt}
+ ul{margin-left:18px}
+</style>
+</head>
+<body>
+<h1>{{NAME}}</h1>
+<p style="text-align:center">{{EMAIL}} · {{PHONE}} · {{LOCATION}}</p>
+
+<h2>Profile</h2>
+<p>{{SUMMARY}}</p>
+
+<h2>Education</h2>
+<p><strong>{{DEGREE}}</strong>, {{UNIVERSITY}} — {{GRADUATION_YEAR}}</p>
+
+<h2>Work Experience</h2>
+<div>
+ <h3>{{JOB_TITLE_1}} — {{COMPANY_NAME_1}}</h3><em>{{JOB_DATES_1}}</em>
+ <ul><li>{{ACHIEVEMENT_1_1}}</li></ul>
+</div>
+{{WORK_EXPERIENCE}}
+
+<h2>Projects</h2>
+{{PROJECTS}}
+
+<h2>Skills & Languages</h2>
+<p>{{SKILLS}}</p>
+</body>
+</html>

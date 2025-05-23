@@ -1,0 +1,430 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ATS Résumé Optimizer</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
+
+<style>
+/* -------------  GENERIC  ------------- */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+     background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+     min-height:100vh;color:#333;}
+.container{max-width:1200px;margin:0 auto;padding:20px;}
+
+/* -------------  HEADER  ------------- */
+.header{text-align:center;margin-bottom:40px;color:#fff}
+.header h1{font-size:3rem;margin-bottom:10px;text-shadow:0 2px 4px rgba(0,0,0,.3)}
+.header p{font-size:1.2rem;opacity:.9}
+
+/* -------------  CARD  ------------- */
+.main-content{background:#fff;border-radius:20px;padding:40px;
+              box-shadow:0 20px 40px rgba(0,0,0,.1);position:relative;overflow:hidden}
+.main-content::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;
+                      background:linear-gradient(90deg,#667eea,#764ba2,#f093fb,#f5576c)}
+
+/* -------------  STEPS  ------------- */
+.step{display:none;animation:fadeIn .5s ease}
+.step.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+.step-header{display:flex;align-items:center;margin-bottom:30px;padding-bottom:20px;border-bottom:2px solid #f0f0f0}
+.step-number{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;width:50px;height:50px;border-radius:50%;
+             display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;margin-right:20px}
+.step-title{font-size:1.8rem;color:#333}
+
+/* -------------  STEPPER DOTS  ------------- */
+.step-indicator{display:flex;justify-content:center;margin-bottom:40px}
+.step-dot{width:40px;height:40px;border-radius:50%;background:#e0e0e0;display:flex;
+          align-items:center;justify-content:center;margin:0 10px;cursor:pointer;position:relative;transition:.3s}
+.step-dot.active{background:#667eea;color:#fff}
+.step-dot.completed{background:#28a745;color:#fff}
+.step-dot::after{content:'';position:absolute;top:50%;left:100%;width:20px;height:2px;
+                 background:#e0e0e0;transform:translateY(-50%)}
+.step-dot:last-child::after{display:none}
+.step-dot.completed::after{background:#28a745}
+
+/* -------------  UPLOAD AREA  ------------- */
+.upload-area{border:3px dashed #667eea;border-radius:15px;padding:60px 40px;text-align:center;
+             background:#f8f9ff;transition:.3s;cursor:pointer;position:relative}
+.upload-area:hover{border-color:#764ba2;background:#f0f2ff;transform:translateY(-5px)}
+.upload-area.dragover{border-color:#28a745;background:#f0fff4}
+.upload-icon{font-size:4rem;color:#667eea;margin-bottom:20px}
+.upload-text{font-size:1.2rem;color:#666;margin-bottom:15px}
+.file-input{display:none}
+.uploaded-file{background:#e8f5e8;border:2px solid #28a745;border-radius:10px;padding:20px;margin-top:20px;display:none}
+.file-info{display:flex;align-items:center;justify-content:space-between}
+.file-details{display:flex;align-items:center}
+.file-icon{font-size:2rem;color:#28a745;margin-right:15px}
+
+/* -------------  TEXTAREA / PAGE SELECT  ------------- */
+.textarea-container{margin:30px 0}
+.textarea-container label{font-size:1.1rem;font-weight:600;margin-bottom:10px;color:#333;display:block}
+.job-description{width:100%;min-height:200px;padding:20px;border:2px solid #e0e0e0;border-radius:10px;
+                 font-size:1rem;font-family:inherit;resize:vertical;transition:.3s}
+.job-description:focus{outline:none;border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,.1)}
+.page-select{margin-top:20px;display:flex;align-items:center;gap:10px}
+.page-select label{font-weight:600}
+.page-select select{padding:10px;border:2px solid #e0e0e0;border-radius:8px}
+
+/* -------------  TEMPLATE GRID  ------------- */
+.templates-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin:30px 0}
+.template-card{border:2px solid #e0e0e0;border-radius:15px;padding:25px;text-align:center;cursor:pointer;
+               transition:.3s;background:#fafafa}
+.template-card:hover{border-color:#667eea;transform:translateY(-5px);box-shadow:0 10px 25px rgba(0,0,0,.1)}
+.template-card.selected{border-color:#28a745;background:#f0fff4}
+.template-icon{font-size:3rem;color:#667eea;margin-bottom:15px}
+.template-name{font-size:1.2rem;font-weight:600;margin-bottom:10px}
+.template-description{color:#666;font-size:.9rem}
+
+/* -------------  BUTTONS  ------------- */
+.btn{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;padding:15px 30px;border-radius:10px;
+     font-size:1.1rem;font-weight:600;cursor:pointer;transition:.3s;display:inline-flex;align-items:center;gap:10px}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(102,126,234,.3)}
+.btn:disabled{background:#ccc;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-secondary{background:#6c757d}.btn-secondary:hover{background:#5a6268}
+
+/* -------------  LOADING & SCORES  ------------- */
+.loading{text-align:center;padding:40px;display:none}
+.spinner{border:4px solid #f3f3f3;border-top:4px solid #667eea;border-radius:50%;width:60px;height:60px;
+         animation:spin 1s linear infinite;margin:0 auto 20px}
+@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+.progress-container{margin:30px 0}
+.progress-bar{width:100%;height:8px;background:#e0e0e0;border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#667eea,#764ba2);width:0;transition:width .3s}
+.progress-text{text-align:center;margin-top:10px;font-weight:600;color:#667eea}
+.score-box{padding:20px;border-radius:15px;text-align:center;margin-bottom:20px;color:#fff}
+.score-number{font-size:3rem;font-weight:700}
+.score-label{font-size:1.2rem;opacity:.9}
+.ats{background:linear-gradient(135deg,#28a745,#20c997)}
+.job{background:linear-gradient(135deg,#17a2b8,#0d6efd)}
+
+/* -------------  PREVIEW  ------------- */
+.resume-preview{background:#f8f9fa;border:1px solid #e0e0e0;border-radius:15px;padding:30px;max-height:600px;overflow-y:auto}
+
+/* -------------  NAV / MSGS  ------------- */
+.action-buttons{display:flex;gap:15px;justify-content:center;margin-top:30px;flex-wrap:wrap}
+.navigation{display:flex;justify-content:space-between;margin-top:30px}
+.error,.success{padding:15px;border-radius:10px;margin:20px 0;display:none;color:#fff}
+.error{background:#dc3545}.success{background:#28a745}
+
+@media(max-width:768px){
+ .header h1{font-size:2rem}
+ .main-content{padding:20px;margin:10px}
+ .templates-grid{grid-template-columns:1fr}
+ .navigation{flex-direction:column;gap:15px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+<header class="header">
+    <h1><i class="fas fa-file-alt"></i> ATS Résumé Optimizer</h1>
+    <p>Transform your résumé so it perfectly matches any job description.</p>
+</header>
+
+<main class="main-content">
+    <!-- ─────────── STEPPER ─────────── -->
+    <nav class="step-indicator">
+        <div class="step-dot active" data-step="1">1</div>
+        <div class="step-dot" data-step="2">2</div>
+        <div class="step-dot" data-step="3">3</div>
+        <div class="step-dot" data-step="4">4</div>
+    </nav>
+
+    <div id="errorMessage" class="error"></div>
+    <div id="successMessage" class="success"></div>
+
+    <!-- ─────────── STEP 1 ─────────── -->
+    <section class="step active" id="step1">
+        <div class="step-header">
+            <div class="step-number">1</div><h2 class="step-title">Upload or Select a Résumé</h2>
+        </div>
+
+        <div class="upload-area" id="uploadArea">
+            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+            <p class="upload-text"><strong>Click to upload</strong> or drag-and-drop</p>
+            <p style="color:#999;margin-top:10px">PDF, DOC, DOCX (max 10 MB)</p>
+            <input type="file" class="file-input" id="fileInput" accept=".pdf,.doc,.docx">
+        </div>
+
+        <h3 style="margin:30px 0 10px">Previously uploaded</h3>
+        <ul id="resumeList" style="list-style:none;padding:0;margin-bottom:20px"></ul>
+
+        <div class="uploaded-file" id="uploadedFile">
+            <div class="file-info">
+                <div class="file-details">
+                    <i class="fas fa-file-alt file-icon"></i>
+                    <div>
+                        <div id="fileName"></div>
+                        <div id="fileSize" style="color:#666;font-size:.9rem"></div>
+                    </div>
+                </div>
+                <button class="btn btn-secondary" onclick="removeFile()"><i class="fas fa-trash"></i> Remove</button>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <div></div>
+            <button id="nextStep1" class="btn" onclick="nextStep()" disabled>
+                Next <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </section>
+
+    <!-- ─────────── STEP 2 ─────────── -->
+    <section class="step" id="step2">
+        <div class="step-header">
+            <div class="step-number">2</div><h2 class="step-title">Paste Job Description & Select Pages</h2>
+        </div>
+
+        <div class="textarea-container">
+            <label for="jobDescription">Full job description:</label>
+            <textarea id="jobDescription" class="job-description"
+                      placeholder="Include responsibilities, must-have skills, qualifications…"></textarea>
+        </div>
+
+        <div class="page-select">
+            <label for="numPages">Desired résumé length:</label>
+            <select id="numPages">
+                <option value="1">1 page</option>
+                <option value="2" selected>2 pages</option>
+                <option value="3">3 pages</option>
+            </select>
+        </div>
+
+        <div class="navigation">
+            <button class="btn btn-secondary" onclick="prevStep()"><i class="fas fa-arrow-left"></i> Back</button>
+            <button id="nextStep2" class="btn" onclick="nextStep()" disabled>
+                Next <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </section>
+
+    <!-- ─────────── STEP 3 ─────────── -->
+    <section class="step" id="step3">
+        <div class="step-header">
+            <div class="step-number">3</div><h2 class="step-title">Choose a Template</h2>
+        </div>
+
+        <div id="templatesGrid" class="templates-grid"></div>
+
+        <div class="navigation">
+            <button class="btn btn-secondary" onclick="prevStep()"><i class="fas fa-arrow-left"></i> Back</button>
+            <button id="nextStep3" class="btn" onclick="generateResume()" disabled>
+                Generate Résumé <i class="fas fa-magic"></i>
+            </button>
+        </div>
+    </section>
+
+    <!-- ─────────── STEP 4 ─────────── -->
+    <section class="step" id="step4">
+        <div class="step-header">
+            <div class="step-number">4</div><h2 class="step-title">Preview & Download</h2>
+        </div>
+
+        <div id="loadingSection" class="loading">
+            <div class="spinner"></div>
+            <div class="progress-container">
+                <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
+                <div id="progressText" class="progress-text">Analyzing your résumé…</div>
+            </div>
+        </div>
+
+        <div id="resultContainer" style="display:none">
+            <div class="score-box ats">
+                <div id="atsScore" class="score-number">0</div>
+                <div class="score-label">ATS compatibility</div>
+            </div>
+            <div class="score-box job">
+                <div id="jobScore" class="score-number">0</div>
+                <div class="score-label">Job-match score</div>
+            </div>
+
+            <div id="resumePreview" class="resume-preview"></div>
+
+            <div class="action-buttons">
+                <button class="btn" onclick="downloadPDF()"><i class="fas fa-download"></i> Download PDF</button>
+                <button class="btn btn-secondary" onclick="startOver()"><i class="fas fa-redo"></i> Start over</button>
+                <button class="btn btn-secondary" onclick="prevStep()"><i class="fas fa-arrow-left"></i> Back to templates</button>
+            </div>
+        </div>
+    </section>
+</main>
+</div>
+
+<!-- ─────────── SCRIPT ─────────── -->
+<script>
+/* ───────── CONFIG ───────── */
+let currentStep=1,currentResumeID=null,selectedTemplate=null;
+const csrftoken='{{ csrf_token }}';
+
+/* ───────── INIT ───────── */
+document.addEventListener('DOMContentLoaded',()=>{
+ hookStepper();loadPrevResumes();loadTemplates();setupUpload();
+ document.getElementById('jobDescription').addEventListener('input',()=>validateNext());
+});
+
+/* ───────── STEPPER ───────── */
+function goToStep(n){
+ document.querySelectorAll('.step').forEach(s=>s.classList.toggle('active',s.id==='step'+n));
+ document.querySelectorAll('.step-dot').forEach(d=>{
+  const idx=+d.dataset.step;
+  d.classList.remove('active','completed');
+  if(idx===n)d.classList.add('active'); else if(idx<n)d.classList.add('completed');
+ });
+ currentStep=n;
+}
+function nextStep(){if(currentStep<4)goToStep(currentStep+1)}
+function prevStep(){if(currentStep>1)goToStep(currentStep-1)}
+function hookStepper(){document.querySelectorAll('.step-dot').forEach(d=>d.addEventListener('click',()=>goToStep(+d.dataset.step)));}
+
+/* ───────── UPLOAD ───────── */
+function setupUpload(){
+ const area=document.getElementById('uploadArea');
+ const input=document.getElementById('fileInput');
+ area.addEventListener('click',()=>input.click());
+ input.addEventListener('change',e=>handleFile(e.target.files[0]));
+ ['dragover','dragleave','drop'].forEach(ev=>area.addEventListener(ev,e=>e.preventDefault()));
+ area.addEventListener('dragover',()=>area.classList.add('dragover'));
+ area.addEventListener('dragleave',()=>area.classList.remove('dragover'));
+ area.addEventListener('drop',e=>{area.classList.remove('dragover');handleFile(e.dataTransfer.files[0]);});
+}
+async function handleFile(file){
+ if(!file)return;
+ const ext='.'+file.name.split('.').pop().toLowerCase();
+ if(!['.pdf','.doc','.docx'].includes(ext))return showError('Please upload PDF/DOC/DOCX');
+ if(file.size>10*1024*1024)return showError('File must be under 10 MB');
+
+ const fd=new FormData();fd.append('file',file);
+ showSuccess('Uploading résumé…');
+ const res=await fetch('/upload/',{method:'POST',body:fd,headers:{'X-CSRFToken':csrftoken}});
+ const data=await res.json();
+ if(!res.ok)return showError(data.error||'Upload failed');
+
+ currentResumeID=data.resume_id;
+ document.getElementById('fileName').textContent=file.name;
+ document.getElementById('fileSize').textContent=(file.size/1024/1024).toFixed(1)+' MB';
+ document.getElementById('uploadedFile').style.display='block';
+ document.getElementById('nextStep1').disabled=false;
+ showSuccess('Upload complete!');
+}
+function removeFile(){
+ currentResumeID=null;document.getElementById('uploadedFile').style.display='none';
+ document.getElementById('fileInput').value='';document.getElementById('nextStep1').disabled=true;
+}
+
+/* ───────── PREVIOUS RESUMES ───────── */
+async function loadPrevResumes(){
+ const ul=document.getElementById('resumeList');
+ ul.innerHTML='<li style="color:#666">Loading…</li>';
+ try{
+  const data=await (await fetch('/api/resumes/')).json();
+  ul.innerHTML='';
+  if(!data.resumes.length){ul.innerHTML='<li style="color:#999">None yet.</li>';return;}
+  data.resumes.forEach(r=>{
+   const li=document.createElement('li');
+   li.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:10px 15px;border:1px solid #e0e0e0;border-radius:8px;margin-bottom:8px';
+   li.innerHTML=`<span>${r.filename}</span>`;
+   const btn=document.createElement('button');
+   btn.className='btn btn-secondary';btn.textContent='Select';
+   btn.onclick=()=>{currentResumeID=r.id;document.getElementById('nextStep1').disabled=false;showSuccess('Résumé selected!');};
+   li.appendChild(btn);ul.appendChild(li);
+  });
+ }catch{ul.innerHTML='<li style="color:#c00">Failed to load list</li>'; }
+}
+
+/* ───────── JOB DESCRIPTION ───────── */
+function validateNext(){
+ const ok=document.getElementById('jobDescription').value.trim().length>50;
+ document.getElementById('nextStep2').disabled=!ok;
+}
+
+/* ───────── TEMPLATE LIST ───────── */
+async function loadTemplates(){
+ const grid=document.getElementById('templatesGrid');
+ grid.innerHTML='<p>Loading templates…</p>';
+ try{
+  const data=await (await fetch('/templates/')).json();
+  grid.innerHTML='';
+  const icons={1:'file-alt',2:'font',3:'cogs',4:'align-left',5:'layer-group',6:'star'};
+  data.templates.forEach(t=>{
+   const card=document.createElement('div');
+   card.className='template-card';card.dataset.id=t.id;
+   card.innerHTML=`<i class="fas fa-${icons[t.id]||'file-alt'} template-icon"></i>
+                   <div class="template-name">${t.name}</div>
+                   <div class="template-description">${t.description||''}</div>`;
+   card.onclick=()=>{
+     document.querySelectorAll('.template-card').forEach(c=>c.classList.remove('selected'));
+     card.classList.add('selected');selectedTemplate=t.id;
+     document.getElementById('nextStep3').disabled=false;
+   };
+   grid.appendChild(card);
+  });
+ }catch{grid.innerHTML='<p style="color:#c00">Failed to load templates</p>'; }
+}
+
+/* ───────── GENERATE RESUME ───────── */
+async function generateResume(){
+ if(!currentResumeID||!selectedTemplate)return;
+ nextStep();
+ document.getElementById('loadingSection').style.display='block';
+ document.getElementById('resultContainer').style.display='none';
+ animateProgress();
+
+ const payload={job_description:document.getElementById('jobDescription').value,
+                num_pages:+document.getElementById('numPages').value};
+ try{
+  const res=await fetch(`/generate/${currentResumeID}/${selectedTemplate}/`,{
+     method:'POST',
+     headers:{'Content-Type':'application/json','X-CSRFToken':csrftoken},
+     body:JSON.stringify(payload)});
+  const data=await res.json();
+  if(!res.ok)throw Error(data.error||'Error');
+  document.getElementById('atsScore').textContent=data.ats_score+'%';
+  document.getElementById('jobScore').textContent=data.job_score+'%';
+  document.getElementById('resumePreview').innerHTML=data.final_resume;
+  document.getElementById('loadingSection').style.display='none';
+  document.getElementById('resultContainer').style.display='block';
+ }catch(err){showError(err.message||'Failed to generate');prevStep();}
+}
+function animateProgress() {
+    const phases = [
+        "Analyzing job requirements...",
+        "Extracting key skills...",
+        "Optimizing resume structure...",
+        "Matching keywords...",
+        "Final formatting...",
+        "Quality checking..."
+    ];
+    
+    phases.forEach((text, index) => {
+        setTimeout(() => {
+            document.getElementById('progressText').textContent = text;
+            document.getElementById('progressFill').style.width = 
+                `${Math.min(100, (index + 1) * 20)}%`;
+        }, index * 1500);
+    });
+}
+/* ───────── DOWNLOAD PDF ───────── */
+async function downloadPDF(){
+ if(!currentResumeID)return;
+ const res=await fetch(`/download/${currentResumeID}/`);
+ if(!res.ok)return showError('Download failed');
+ const cd=res.headers.get('Content-Disposition')||'',match=cd.match(/filename="?([^"]+)"?/);
+ const fname=match?match[1]:'resume.pdf';
+ const blob=await res.blob(),url=URL.createObjectURL(blob);
+ const a=document.createElement('a');a.href=url;a.download=fname;document.body.appendChild(a);a.click();a.remove();
+ URL.revokeObjectURL(url);
+}
+
+/* ───────── UTILS ───────── */
+function startOver(){location.reload();}
+function showError(msg){const el=document.getElementById('errorMessage');el.textContent=msg;el.style.display='block';setTimeout(()=>el.style.display='none',5000);}
+function showSuccess(msg){const el=document.getElementById('successMessage');el.textContent=msg;el.style.display='block';setTimeout(()=>el.style.display='none',3000);}
+</script>
+</body>
+</html>

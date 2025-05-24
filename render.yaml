@@ -5,9 +5,9 @@ services:
     plan: free
     region: oregon
     envVars:
+      - key: OPENAI_API_KEY
+        value: ${OPENAI_API_KEY}
       - key: PORT
         value: 8000
-      - key: OPENAI_API_KEY
-        value: your-real-api-key
       - key: DJANGO_SETTINGS_MODULE
         value: ats_resume_app.settings

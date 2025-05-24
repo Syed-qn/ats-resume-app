@@ -1,20 +1,22 @@
-FROM python:3.11-slim
+FROM python:3.11-bullseye
 
-# Avoid interactive prompts during package installation
-ENV DEBIAN_FRONTEND=noninteractive
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-# Install system dependencies required for WeasyPrint
+# Install system dependencies required by WeasyPrint
 RUN apt-get update && apt-get install -y \
     build-essential \
     libffi-dev \
     libcairo2 \
-    pango1.0-tools \
+    libcairo2-dev \
     libpango-1.0-0 \
-    libpangocairo-1.0-0 \
+    libpangoft2-1.0-0 \
+    libharfbuzz0b \
     libgdk-pixbuf2.0-0 \
+    libgdk-pixbuf2.0-dev \
     libxml2 \
     libxslt1.1 \
-    libgobject-2.0-0 \
     shared-mime-info \
     fonts-liberation \
     fonts-dejavu \
@@ -22,15 +24,15 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Set workdir
+# Set work directory
 WORKDIR /app
 
-# Install Python dependencies
+# Copy and install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy app code
+# Copy application code
 COPY . .
 
-# Gunicorn start command
+# Command to run the application
 CMD gunicorn --bind 0.0.0.0:$PORT ats_resume_app.wsgi:application

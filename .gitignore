@@ -136,4 +136,6 @@ logs/*.log
 *.swo
 
 # OS
-Thumbs.db
+Thumbs.db.env
+*.sqlite3
+__pycache__/

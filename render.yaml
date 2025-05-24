@@ -8,6 +8,6 @@ services:
       - key: OPENAI_API_KEY
         value: ${OPENAI_API_KEY}
       - key: PORT
-        value: 8000
+        value: "8000"
       - key: DJANGO_SETTINGS_MODULE
         value: ats_resume_app.settings

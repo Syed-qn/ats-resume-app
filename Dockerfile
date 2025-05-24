@@ -18,4 +18,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Start Gunicorn server
-CMD ["gunicorn", "ats_resume_app.wsgi:application", "--bind", "0.0.0.0:$PORT"]
+CMD gunicorn app.wsgi:application --bind 0.0.0.0:$PORT

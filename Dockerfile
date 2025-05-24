@@ -36,3 +36,4 @@ COPY . .
 
 # Command to run the application
 CMD gunicorn --bind 0.0.0.0:$PORT ats_resume_app.wsgi:application
+CMD python manage.py migrate && gunicorn --bind 0.0.0.0:$PORT ats_resume_app.wsgi:application

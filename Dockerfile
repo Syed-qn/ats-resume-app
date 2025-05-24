@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y \
     libgdk-pixbuf2.0-dev \
     libxml2 \
     libxslt1.1 \
+    libglib2.0-0 \
     shared-mime-info \
     fonts-liberation \
     fonts-dejavu \
@@ -31,9 +32,15 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# Copy project files
 COPY . .
 
-# Command to run the application
-CMD gunicorn --bind 0.0.0.0:$PORT ats_resume_app.wsgi:application
-CMD python manage.py migrate && gunicorn --bind 0.0.0.0:$PORT ats_resume_app.wsgi:application
+# Set environment variable for Django
+ENV DJANGO_SETTINGS_MODULE=ats_resume_app.settings
+
+# Collect static files and run migrations before starting server
+RUN mkdir -p /app/staticfiles
+RUN python manage.py collectstatic --noinput
+
+# Final entrypoint to apply migrations and start gunicorn
+CMD ["sh", "-c", "python manage.py migrate && gunicorn ats_resume_app.wsgi:application --bind 0.0.0.0:$PORT --timeout 120 --workers 1"]

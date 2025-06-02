@@ -9,12 +9,113 @@ services:
     plan: free
     region: oregon
     envVars:
-      - key: OPENAI_API_KEY
-        value: ${OPENAI_API_KEY}
-      - key: PORT
-        value: "8000"
+      # ───── Required for Django itself ─────
       - key: DJANGO_SETTINGS_MODULE
         value: ats_resume_app.settings
+      - key: SECRET_KEY
+        value: ${SECRET_KEY}            # e.g. define SECRET_KEY in Render’s “Environment” tab
+      - key: DEBUG
+        value: "False"                   # ensure DEBUG is false in production
+      - key: ALLOWED_HOSTS
+        value: ${ALLOWED_HOSTS}          # e.g. "atsresumeapp.onrender.com"
+
+      # ───── Port and Optional Business Logic ─────
+      - key: PORT
+        value: "8000"
+      - key: OPENAI_API_KEY
+        value: ${OPENAI_API_KEY}
+      - key: DEEPSEEK_API_KEY
+        value: ${DEEPSEEK_API_KEY}
+
+      # ───── Database ─────
+      - key: DATABASE_URL
+        value: ${DATABASE_URL}           # e.g. "postgres://user:pass@host:5432/dbname"
+
+      # ───── Email Configuration ─────
+      - key: EMAIL_HOST
+        value: ${EMAIL_HOST}             # e.g. "smtp.gmail.com"
+      - key: EMAIL_PORT
+        value: ${EMAIL_PORT}             # e.g. "587"
+      - key: EMAIL_USE_TLS
+        value: ${EMAIL_USE_TLS}          # e.g. "True"
+      - key: EMAIL_HOST_USER
+        value: ${EMAIL_HOST_USER}        # e.g. "your_email@gmail.com"
+      - key: EMAIL_HOST_PASSWORD
+        value: ${EMAIL_HOST_PASSWORD}    # e.g. your app password
+      - key: DEFAULT_FROM_EMAIL
+        value: ${DEFAULT_FROM_EMAIL}     # e.g. "noreply@atsresume.com"
+      - key: ADMIN_EMAIL
+        value: ${ADMIN_EMAIL}            # e.g. "admin@yourdomain.com"
+
+      # ───── File‐upload / S3 (if used) ─────
+      - key: AWS_ACCESS_KEY_ID
+        value: ${AWS_ACCESS_KEY_ID}
+      - key: AWS_SECRET_ACCESS_KEY
+        value: ${AWS_SECRET_ACCESS_KEY}
+      - key: AWS_STORAGE_BUCKET_NAME
+        value: ${AWS_STORAGE_BUCKET_NAME}
+      - key: AWS_S3_REGION_NAME
+        value: ${AWS_S3_REGION_NAME}
+
+      # ───── Redis (if used) ─────
+      - key: REDIS_URL
+        value: ${REDIS_URL}              # e.g. "redis://:password@redis:6379/0"
+
+      # ───── Session / Security ─────
+      - key: SESSION_COOKIE_AGE
+        value: "3600"
+      - key: SESSION_EXPIRE_AT_BROWSER_CLOSE
+        value: "True"
+      - key: SENTRY_DSN
+        value: ${SENTRY_DSN}             # if you use Sentry
+
+      # ───── PDF Generation Settings ─────
+      - key: PDF_PAGE_SIZE
+        value: "A4"
+      - key: PDF_MARGIN
+        value: "0.5in"
+      - key: PDF_DPI
+        value: "300"
+      - key: PDF_QUALITY
+        value: "high"
+
+      # ───── Downloads / Notifications ─────
+      - key: DOWNLOADS_PER_15_DAYS
+        value: "3"
+      - key: DOWNLOADS_PER_MONTH
+        value: "6"
+      - key: SEND_WELCOME_EMAIL
+        value: "True"
+      - key: SEND_RESUME_NOTIFICATION
+        value: "True"
+      - key: NOTIFY_ADMIN_NEW_USER
+        value: "True"
+
+      # ───── SEO / Analytics (optional) ─────
+      - key: GOOGLE_ANALYTICS_ID
+        value: ${GOOGLE_ANALYTICS_ID}    # if set
+      - key: MIXPANEL_TOKEN
+        value: ${MIXPANEL_TOKEN}
+
+      # ───── Other Optional Keys ─────
+      - key: WHATSAPP_PHONE_NUMBER
+        value: ${WHATSAPP_PHONE_NUMBER}
+      - key: WHATSAPP_DEFAULT_MESSAGE
+        value: ${WHATSAPP_DEFAULT_MESSAGE}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Below section is unchanged: build, collectstatic, migrations, and start up
+# ─────────────────────────────────────────────────────────────────────────────
+buildCommand: |
+  pip install --upgrade pip
+  pip install -r requirements.txt
+  mkdir -p /app/staticfiles
+  python manage.py collectstatic --noinput
+
+startCommand: |
+  python manage.py migrate
+  gunicorn ats_resume_app.wsgi:application --bind 0.0.0.0:$PORT --timeout 120 --workers 1
+
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.DS_Store =====
 
@@ -20592,7 +20693,7 @@ Unnamed repository; edit this file 'description' to name the repository.
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/COMMIT_EDITMSG =====
 
-Login, admin and all tasks
+Login, admin and all tasks-1
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/0d/84287d8e8a67d4b1fe581bb315172cd01881fc =====
@@ -20780,6 +20881,11 @@ Login, admin and all tasks
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/42/a90c60d956a2caa799b7e3997a5dc694c4d894
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/42/3bbfcef916414e4ebf6211b416da47f9c2d576 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/42/3bbfcef916414e4ebf6211b416da47f9c2d576
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/45/de5c460d8f222c856d61eaf822a80303138543 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/45/de5c460d8f222c856d61eaf822a80303138543
@@ -20884,6 +20990,11 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/62/4d36fbe15f8f54670a250e97df69f806156d4d =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/62/4d36fbe15f8f54670a250e97df69f806156d4d
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/53/0e0569f5f9741edc41e734c166fd5157ea9b6e =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/53/0e0569f5f9741edc41e734c166fd5157ea9b6e
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/53/384c4e009e0b42b9c70a3bbad120bf4ae66e94 =====
@@ -21011,6 +21122,11 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f1/f6fe7d31af57466c67fa14eb5470499514bf35
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/e7/fe396ab49a4ddf4e0a567e92b38de5503ca283 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/e7/fe396ab49a4ddf4e0a567e92b38de5503ca283
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/2d/3c7b05d37ec5c73dd68e7adf693082ffc54fc7 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/2d/3c7b05d37ec5c73dd68e7adf693082ffc54fc7
@@ -21049,6 +21165,11 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/24/da661f69438df1da3b491e39da7f476bf52528 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/24/da661f69438df1da3b491e39da7f476bf52528
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/4f/422bf09b065a7eb168b8c2c0eebbdcd5c75205 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/4f/422bf09b065a7eb168b8c2c0eebbdcd5c75205
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/8d/2fb3822a496f33e7133e338b588eb2f3f6d3d2 =====
@@ -21113,6 +21234,7 @@ ded30c5f5c264caaea681a6d5ee884021c5431b1 56f1be8b29d0ceb0407457e5abb8edad098c717
 ff49db72d8006544cfadcaedf39e7add8f21aee0 1d1a2254cd83d07a86dc9e34d3dbbe56608c44b9 Syed Khaja <syed@Syeds-MacBook-Air-2.local> 1748047150 +0400	commit: Run migrations before starting app
 1d1a2254cd83d07a86dc9e34d3dbbe56608c44b9 384b630a42c04aa83815aecc484a06876103d712 Syed Khaja <syed@Syeds-MacBook-Air-2.local> 1748048196 +0400	commit: Fix Dockerfile for WeasyPrint deployment and add static/migrate support
 384b630a42c04aa83815aecc484a06876103d712 39c0cc092b7dce6659e880f0a8337d985240bb0a Syed-qn <snassirodinquadri@gmail.com> 1748868387 +0400	commit: Login, admin and all tasks
+39c0cc092b7dce6659e880f0a8337d985240bb0a 530e0569f5f9741edc41e734c166fd5157ea9b6e Syed-qn <snassirodinquadri@gmail.com> 1748869393 +0400	commit: Login, admin and all tasks-1
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/logs/refs/heads/main =====
@@ -21126,6 +21248,7 @@ ded30c5f5c264caaea681a6d5ee884021c5431b1 56f1be8b29d0ceb0407457e5abb8edad098c717
 ff49db72d8006544cfadcaedf39e7add8f21aee0 1d1a2254cd83d07a86dc9e34d3dbbe56608c44b9 Syed Khaja <syed@Syeds-MacBook-Air-2.local> 1748047150 +0400	commit: Run migrations before starting app
 1d1a2254cd83d07a86dc9e34d3dbbe56608c44b9 384b630a42c04aa83815aecc484a06876103d712 Syed Khaja <syed@Syeds-MacBook-Air-2.local> 1748048196 +0400	commit: Fix Dockerfile for WeasyPrint deployment and add static/migrate support
 384b630a42c04aa83815aecc484a06876103d712 39c0cc092b7dce6659e880f0a8337d985240bb0a Syed-qn <snassirodinquadri@gmail.com> 1748868387 +0400	commit: Login, admin and all tasks
+39c0cc092b7dce6659e880f0a8337d985240bb0a 530e0569f5f9741edc41e734c166fd5157ea9b6e Syed-qn <snassirodinquadri@gmail.com> 1748869393 +0400	commit: Login, admin and all tasks-1
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/logs/refs/remotes/origin/main =====
@@ -21140,6 +21263,7 @@ ded30c5f5c264caaea681a6d5ee884021c5431b1 56f1be8b29d0ceb0407457e5abb8edad098c717
 ff49db72d8006544cfadcaedf39e7add8f21aee0 1d1a2254cd83d07a86dc9e34d3dbbe56608c44b9 Syed Khaja <syed@Syeds-MacBook-Air-2.local> 1748047152 +0400	update by push
 1d1a2254cd83d07a86dc9e34d3dbbe56608c44b9 384b630a42c04aa83815aecc484a06876103d712 Syed Khaja <syed@Syeds-MacBook-Air-2.local> 1748048198 +0400	update by push
 384b630a42c04aa83815aecc484a06876103d712 39c0cc092b7dce6659e880f0a8337d985240bb0a Syed-qn <snassirodinquadri@gmail.com> 1748868391 +0400	update by push
+39c0cc092b7dce6659e880f0a8337d985240bb0a 530e0569f5f9741edc41e734c166fd5157ea9b6e Syed-qn <snassirodinquadri@gmail.com> 1748869395 +0400	update by push
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/hooks/commit-msg.sample =====
@@ -22068,12 +22192,12 @@ fi
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/refs/heads/main =====
 
-39c0cc092b7dce6659e880f0a8337d985240bb0a
+530e0569f5f9741edc41e734c166fd5157ea9b6e
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/refs/remotes/origin/main =====
 
-39c0cc092b7dce6659e880f0a8337d985240bb0a
+530e0569f5f9741edc41e734c166fd5157ea9b6e
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/media/resumes/AI_-_Syed_Nasirodin_Quadri_Resume.pdf =====

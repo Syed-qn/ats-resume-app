@@ -81,9 +81,9 @@ services:
       - key: DOWNLOADS_PER_MONTH
         value: "6"
       - key: SEND_WELCOME_EMAIL
-        value: "True"
+        value: "False"
       - key: SEND_RESUME_NOTIFICATION
-        value: "True"
+        value: "False"
       - key: NOTIFY_ADMIN_NEW_USER
         value: "True"
 

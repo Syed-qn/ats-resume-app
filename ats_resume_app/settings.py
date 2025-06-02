@@ -435,3 +435,30 @@ else:
     print("📧 Email Backend: SMTP")
 
 print(f"📊 Tasks Completed: {sum(TASKS_COMPLETED.values())}/5")
+
+# ====== CUSTOM SETTINGS VALIDATION ======
+def validate_settings():
+    """Gracefully downgrade missing production secrets instead of killing the app."""
+    warnings = []
+
+    # Task 10 – notifications
+    if NOTIFICATIONS['SEND_RESUME_NOTIFICATION'] and not EMAIL_HOST_USER:
+        warnings.append(
+            "EMAIL_HOST_USER not set – disabling resume-upload notification e-mails."
+        )
+        NOTIFICATIONS['SEND_RESUME_NOTIFICATION'] = False
+
+    # Task 11 – password-reset e-mail
+    if not EMAIL_HOST_USER and not DEBUG:
+        warnings.append(
+            "EMAIL_HOST_USER not set – password-reset e-mails will be routed to the console backend."
+        )
+        EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+    # Task 14 – sanity-check middleware
+    if 'resume.middleware.SPAAuthenticationMiddleware' not in MIDDLEWARE:
+        warnings.append("SPAAuthenticationMiddleware missing from MIDDLEWARE list.")
+
+    for w in warnings:
+        print(f"⚠️  {w}")
+    print("✅ Settings validation finished – continuing startup.")

@@ -66,3 +66,7 @@ beautifulsoup4==4.12.3
 django-countries==7.6.1
 django-phonenumber-field==7.2.0
 phonenumbers==9.0.6
+
+render shell -- bash -c "python manage.py createsuperuser --username syed --email syed000211@gmail..com"
+CSRF_TRUSTED_ORIGINS=https://ats-resume-app.onrender.com
+SECURE_PROXY_SSL_HEADER=HTTP_X_FORWARDED_PROTO,https

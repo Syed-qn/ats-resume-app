@@ -1,0 +1,463 @@
+<!-- templates/components/navigation.html -->
+<nav class="main-navigation">
+  <div class="nav-container">
+    <!-- Logo/Brand -->
+    <div class="nav-brand">
+      <a href="{% url 'landing' %}" class="brand-link">
+        <i class="fas fa-rocket"></i>
+        <span>ATS Resume Optimizer</span>
+      </a>
+    </div>
+
+    <!-- Main Navigation Links -->
+    <div class="nav-links">
+      <a href="{% url 'landing' %}" class="nav-link">
+        <i class="fas fa-home"></i> Home
+      </a>
+      
+      {% if user.is_authenticated %}
+        <a href="{% url 'dashboard' %}" class="nav-link">
+          <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+      {% endif %}
+      
+      <!-- Task 13: ATS Details Page -->
+      <a href="{% url 'ats_details' %}" class="nav-link nav-highlight">
+        <i class="fas fa-robot"></i> About ATS
+      </a>
+      
+      <!-- Task 13: Our Services Page -->
+      <a href="{% url 'our_services' %}" class="nav-link nav-highlight">
+        <i class="fas fa-star"></i> Our Services
+      </a>
+      
+      {% if user.is_authenticated %}
+        {% if user.is_staff or user.is_superuser %}
+          <a href="{% url 'admin_dashboard' %}" class="nav-link admin-link">
+            <i class="fas fa-cog"></i> Admin Panel
+          </a>
+        {% endif %}
+      {% endif %}
+    </div>
+
+    <!-- User Authentication Area -->
+    <div class="nav-auth">
+      {% if user.is_authenticated %}
+        <div class="user-menu">
+          <span class="user-greeting">
+            <i class="fas fa-user-circle"></i>
+            Hi, {{ user.username }}
+          </span>
+          <div class="user-dropdown">
+            {% if not user.is_staff %}
+              <a href="{% url 'dashboard' %}" class="dropdown-item">
+                <i class="fas fa-file-alt"></i> My Resumes
+              </a>
+            {% endif %}
+            <a href="{% url 'logout' %}" class="dropdown-item logout">
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+          </div>
+        </div>
+      {% else %}
+        <div class="auth-buttons">
+          <a href="{% url 'login' %}" class="nav-btn btn-login">
+            <i class="fas fa-sign-in-alt"></i> Login
+          </a>
+          <a href="{% url 'signup' %}" class="nav-btn btn-signup">
+            <i class="fas fa-user-plus"></i> Sign Up
+          </a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <div class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="{% url 'landing' %}" class="mobile-nav-link">
+      <i class="fas fa-home"></i> Home
+    </a>
+    
+    {% if user.is_authenticated %}
+      <a href="{% url 'dashboard' %}" class="mobile-nav-link">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+      </a>
+    {% endif %}
+    
+    <a href="{% url 'ats_details' %}" class="mobile-nav-link">
+      <i class="fas fa-robot"></i> About ATS
+    </a>
+    
+    <a href="{% url 'our_services' %}" class="mobile-nav-link">
+      <i class="fas fa-star"></i> Our Services
+    </a>
+    
+    {% if user.is_authenticated %}
+      {% if user.is_staff or user.is_superuser %}
+        <a href="{% url 'admin_dashboard' %}" class="mobile-nav-link">
+          <i class="fas fa-cog"></i> Admin Panel
+        </a>
+      {% endif %}
+      <a href="{% url 'logout' %}" class="mobile-nav-link">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </a>
+    {% else %}
+      <a href="{% url 'login' %}" class="mobile-nav-link">
+        <i class="fas fa-sign-in-alt"></i> Login
+      </a>
+      <a href="{% url 'signup' %}" class="mobile-nav-link">
+        <i class="fas fa-user-plus"></i> Sign Up
+      </a>
+    {% endif %}
+  </div>
+</nav>
+
+<style>
+/* Navigation Styles */
+.main-navigation {
+  background: linear-gradient(135deg, #F9F7F7, #DBE2EF);
+  box-shadow: 0 2px 10px rgba(17, 45, 78, 0.1);
+  border-bottom: 1px solid #DBE2EF;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  backdrop-filter: blur(10px);
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+}
+
+/* Brand */
+.nav-brand .brand-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #112D4E;
+  font-weight: 700;
+  font-size: 1.3rem;
+  transition: all 0.3s ease;
+}
+
+.nav-brand .brand-link:hover {
+  color: #3F72AF;
+  transform: translateY(-1px);
+}
+
+.nav-brand i {
+  font-size: 1.5rem;
+  color: #3F72AF;
+}
+
+/* Navigation Links */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: #112D4E;
+  font-weight: 500;
+  padding: 8px 15px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.nav-link:hover {
+  color: #3F72AF;
+  background: rgba(63, 114, 175, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Task 13: Highlight important navigation items */
+.nav-highlight {
+  background: linear-gradient(135deg, #3F72AF, #112D4E);
+  color: #F9F7F7 !important;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(63, 114, 175, 0.3);
+}
+
+.nav-highlight:hover {
+  background: linear-gradient(135deg, #112D4E, #3F72AF);
+  color: #F9F7F7 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(63, 114, 175, 0.4);
+}
+
+.admin-link {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white !important;
+}
+
+.admin-link:hover {
+  background: linear-gradient(135deg, #20c997, #28a745);
+  color: white !important;
+}
+
+/* User Authentication Area */
+.nav-auth {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-menu {
+  position: relative;
+}
+
+.user-greeting {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #112D4E;
+  font-weight: 600;
+  padding: 8px 15px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.user-greeting:hover {
+  background: rgba(63, 114, 175, 0.1);
+  color: #3F72AF;
+}
+
+.user-greeting i {
+  font-size: 1.2rem;
+  color: #3F72AF;
+}
+
+.user-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #F9F7F7;
+  border: 1px solid #DBE2EF;
+  border-radius: 10px;
+  box-shadow: 0 8px 25px rgba(17, 45, 78, 0.15);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  min-width: 180px;
+  margin-top: 10px;
+}
+
+.user-menu:hover .user-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 15px;
+  text-decoration: none;
+  color: #112D4E;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  margin: 5px;
+}
+
+.dropdown-item:hover {
+  background: #3F72AF;
+  color: #F9F7F7;
+}
+
+.dropdown-item.logout {
+  color: #dc3545;
+}
+
+.dropdown-item.logout:hover {
+  background: #dc3545;
+  color: white;
+}
+
+/* Auth Buttons */
+.auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+}
+
+.btn-login {
+  color: #3F72AF;
+  border: 2px solid #3F72AF;
+  background: transparent;
+}
+
+.btn-login:hover {
+  background: #3F72AF;
+  color: #F9F7F7;
+  transform: translateY(-1px);
+}
+
+.btn-signup {
+  background: linear-gradient(135deg, #3F72AF, #112D4E);
+  color: #F9F7F7;
+  border: 2px solid transparent;
+}
+
+.btn-signup:hover {
+  background: linear-gradient(135deg, #112D4E, #3F72AF);
+  color: #F9F7F7;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(63, 114, 175, 0.3);
+}
+
+/* Mobile Menu */
+.mobile-menu-toggle {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.mobile-menu-toggle span {
+  width: 25px;
+  height: 3px;
+  background: #112D4E;
+  margin: 3px 0;
+  transition: 0.3s;
+  border-radius: 2px;
+}
+
+.mobile-menu {
+  display: none;
+  flex-direction: column;
+  background: #F9F7F7;
+  border-top: 1px solid #DBE2EF;
+  padding: 20px;
+  gap: 15px;
+}
+
+.mobile-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #112D4E;
+  font-weight: 500;
+  padding: 12px 15px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.mobile-nav-link:hover {
+  background: #3F72AF;
+  color: #F9F7F7;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .nav-links,
+  .nav-auth {
+    display: none;
+  }
+
+  .mobile-menu-toggle {
+    display: flex;
+  }
+
+  .mobile-menu.active {
+    display: flex;
+  }
+
+  .nav-container {
+    padding: 10px 15px;
+  }
+
+  .brand-link span {
+    display: none;
+  }
+
+  .nav-brand i {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-container {
+    padding: 8px 10px;
+  }
+}
+
+/* Animation for mobile menu toggle */
+.mobile-menu-toggle.active span:nth-child(1) {
+  transform: rotate(-45deg) translate(-5px, 6px);
+}
+
+.mobile-menu-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.mobile-menu-toggle.active span:nth-child(3) {
+  transform: rotate(45deg) translate(-5px, -6px);
+}
+</style>
+
+<script>
+function toggleMobileMenu() {
+  const mobileMenu = document.getElementById('mobileMenu');
+  const toggle = document.querySelector('.mobile-menu-toggle');
+  
+  mobileMenu.classList.toggle('active');
+  toggle.classList.toggle('active');
+}
+
+// Close mobile menu when clicking outside
+document.addEventListener('click', function(event) {
+  const mobileMenu = document.getElementById('mobileMenu');
+  const toggle = document.querySelector('.mobile-menu-toggle');
+  const navContainer = document.querySelector('.nav-container');
+  
+  if (!navContainer.contains(event.target)) {
+    mobileMenu.classList.remove('active');
+    toggle.classList.remove('active');
+  }
+});
+
+// Close mobile menu when window is resized to desktop
+window.addEventListener('resize', function() {
+  if (window.innerWidth > 768) {
+    const mobileMenu = document.getElementById('mobileMenu');
+    const toggle = document.querySelector('.mobile-menu-toggle');
+    
+    mobileMenu.classList.remove('active');
+    toggle.classList.remove('active');
+  }
+});
+</script>

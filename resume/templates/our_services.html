@@ -1,0 +1,832 @@
+<!-- templates/our_services.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Our Services | ATS Resume Optimizer</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #DBE2EF 0%, #F9F7F7 100%);
+      color: #112D4E;
+      line-height: 1.6;
+    }
+
+    /* WhatsApp Float Button - RIGHT SIDE */
+    .whatsapp-float {
+      position: fixed;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3);
+      z-index: 1000;
+      transition: all 0.3s ease;
+      animation: pulse 2s infinite;
+    }
+    .whatsapp-float:hover {
+      transform: translateY(-50%) scale(1.1);
+      box-shadow: 0 12px 35px rgba(37, 211, 102, 0.5);
+    }
+    .whatsapp-float i {
+      color: white;
+      font-size: 24px;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3); }
+      50% { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.6), 0 0 0 10px rgba(37, 211, 102, 0.1); }
+      100% { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3); }
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #3F72AF, #112D4E);
+      color: #F9F7F7;
+      padding: 100px 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/></svg>') repeat;
+      animation: float 20s infinite linear;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-100px); }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero h1 {
+      font-size: 3.5rem;
+      margin-bottom: 20px;
+      font-weight: 800;
+    }
+
+    .hero-subtitle {
+      font-size: 1.3rem;
+      margin-bottom: 40px;
+      opacity: 0.95;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .section {
+      padding: 80px 0;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      color: #112D4E;
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .section-subtitle {
+      font-size: 1.2rem;
+      color: #3F72AF;
+      text-align: center;
+      margin-bottom: 60px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Service Comparison */
+    .service-comparison {
+      background: #F9F7F7;
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin-top: 60px;
+    }
+
+    /* Main Services */
+    .main-services {
+      background: linear-gradient(135deg, #DBE2EF, #F9F7F7);
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 60px;
+      margin-top: 80px;
+    }
+
+    .service-card {
+      background: #F9F7F7;
+      padding: 50px 40px;
+      border-radius: 25px;
+      box-shadow: 0 15px 40px rgba(17,45,78,0.1);
+      border: 1px solid #DBE2EF;
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(63,114,175,0.1), transparent);
+      transform: rotate(45deg);
+      transition: all 0.6s ease;
+      opacity: 0;
+    }
+
+    .service-card:hover::before {
+      animation: shimmer 1.5s ease-in-out;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: translateX(100%) translateY(100%) rotate(45deg); opacity: 0; }
+    }
+
+    .service-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 25px 60px rgba(17,45,78,0.2);
+      border-color: #3F72AF;
+    }
+
+    .service-header {
+      text-align: center;
+      margin-bottom: 30px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .service-icon {
+      font-size: 4rem;
+      color: #3F72AF;
+      margin-bottom: 20px;
+    }
+
+    .service-title {
+      font-size: 2rem;
+      color: #112D4E;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .service-tagline {
+      color: #3F72AF;
+      font-size: 1.1rem;
+      font-style: italic;
+      margin-bottom: 20px;
+    }
+
+    .service-description {
+      color: #3F72AF;
+      font-size: 1.1rem;
+      line-height: 1.7;
+      margin-bottom: 30px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .service-features {
+      list-style: none;
+      margin: 30px 0;
+      position: relative;
+      z-index: 2;
+    }
+
+    .service-features li {
+      color: #112D4E;
+      margin-bottom: 12px;
+      font-size: 1rem;
+      position: relative;
+      padding-left: 25px;
+    }
+
+    .service-features li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: #3F72AF;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+
+    .service-pricing {
+      background: linear-gradient(135deg, #112D4E, #3F72AF);
+      color: #F9F7F7;
+      padding: 20px;
+      border-radius: 15px;
+      text-align: center;
+      margin: 30px 0;
+      position: relative;
+      z-index: 2;
+    }
+
+    .pricing-label {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      margin-bottom: 10px;
+    }
+
+    .pricing-value {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .pricing-note {
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+
+    .service-btn {
+      background: linear-gradient(135deg, #3F72AF, #112D4E);
+      color: #F9F7F7;
+      padding: 15px 35px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .service-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(63,114,175,0.4);
+      color: #F9F7F7;
+    }
+
+    /* Premium Service Card */
+    .service-card.premium {
+      background: linear-gradient(135deg, #112D4E, #3F72AF);
+      color: #F9F7F7;
+      border: 2px solid #DBE2EF;
+    }
+
+    .service-card.premium .service-title,
+    .service-card.premium .service-features li {
+      color: #F9F7F7;
+    }
+
+    .service-card.premium .service-description,
+    .service-card.premium .service-tagline {
+      color: #DBE2EF;
+    }
+
+    .service-card.premium .service-features li::before {
+      color: #DBE2EF;
+    }
+
+    .service-card.premium .service-btn {
+      background: linear-gradient(135deg, #F9F7F7, #DBE2EF);
+      color: #112D4E;
+    }
+
+    .service-card.premium .service-btn:hover {
+      background: linear-gradient(135deg, #DBE2EF, #F9F7F7);
+      color: #112D4E;
+    }
+
+    .service-card.premium .service-icon {
+      color: #DBE2EF;
+    }
+
+    .premium-badge {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #DBE2EF, #F9F7F7);
+      color: #112D4E;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      z-index: 3;
+    }
+
+    /* Process Section */
+    .process-section {
+      background: linear-gradient(135deg, #112D4E, #3F72AF);
+      color: #F9F7F7;
+    }
+
+    .process-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 40px;
+      margin-top: 60px;
+    }
+
+    .process-step {
+      text-align: center;
+      padding: 30px 20px;
+    }
+
+    .process-number {
+      background: rgba(249, 247, 247, 0.2);
+      color: #F9F7F7;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin: 0 auto 25px;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(219, 226, 239, 0.3);
+    }
+
+    .process-title {
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    .process-description {
+      color: #DBE2EF;
+      line-height: 1.6;
+    }
+
+    /* Benefits Section */
+    .benefits-section {
+      background: #F9F7F7;
+    }
+
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-top: 60px;
+    }
+
+    .benefit-card {
+      background: linear-gradient(135deg, #DBE2EF, #F9F7F7);
+      padding: 30px 25px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(17,45,78,0.1);
+      border: 1px solid #DBE2EF;
+      transition: all 0.3s ease;
+    }
+
+    .benefit-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(17,45,78,0.15);
+    }
+
+    .benefit-icon {
+      font-size: 2.5rem;
+      color: #3F72AF;
+      margin-bottom: 20px;
+    }
+
+    .benefit-title {
+      font-size: 1.3rem;
+      color: #112D4E;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    .benefit-description {
+      color: #3F72AF;
+      line-height: 1.5;
+    }
+
+    /* Stats Section */
+    .stats-section {
+      background: linear-gradient(135deg, #3F72AF, #112D4E);
+      color: #F9F7F7;
+      padding: 80px 0;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 40px;
+      text-align: center;
+    }
+
+    .stat {
+      padding: 20px;
+    }
+
+    .stat-number {
+      font-size: 3.5rem;
+      font-weight: 700;
+      color: #DBE2EF;
+      margin-bottom: 10px;
+    }
+
+    .stat-label {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    /* CTA Section */
+    .cta-section {
+      background: linear-gradient(135deg, #DBE2EF, #F9F7F7);
+      padding: 80px 0;
+      text-align: center;
+    }
+
+    .cta-title {
+      font-size: 2.5rem;
+      color: #112D4E;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .cta-description {
+      font-size: 1.2rem;
+      color: #3F72AF;
+      margin-bottom: 40px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 18px 35px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+    }
+
+    .cta-btn.primary {
+      background: linear-gradient(135deg, #3F72AF, #112D4E);
+      color: #F9F7F7;
+    }
+
+    .cta-btn.secondary {
+      background: transparent;
+      color: #3F72AF;
+      border: 2px solid #3F72AF;
+    }
+
+    .cta-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(63,114,175,0.3);
+    }
+
+    .cta-btn.primary:hover {
+      color: #F9F7F7;
+    }
+
+    .cta-btn.secondary:hover {
+      background: #3F72AF;
+      color: #F9F7F7;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+      
+      .services-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      
+      .service-card {
+        padding: 40px 30px;
+      }
+      
+      .section-title {
+        font-size: 2rem;
+      }
+      
+      .comparison-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  {% include 'components/navigation.html' %}
+
+  <!-- WhatsApp Float Button -->
+  <a href="https://wa.me/916303858671?text=Hi! I'm interested in your job application service. Can you provide more details about pricing and process?" 
+     class="whatsapp-float" target="_blank" rel="noopener">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <h1><i class="fas fa-star"></i> Our Services</h1>
+        <p class="hero-subtitle">
+          Two powerful ways to accelerate your career success. Choose the perfect solution 
+          for your job search needs and start landing interviews faster.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Services -->
+  <section class="section main-services">
+    <div class="container">
+      <h2 class="section-title">Choose Your Path to Success</h2>
+      <p class="section-subtitle">
+        Whether you prefer hands-on control or complete automation, we have the perfect solution for your career goals
+      </p>
+      
+      <div class="services-grid">
+        <!-- AI Resume Optimizer -->
+        <div class="service-card">
+          <div class="service-header">
+            <i class="fas fa-brain service-icon"></i>
+            <h3 class="service-title">AI Resume Optimizer</h3>
+            <p class="service-tagline">"Do It Yourself" - With AI Assistance</p>
+          </div>
+          
+          <p class="service-description">
+            Transform your resume with cutting-edge AI technology. Our intelligent system analyzes 
+            job descriptions and optimizes your resume for maximum ATS compatibility and recruiter appeal.
+          </p>
+          
+          <ul class="service-features">
+            <li>AI-powered keyword extraction and integration</li>
+            <li>University-approved professional templates</li>
+            <li>Real-time ATS compatibility scoring (90%+ guarantee)</li>
+            <li>Manual resume builder with guided forms</li>
+            <li>Unlimited revisions and downloads</li>
+            <li>Job-specific resume tailoring</li>
+            <li>Professional formatting optimization</li>
+            <li>Instant PDF generation</li>
+          </ul>
+          
+          <div class="service-pricing">
+            <div class="pricing-label">Get Started</div>
+            <div class="pricing-value">FREE</div>
+            <div class="pricing-note">Always free to use</div>
+          </div>
+          
+          <a href="{% url 'signup' %}" class="service-btn">
+            <i class="fas fa-rocket"></i> Start Optimizing Now
+          </a>
+        </div>
+
+        <!-- Job Application Service -->
+        <div class="service-card premium">
+          <div class="premium-badge">Most Popular</div>
+          <div class="service-header">
+            <i class="fas fa-handshake service-icon"></i>
+            <h3 class="service-title">Done-For-You Job Applications</h3>
+            <p class="service-tagline">"Sit Back & Relax" - We Handle Everything</p>
+          </div>
+          
+          <p class="service-description">
+            Focus on interview preparation while our experts apply to hundreds of relevant jobs on your behalf. 
+            Professional consultation, custom applications, and interview coordination included.
+          </p>
+          
+          <ul class="service-features">
+            <li>Personal consultation & profile optimization</li>
+            <li>50+ daily job applications by experts</li>
+            <li>Custom cover letters for each application</li>
+            <li>LinkedIn profile optimization</li>
+            <li>Interview scheduling & coordination</li>
+            <li>Daily progress reports & updates</li>
+            <li>Follow-up communication management</li>
+            <li>Salary negotiation guidance</li>
+          </ul>
+          
+          <div class="service-pricing">
+            <div class="pricing-label">Starting From</div>
+            <div class="pricing-value">$299/week</div>
+            <div class="pricing-note">3-day free trial included</div>
+          </div>
+          
+          <a href="https://wa.me/916303858671?text=Hi! I'm interested in your job application service. Can you provide more details about pricing and process?" 
+             class="service-btn" target="_blank">
+            <i class="fab fa-whatsapp"></i> Start Free Trial
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Process Section -->
+  <section class="section process-section">
+    <div class="container">
+      <h2 class="section-title" style="color: #F9F7F7;">How Our Job Application Service Works</h2>
+      <p class="section-subtitle" style="color: #DBE2EF;">
+        A simple 4-step process that gets you interviews while you prepare
+      </p>
+      
+      <div class="process-grid">
+        <div class="process-step">
+          <div class="process-number">1</div>
+          <h3 class="process-title">Discovery & Strategy</h3>
+          <p class="process-description">
+            Comprehensive consultation to understand your background, target roles, 
+            salary expectations, and career goals. We create a personalized application strategy.
+          </p>
+        </div>
+        
+        <div class="process-step">
+          <div class="process-number">2</div>
+          <h3 class="process-title">Profile Optimization</h3>
+          <p class="process-description">
+            We optimize your LinkedIn profile, prepare custom resume versions, 
+            and set up application tracking systems for maximum efficiency.
+          </p>
+        </div>
+        
+        <div class="process-step">
+          <div class="process-number">3</div>
+          <h3 class="process-title">Mass Application</h3>
+          <p class="process-description">
+            Our team applies to 50+ relevant positions daily with custom cover letters 
+            while you focus on interview preparation and skill development.
+          </p>
+        </div>
+        
+        <div class="process-step">
+          <div class="process-number">4</div>
+          <h3 class="process-title">Interview Coordination</h3>
+          <p class="process-description">
+            We manage all communication, schedule interviews, provide daily updates, 
+            and guide you through the entire hiring process until you land your dream job.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefits Section -->
+  <section class="section benefits-section">
+    <div class="container">
+      <h2 class="section-title">Why Choose Our Services</h2>
+      <p class="section-subtitle">
+        Proven results backed by technology and expertise
+      </p>
+      
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <i class="fas fa-robot benefit-icon"></i>
+          <h3 class="benefit-title">AI-Powered Precision</h3>
+          <p class="benefit-description">
+            Our advanced AI analyzes thousands of job descriptions to ensure your resume 
+            matches exactly what employers are looking for.
+          </p>
+        </div>
+        
+        <div class="benefit-card">
+          <i class="fas fa-university benefit-icon"></i>
+          <h3 class="benefit-title">University-Approved</h3>
+          <p class="benefit-description">
+            Professional templates designed by career experts and approved by top universities 
+            including Harvard, MIT, and Stanford.
+          </p>
+        </div>
+        
+        <div class="benefit-card">
+          <i class="fas fa-chart-line benefit-icon"></i>
+          <h3 class="benefit-title">Proven Results</h3>
+          <p class="benefit-description">
+            92% ATS pass rate and 3x higher interview callback rate compared to 
+            traditional resume writing methods.
+          </p>
+        </div>
+        
+        <div class="benefit-card">
+          <i class="fas fa-clock benefit-icon"></i>
+          <h3 class="benefit-title">Save Time</h3>
+          <p class="benefit-description">
+            Automated job applications save you 40+ hours per week of manual searching 
+            and applying to positions.
+          </p>
+        </div>
+        
+        <div class="benefit-card">
+          <i class="fas fa-shield-alt benefit-icon"></i>
+          <h3 class="benefit-title">Risk-Free Trial</h3>
+          <p class="benefit-description">
+            Try our job application service for 3 days completely free. No commitment, 
+            no credit card required.
+          </p>
+        </div>
+        
+        <div class="benefit-card">
+          <i class="fas fa-headset benefit-icon"></i>
+          <h3 class="benefit-title">Expert Support</h3>
+          <p class="benefit-description">
+            Dedicated career consultants and job application specialists available 
+            throughout your entire job search journey.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats-section">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat">
+          <div class="stat-number">92%</div>
+          <div class="stat-label">ATS Pass Rate</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">350+</div>
+          <div class="stat-label">Jobs Applied Weekly</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">15</div>
+          <div class="stat-label">Days Average Response</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">3x</div>
+          <div class="stat-label">Higher Interview Rate</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Call to Action -->
+  <section class="cta-section">
+    <div class="container">
+      <h2 class="cta-title">Ready to Transform Your Career?</h2>
+      <p class="cta-description">
+        Choose the service that fits your style. Get started today and see why thousands 
+        of professionals trust us with their career success.
+      </p>
+      
+      <div class="cta-buttons">
+        <a href="{% url 'signup' %}" class="cta-btn primary">
+          <i class="fas fa-rocket"></i> Try AI Optimizer Free
+        </a>
+        <a href="https://wa.me/916303858671?text=Hi! I'm interested in your job application service. Can you provide more details about pricing and process?" 
+           class="cta-btn secondary" target="_blank">
+          <i class="fab fa-whatsapp"></i> Start 3-Day Free Trial
+        </a>
+      </div>
+    </div>
+  </section>
+</body>
+</html>

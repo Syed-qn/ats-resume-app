@@ -1,50 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>MIT Technical</title>
-<style>
- /* MIT CAPD: 0.5-0.75 in, clear sans-serif, 10-11 pt */
- @page{margin:0.5in}
- body{font-family:Arial,Helvetica,sans-serif;font-size:10.5pt;margin:0.5in;color:#333}
- h1{text-align:center;font-size:18pt;margin:0 0 10pt}
- h2{font-size:11pt;border-bottom:1px solid #888;padding-bottom:3px;margin:14pt 0 6pt;text-transform:uppercase;color:#111}
- h3{font-size:10.5pt;margin:2pt 0}
- p,li{margin:0 0 3pt}
- ul{margin-left:16px}
- .two-col{display:flex;justify-content:space-between}
- .two-col > div{width:49%}
-</style>
+  <meta charset="UTF-8">
+  <title>MIT Technical</title>
+  <style>
+    /* MIT CAPD: 0.5–0.75 in margins, clear sans-serif font, 10–11 pt */
+    @page { margin: 0.5in; }
+    body { font-family: Arial, Helvetica, sans-serif; font-size: 10.5pt; margin: 0.5in; color: #333; }
+    h1   { text-align: center; font-size: 18pt; margin: 0 0 10pt; }
+    h2   { font-size: 11pt; text-transform: uppercase; margin: 14pt 0 6pt; padding-bottom: 3px; border-bottom: 1px solid #888; color: #111; }
+    h3   { font-size: 10.5pt; margin: 2pt 0; font-weight: bold; }
+    p, li { margin: 0 0 3pt; }
+    ul  { margin-left: 16px; }
+    .two-col { display: flex; justify-content: space-between; }
+    .two-col > div { width: 49%; }
+  </style>
 </head>
 <body>
-<h1>{{NAME}}</h1>
-<p style="text-align:center">{{EMAIL}} · {{PHONE}} · {{LINKEDIN}}</p>
+  <h1>{{NAME}}</h1>
+  <p style="text-align:center">{{EMAIL}} · {{PHONE}} · {{LINKEDIN}}</p>
 
-<h2>Technical Profile</h2>
-<p>{{SUMMARY}}</p>
+  <h2>Technical Profile</h2>
+  <p>{{SUMMARY}}</p>
 
-<div class="two-col">
- <div>
-  <h2>Core Skills</h2>
-  <p>{{SKILLS}}</p>
- </div>
- <div>
-  <h2>Tools & Technologies</h2>
-  <p>{{TOOLS}}</p>
- </div>
-</div>
+  <!-- Two-column section for skills and tools -->
+  <div class="two-col">
+    <div>
+      <h2>Core Skills</h2>
+      <p>{{SKILLS}}</p>
+    </div>
+    <div>
+      <h2>Tools &amp; Technologies</h2>
+      <p>{{TOOLS}}</p>
+    </div>
+  </div>
 
-<h2>Work Experience</h2>
-<div>
- <h3>{{JOB_TITLE_1}} — {{COMPANY_NAME_1}}</h3><em>{{JOB_DATES_1}}</em>
- <ul><li>{{ACHIEVEMENT_1_1}}</li></ul>
-</div>
-{{WORK_EXPERIENCE}}
+  <h2>Work Experience</h2>
+  <div>
+    <h3>{{JOB_TITLE_1}} — {{COMPANY_NAME_1}}</h3> <em>{{JOB_DATES_1}}</em>
+    <ul><li>{{ACHIEVEMENT_1_1}}</li></ul>
+  </div>
+  {{WORK_EXPERIENCE}}
 
-<h2>Projects</h2>
-{{PROJECTS}}
+  <h2>Projects</h2>
+  {{PROJECTS}}
 
-<h2>Education</h2>
-<p><strong>{{DEGREE}}</strong>, {{UNIVERSITY}}, {{GRADUATION_YEAR}}</p>
+  <h2>Education</h2>
+  <p><strong>{{DEGREE}}</strong>, {{UNIVERSITY}}, {{GRADUATION_YEAR}}</p>
 </body>
 </html>

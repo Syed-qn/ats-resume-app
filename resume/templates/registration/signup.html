@@ -1,0 +1,899 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Create Account | ATS Resume Optimizer</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #DBE2EF 0%, #F9F7F7 100%);
+      min-height: 100vh;
+      color: #112D4E;
+      position: relative;
+    }
+
+    /* Navigation will be included here */
+    .main-content {
+      padding: 20px 0;
+    }
+
+    /* WhatsApp Float Button - Task 12: RIGHT SIDE */
+    .whatsapp-float {
+      position: fixed;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3);
+      z-index: 1000;
+      transition: all 0.3s ease;
+      animation: pulse 2s infinite;
+      text-decoration: none;
+    }
+    .whatsapp-float:hover {
+      transform: translateY(-50%) scale(1.1);
+      box-shadow: 0 12px 35px rgba(37, 211, 102, 0.5);
+    }
+    .whatsapp-float i {
+      color: white;
+      font-size: 24px;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3); }
+      50% { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.6), 0 0 0 10px rgba(37, 211, 102, 0.1); }
+      100% { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3); }
+    }
+
+    /* Main Container */
+    .signup-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .brand-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .brand-header h1 {
+      font-size: 2.5rem;
+      background: linear-gradient(135deg, #3F72AF, #112D4E);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+      font-weight: 800;
+    }
+
+    .brand-header p {
+      color: #3F72AF;
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .signup-card {
+      background: rgba(249, 247, 247, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 50px 40px;
+      border-radius: 25px;
+      box-shadow: 0 25px 50px rgba(17,45,78,.15);
+      border: 1px solid rgba(219, 226, 239, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .signup-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(63,114,175,0.05), transparent);
+      transform: rotate(45deg);
+      pointer-events: none;
+    }
+
+    .card-header {
+      text-align: center;
+      margin-bottom: 40px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .card-header .auth-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #3F72AF, #112D4E);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 25px;
+      box-shadow: 0 10px 30px rgba(63,114,175,0.3);
+    }
+
+    .card-header .auth-icon i {
+      font-size: 2rem;
+      color: #F9F7F7;
+    }
+
+    .card-header h2 {
+      color: #112D4E;
+      font-size: 2rem;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .card-header p {
+      color: #3F72AF;
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .benefits-banner {
+      background: linear-gradient(135deg, #112D4E, #3F72AF);
+      color: #F9F7F7;
+      padding: 25px;
+      border-radius: 15px;
+      margin-bottom: 35px;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .benefits-banner h3 {
+      margin-bottom: 15px;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .benefits-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      font-size: 0.95rem;
+    }
+
+    .benefits-list span {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(249, 247, 247, 0.1);
+      padding: 8px 12px;
+      border-radius: 8px;
+      backdrop-filter: blur(5px);
+    }
+
+    .signup-form {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .form-group {
+      position: relative;
+    }
+
+    .form-group.full-width {
+      grid-column: span 2;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      color: #112D4E;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 18px 20px;
+      padding-left: 50px;
+      border: 2px solid #DBE2EF;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: rgba(249, 247, 247, 0.8);
+      color: #112D4E;
+      outline: none;
+    }
+
+    .form-control:focus {
+      border-color: #3F72AF;
+      box-shadow: 0 0 0 4px rgba(63,114,175,.1);
+      background: #FFFFFF;
+      transform: translateY(-2px);
+    }
+
+    .form-control.error {
+      border-color: #dc3545;
+      background: rgba(220, 53, 69, 0.1);
+    }
+
+    .form-control.success {
+      border-color: #28a745;
+      background: rgba(40, 167, 69, 0.1);
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #3F72AF;
+      font-size: 1.1rem;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus + .input-icon {
+      color: #112D4E;
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .form-control.error + .input-icon {
+      color: #dc3545;
+    }
+
+    .form-control.success + .input-icon {
+      color: #28a745;
+    }
+
+    .required {
+      color: #dc3545;
+      font-weight: bold;
+    }
+
+    .btn-signup {
+      background: linear-gradient(135deg, #3F72AF, #112D4E);
+      color: #F9F7F7;
+      padding: 20px;
+      border: none;
+      border-radius: 15px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 20px;
+      position: relative;
+      overflow: hidden;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn-signup::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn-signup:hover::before {
+      left: 100%;
+    }
+
+    .btn-signup:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 35px rgba(63,114,175,.4);
+    }
+
+    .btn-signup:active {
+      transform: translateY(-1px);
+    }
+
+    .btn-signup.loading {
+      pointer-events: none;
+      opacity: 0.8;
+    }
+
+    .btn-signup.loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      margin: -10px 0 0 -10px;
+      border: 2px solid transparent;
+      border-top: 2px solid #F9F7F7;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .divider {
+      position: relative;
+      text-align: center;
+      margin: 30px 0;
+    }
+
+    .divider::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #DBE2EF, transparent);
+    }
+
+    .divider span {
+      background: rgba(249, 247, 247, 0.95);
+      padding: 0 20px;
+      color: #3F72AF;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 30px;
+      padding-top: 25px;
+      border-top: 1px solid #DBE2EF;
+      position: relative;
+      z-index: 2;
+    }
+
+    .login-link p {
+      color: #3F72AF;
+      margin-bottom: 15px;
+      font-size: 1rem;
+    }
+
+    .login-link a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #112D4E;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 12px 25px;
+      border: 2px solid #3F72AF;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      background: transparent;
+    }
+
+    .login-link a:hover {
+      background: #3F72AF;
+      color: #F9F7F7;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(63,114,175,.3);
+    }
+
+    .error-messages {
+      background: linear-gradient(135deg, #dc3545, #c82333);
+      color: #F9F7F7;
+      padding: 15px 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      border-left: 4px solid #a71e2a;
+      font-size: 0.95rem;
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .error-messages i {
+      font-size: 1.2rem;
+      margin-top: 2px;
+    }
+
+    .error-messages ul {
+      margin: 0;
+      padding-left: 15px;
+      list-style: none;
+    }
+
+    .error-messages li {
+      margin-bottom: 5px;
+      position: relative;
+      padding-left: 15px;
+    }
+
+    .error-messages li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: #F9F7F7;
+    }
+
+    .help-text {
+      font-size: 0.85rem;
+      color: #3F72AF;
+      margin-top: 5px;
+      line-height: 1.4;
+    }
+
+    .password-requirements {
+      background: rgba(219, 226, 239, 0.3);
+      border: 1px solid #DBE2EF;
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .password-requirements h4 {
+      color: #112D4E;
+      margin-bottom: 15px;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .password-requirements ul {
+      margin: 0;
+      padding-left: 20px;
+      color: #3F72AF;
+    }
+
+    .password-requirements li {
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    /* Form Validation Styling */
+    .field-error {
+      color: #dc3545;
+      font-size: 0.85rem;
+      margin-top: 5px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .field-success {
+      color: #28a745;
+      font-size: 0.85rem;
+      margin-top: 5px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .main-content {
+        padding: 10px 0;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .form-group.full-width {
+        grid-column: span 1;
+      }
+
+      .signup-card {
+        padding: 40px 25px;
+        margin: 10px;
+      }
+
+      .brand-header h1 {
+        font-size: 2rem;
+      }
+
+      .card-header h2 {
+        font-size: 1.7rem;
+      }
+
+      .benefits-list {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .whatsapp-float {
+        width: 50px;
+        height: 50px;
+        right: 15px;
+      }
+
+      .whatsapp-float i {
+        font-size: 20px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .main-content {
+        padding: 5px 0;
+      }
+
+      .signup-container {
+        padding: 10px;
+      }
+
+      .signup-card {
+        padding: 30px 20px;
+      }
+
+      .form-control {
+        padding: 15px 18px;
+        padding-left: 45px;
+      }
+
+      .input-icon {
+        left: 15px;
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Task 13: Navigation Component -->
+  {% include 'components/navigation.html' %}
+
+  <!-- Task 12: WhatsApp Float Button - RIGHT SIDE -->
+  <a href="https://wa.me/916303858671?text=Hi! I'm interested in your job application service. Can you provide more details about pricing and process?" 
+     class="whatsapp-float" target="_blank" rel="noopener">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+
+  <div class="main-content">
+    <div class="signup-container">
+      <div class="brand-header">
+        <h1><i class="fas fa-rocket"></i> Career Booster</h1>
+        <p>Join thousands optimizing their career success</p>
+      </div>
+
+      <div class="signup-card">
+        <div class="card-header">
+          <div class="auth-icon">
+            <i class="fas fa-user-plus"></i>
+          </div>
+          <h2>Create Your Account</h2>
+          <p>Start your journey to career success today</p>
+        </div>
+
+        <div class="benefits-banner">
+          <h3><i class="fas fa-gift"></i> What You Get Free</h3>
+          <div class="benefits-list">
+            <span><i class="fas fa-check"></i> AI Resume Optimization</span>
+            <span><i class="fas fa-check"></i> ATS Compatibility Scoring</span>
+            <span><i class="fas fa-check"></i> University Templates</span>
+            <span><i class="fas fa-check"></i> Professional Dashboard</span>
+          </div>
+        </div>
+
+        <form method="post" class="signup-form" id="signupForm">
+          {% csrf_token %}
+          
+          {% if form.non_field_errors %}
+            <div class="error-messages">
+              <i class="fas fa-exclamation-triangle"></i>
+              <div>
+                <ul>
+                  {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          {% endif %}
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>{{ form.username.label }} <span class="required">*</span></label>
+              <div class="input-wrapper">
+                {{ form.username }}
+                <i class="fas fa-user input-icon"></i>
+              </div>
+              {% if form.username.errors %}
+                <div class="field-error">
+                  <i class="fas fa-exclamation-circle"></i>
+                  {{ form.username.errors.0 }}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label>{{ form.email.label }} <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <input type="email" 
+                       name="email" 
+                       id="id_email" 
+                       required 
+                       class="form-control"
+                       placeholder="your.email@example.com"
+                       value="{{ form.email.value|default_if_none:'' }}">
+                <i class="fas fa-envelope input-icon"></i>
+              </div>
+              {% if form.email.errors %}
+                <div class="field-error">
+                  <i class="fas fa-exclamation-circle"></i>
+                  {{ form.email.errors.0 }}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>{{ form.country_code.label }} <span class="required">*</span></label>
+              <div class="input-wrapper">
+                {{ form.country_code }}
+                <i class="fas fa-flag input-icon"></i>
+              </div>
+              {% if form.country_code.errors %}
+                <div class="field-error">
+                  <i class="fas fa-exclamation-circle"></i>
+                  {{ form.country_code.errors.0 }}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label>{{ form.phone_number.label }} <span class="required">*</span></label>
+              <div class="input-wrapper">
+                {{ form.phone_number }}
+                <i class="fas fa-phone input-icon"></i>
+              </div>
+              {% if form.phone_number.errors %}
+                <div class="field-error">
+                  <i class="fas fa-exclamation-circle"></i>
+                  {{ form.phone_number.errors.0 }}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>{{ form.city.label }} <span class="required">*</span></label>
+              <div class="input-wrapper">
+                {{ form.city }}
+                <i class="fas fa-map-marker-alt input-icon"></i>
+              </div>
+              {% if form.city.errors %}
+                <div class="field-error">
+                  <i class="fas fa-exclamation-circle"></i>
+                  {{ form.city.errors.0 }}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label>{{ form.country.label }} <span class="required">*</span></label>
+              <div class="input-wrapper">
+                {{ form.country }}
+                <i class="fas fa-globe input-icon"></i>
+              </div>
+              {% if form.country.errors %}
+                <div class="field-error">
+                  <i class="fas fa-exclamation-circle"></i>
+                  {{ form.country.errors.0 }}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label>{{ form.password1.label }} <span class="required">*</span></label>
+            <div class="input-wrapper">
+              {{ form.password1 }}
+              <i class="fas fa-lock input-icon"></i>
+            </div>
+            {% if form.password1.errors %}
+              <div class="field-error">
+                <i class="fas fa-exclamation-circle"></i>
+                {{ form.password1.errors.0 }}
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="form-group full-width">
+            <label>{{ form.password2.label }} <span class="required">*</span></label>
+            <div class="input-wrapper">
+              {{ form.password2 }}
+              <i class="fas fa-check-circle input-icon"></i>
+            </div>
+            {% if form.password2.errors %}
+              <div class="field-error">
+                <i class="fas fa-exclamation-circle"></i>
+                {{ form.password2.errors.0 }}
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="password-requirements">
+            <h4><i class="fas fa-shield-alt"></i> Password Requirements</h4>
+            <ul>
+              <li>At least 8 characters long</li>
+              <li>Cannot be too similar to your personal information</li>
+              <li>Cannot be a commonly used password</li>
+              <li>Cannot be entirely numeric</li>
+            </ul>
+          </div>
+
+          <button type="submit" class="btn-signup">
+            <i class="fas fa-rocket"></i> Create My Free Account
+          </button>
+        </form>
+
+        <div class="divider">
+          <span>Already optimizing your career?</span>
+        </div>
+
+        <div class="login-link">
+          <p>Welcome back to your dashboard</p>
+          <a href="{% url 'login' %}">
+            <i class="fas fa-sign-in-alt"></i> Sign In to Account
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Form validation and UX improvements
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('signupForm');
+      const inputs = document.querySelectorAll('.form-control');
+      const submitBtn = document.querySelector('.btn-signup');
+
+      // Real-time validation
+      inputs.forEach(input => {
+        input.addEventListener('blur', validateField);
+        input.addEventListener('input', clearFieldError);
+      });
+
+      // Form submission handling
+      form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        // Validate all fields
+        inputs.forEach(input => {
+          if (!validateField.call(input)) {
+            isValid = false;
+          }
+        });
+
+        if (isValid) {
+          submitBtn.classList.add('loading');
+          submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+        }
+      });
+
+      function validateField() {
+        const value = this.value.trim();
+        const wrapper = this.closest('.form-group');
+        let isValid = true;
+
+        // Remove existing validation classes and messages
+        this.classList.remove('error', 'success');
+        const existingError = wrapper.querySelector('.field-error');
+        const existingSuccess = wrapper.querySelector('.field-success');
+        if (existingError) existingError.remove();
+        if (existingSuccess) existingSuccess.remove();
+
+        // Basic validation
+        if (this.hasAttribute('required') && value === '') {
+          showFieldError(wrapper, this, 'This field is required');
+          isValid = false;
+        } else if (this.type === 'email' && value && !isValidEmail(value)) {
+          showFieldError(wrapper, this, 'Please enter a valid email address');
+          isValid = false;
+        } else if (this.name === 'username' && value && value.length < 3) {
+          showFieldError(wrapper, this, 'Username must be at least 3 characters');
+          isValid = false;
+        } else if (this.name === 'password1' && value && value.length < 8) {
+          showFieldError(wrapper, this, 'Password must be at least 8 characters');
+          isValid = false;
+        } else if (this.name === 'password2' && value) {
+          const password1 = document.querySelector('[name="password1"]').value;
+          if (value !== password1) {
+            showFieldError(wrapper, this, 'Passwords do not match');
+            isValid = false;
+          }
+        } else if (value) {
+          showFieldSuccess(wrapper, this);
+        }
+
+        return isValid;
+      }
+
+      function clearFieldError() {
+        this.classList.remove('error');
+        const wrapper = this.closest('.form-group');
+        const existingError = wrapper.querySelector('.field-error');
+        if (existingError) existingError.remove();
+      }
+
+      function showFieldError(wrapper, input, message) {
+        input.classList.add('error');
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'field-error';
+        errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+        wrapper.appendChild(errorDiv);
+      }
+
+      function showFieldSuccess(wrapper, input) {
+        input.classList.add('success');
+        const successDiv = document.createElement('div');
+        successDiv.className = 'field-success';
+        successDiv.innerHTML = `<i class="fas fa-check-circle"></i> Looks good!`;
+        wrapper.appendChild(successDiv);
+      }
+
+      function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+      }
+
+      // Password confirmation real-time validation
+      const password1 = document.querySelector('[name="password1"]');
+      const password2 = document.querySelector('[name="password2"]');
+
+      if (password1 && password2) {
+        password2.addEventListener('input', function() {
+          if (this.value && password1.value) {
+            const wrapper = this.closest('.form-group');
+            const existingError = wrapper.querySelector('.field-error');
+            const existingSuccess = wrapper.querySelector('.field-success');
+            
+            if (existingError) existingError.remove();
+            if (existingSuccess) existingSuccess.remove();
+            
+            this.classList.remove('error', 'success');
+            
+            if (this.value === password1.value) {
+              showFieldSuccess(wrapper, this);
+            } else {
+              showFieldError(wrapper, this, 'Passwords do not match');
+            }
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>

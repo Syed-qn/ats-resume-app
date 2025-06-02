@@ -1,0 +1,1041 @@
+<!-- resume/templates/resume/manual_entry/full_form.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Manual Resume Entry | ATS Resume Optimizer</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #DBE2EF, #F9F7F7);
+      min-height: 100vh;
+      padding: 20px 0;
+      color: #112D4E;
+    }
+    .container {
+      max-width: 1000px;
+    }
+    .main-card {
+      background: #F9F7F7;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(17,45,78,.1);
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(135deg, #3F72AF, #112D4E);
+      color: #F9F7F7;
+      padding: 30px;
+      text-align: center;
+    }
+    .form-section {
+      padding: 30px;
+    }
+    .section-header {
+      border-bottom: 2px solid #DBE2EF;
+      padding-bottom: 10px;
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+    .section-header.collapsed .section-content {
+      display: none;
+    }
+    .section-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-icon {
+      color: #3F72AF;
+      font-size: 1.5rem;
+    }
+    .toggle-icon {
+      color: #3F72AF;
+      font-size: 1.2rem;
+      transition: transform 0.3s ease;
+    }
+    .section-header.collapsed .toggle-icon {
+      transform: rotate(-90deg);
+    }
+    .add-section-btn {
+      background: linear-gradient(135deg, #3F72AF, #112D4E);
+      color: #F9F7F7;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .optional-section {
+      display: none;
+    }
+    .optional-section.show {
+      display: block;
+    }
+    .formset-item {
+      background: #DBE2EF;
+      border: 1px solid #3F72AF;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .formset-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .delete-btn {
+      background: #112D4E;
+      color: #F9F7F7;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .add-btn {
+      background: linear-gradient(135deg, #3F72AF, #112D4E);
+      color: #F9F7F7;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #3F72AF, #112D4E);
+      border: none;
+      padding: 12px 30px;
+      border-radius: 8px;
+      font-weight: 600;
+      color: #F9F7F7;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(63,114,175,.3);
+      color: #F9F7F7;
+    }
+    .current-checkbox {
+      margin-top: 10px;
+    }
+    .form-text {
+      color: #3F72AF;
+      font-size: 0.875rem;
+    }
+    .progress-indicator {
+      background: #DBE2EF;
+      padding: 15px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #3F72AF;
+    }
+    
+    /* Error Styling */
+    .form-control.is-invalid {
+      border-color: #dc3545;
+      background-color: rgba(220, 53, 69, 0.1);
+    }
+    .form-control.is-valid {
+      border-color: #28a745;
+      background-color: rgba(40, 167, 69, 0.1);
+    }
+    .invalid-feedback {
+      color: #dc3545;
+      font-size: 0.875rem;
+      margin-top: 5px;
+    }
+    .alert-errors {
+      background: linear-gradient(135deg, #dc3545, #c82333);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 30px;
+    }
+    .alert-errors h4 {
+      margin-bottom: 15px;
+      font-size: 1.2rem;
+    }
+    .alert-errors ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+    .alert-errors li {
+      margin-bottom: 8px;
+    }
+    
+    /* Collapsible sections */
+    .section-content {
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+    .section-content.collapsed {
+      max-height: 0;
+      padding: 0;
+      margin: 0;
+    }
+    
+    /* Required field indicator */
+    .required::after {
+      content: " *";
+      color: #dc3545;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="main-card">
+      <div class="header">
+        <h1><i class="fas fa-edit"></i> Manual Resume Entry</h1>
+        <p>Fill out all sections to create your professional resume</p>
+      </div>
+
+      <div class="progress-indicator">
+        <i class="fas fa-info-circle"></i> Complete all required sections below, then preview your resume
+      </div>
+
+      <!-- Global Error Display -->
+      {% if form.errors or education_formset.errors or work_formset.errors or project_formset.errors or skill_formset.errors or cert_formset.errors or lang_formset.errors %}
+        <div class="alert alert-errors">
+          <h4><i class="fas fa-exclamation-triangle"></i> Please correct the following errors:</h4>
+          <ul>
+            {% for field, errors in form.errors.items %}
+              {% for error in errors %}
+                <li><strong>{{ form|yesno:",Personal Info" }} - {{ field|title }}:</strong> {{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+            
+            {% if education_formset.errors %}
+              {% for form_errors in education_formset.errors %}
+                {% for field, errors in form_errors.items %}
+                  {% for error in errors %}
+                    <li><strong>Education:</strong> {{ error }}</li>
+                  {% endfor %}
+                {% endfor %}
+              {% endfor %}
+            {% endif %}
+            
+            {% if work_formset.errors %}
+              {% for form_errors in work_formset.errors %}
+                {% for field, errors in form_errors.items %}
+                  {% for error in errors %}
+                    <li><strong>Work Experience:</strong> {{ error }}</li>
+                  {% endfor %}
+                {% endfor %}
+              {% endfor %}
+            {% endif %}
+            
+            {% if project_formset.errors %}
+              {% for form_errors in project_formset.errors %}
+                {% for field, errors in form_errors.items %}
+                  {% for error in errors %}
+                    <li><strong>Projects:</strong> {{ error }}</li>
+                  {% endfor %}
+                {% endfor %}
+              {% endfor %}
+            {% endif %}
+            
+            {% if skill_formset.errors %}
+              {% for form_errors in skill_formset.errors %}
+                {% for field, errors in form_errors.items %}
+                  {% for error in errors %}
+                    <li><strong>Skills:</strong> {{ error }}</li>
+                  {% endfor %}
+                {% endfor %}
+              {% endfor %}
+            {% endif %}
+            
+            {% if cert_formset.errors %}
+              {% for form_errors in cert_formset.errors %}
+                {% for field, errors in form_errors.items %}
+                  {% for error in errors %}
+                    <li><strong>Certifications:</strong> {{ error }}</li>
+                  {% endfor %}
+                {% endfor %}
+              {% endfor %}
+            {% endif %}
+            
+            {% if lang_formset.errors %}
+              {% for form_errors in lang_formset.errors %}
+                {% for field, errors in form_errors.items %}
+                  {% for error in errors %}
+                    <li><strong>Languages:</strong> {{ error }}</li>
+                  {% endfor %}
+                {% endfor %}
+              {% endfor %}
+            {% endif %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <form method="post" id="manualResumeForm">
+        {% csrf_token %}
+        
+        <!-- Personal Information Section -->
+        <div class="form-section">
+          <div class="section-header" onclick="toggleSection('personal')">
+            <div class="section-title-group">
+              <i class="fas fa-user section-icon"></i>
+              <h3 class="required">Personal Information</h3>
+            </div>
+            <i class="fas fa-chevron-down toggle-icon" id="personal-toggle"></i>
+          </div>
+          <div class="section-content" id="personal-content">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label required">{{ form.full_name.label }}</label>
+                {{ form.full_name }}
+                {% if form.full_name.errors %}
+                  <div class="invalid-feedback d-block">{{ form.full_name.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label required">{{ form.professional_title.label }}</label>
+                {{ form.professional_title }}
+                {% if form.professional_title.errors %}
+                  <div class="invalid-feedback d-block">{{ form.professional_title.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label required">{{ form.email.label }}</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                  <div class="invalid-feedback d-block">{{ form.email.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label required">{{ form.phone.label }}</label>
+                {{ form.phone }}
+                {% if form.phone.errors %}
+                  <div class="invalid-feedback d-block">{{ form.phone.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label required">{{ form.city.label }}</label>
+                {{ form.city }}
+                {% if form.city.errors %}
+                  <div class="invalid-feedback d-block">{{ form.city.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">{{ form.state_province.label }}</label>
+                {{ form.state_province }}
+                {% if form.state_province.errors %}
+                  <div class="invalid-feedback d-block">{{ form.state_province.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label required">{{ form.country.label }}</label>
+                {{ form.country }}
+                {% if form.country.errors %}
+                  <div class="invalid-feedback d-block">{{ form.country.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">{{ form.linkedin_url.label }}</label>
+                {{ form.linkedin_url }}
+                {% if form.linkedin_url.errors %}
+                  <div class="invalid-feedback d-block">{{ form.linkedin_url.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">{{ form.portfolio_url.label }}</label>
+                {{ form.portfolio_url }}
+                {% if form.portfolio_url.errors %}
+                  <div class="invalid-feedback d-block">{{ form.portfolio_url.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-12 mb-3">
+                <label class="form-label required">{{ form.professional_summary.label }}</label>
+                {{ form.professional_summary }}
+                <div class="form-text">Write 2-3 sentences summarizing your career goals, core strengths, and key achievements</div>
+                {% if form.professional_summary.errors %}
+                  <div class="invalid-feedback d-block">{{ form.professional_summary.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Education Section -->
+        <div class="form-section">
+          <div class="section-header" onclick="toggleSection('education')">
+            <div class="section-title-group">
+              <i class="fas fa-graduation-cap section-icon"></i>
+              <h3 class="required">Education</h3>
+            </div>
+            <i class="fas fa-chevron-down toggle-icon" id="education-toggle"></i>
+          </div>
+          <div class="section-content" id="education-content">
+            <div id="education-formset">
+              {{ education_formset.management_form }}
+              {% for form in education_formset %}
+                <div class="formset-item" data-formset-item>
+                  {% if not forloop.first %}
+                    <button type="button" class="delete-btn" onclick="removeFormsetItem(this)">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  {% endif %}
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label required">Degree/Certification Name</label>
+                      {{ form.degree_name }}
+                      {% if form.degree_name.errors %}
+                        <div class="invalid-feedback d-block">{{ form.degree_name.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label required">Institution Name</label>
+                      {{ form.institution_name }}
+                      {% if form.institution_name.errors %}
+                        <div class="invalid-feedback d-block">{{ form.institution_name.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label required">Institution City</label>
+                      {{ form.institution_city }}
+                      {% if form.institution_city.errors %}
+                        <div class="invalid-feedback d-block">{{ form.institution_city.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label required">Institution Country</label>
+                      {{ form.institution_country }}
+                      {% if form.institution_country.errors %}
+                        <div class="invalid-feedback d-block">{{ form.institution_country.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label required">Start Date</label>
+                      {{ form.start_date }}
+                      {% if form.start_date.errors %}
+                        <div class="invalid-feedback d-block">{{ form.start_date.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label">End Date</label>
+                      {{ form.end_date }}
+                      {% if form.end_date.errors %}
+                        <div class="invalid-feedback d-block">{{ form.end_date.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="col-md-4 current-checkbox">
+                      <div class="form-check">
+                        {{ form.is_current }}
+                        <label class="form-check-label">Currently enrolled</label>
+                      </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">GPA (optional)</label>
+                      {{ form.gpa }}
+                      {% if form.gpa.errors %}
+                        <div class="invalid-feedback d-block">{{ form.gpa.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="col-12 mb-3">
+                      <label class="form-label">Relevant Coursework/Honors (optional)</label>
+                      {{ form.relevant_coursework }}
+                      {% if form.relevant_coursework.errors %}
+                        <div class="invalid-feedback d-block">{{ form.relevant_coursework.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  {{ form.DELETE }}
+                </div>
+              {% endfor %}
+            </div>
+            <button type="button" class="add-btn" onclick="addFormsetItem('education')">
+              <i class="fas fa-plus"></i> Add Another Education
+            </button>
+          </div>
+        </div>
+
+        <!-- Work Experience Section (Optional) -->
+        <div class="form-section">
+          <div class="section-header" onclick="toggleSection('work')">
+            <div class="section-title-group">
+              <i class="fas fa-briefcase section-icon"></i>
+              <h3>Work Experience (Optional)</h3>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <button type="button" class="add-section-btn" onclick="showOptionalSection('work')">
+                <i class="fas fa-plus"></i> Add Experience
+              </button>
+              <i class="fas fa-chevron-down toggle-icon" id="work-toggle"></i>
+            </div>
+          </div>
+          <div class="section-content optional-section" id="work-content">
+            <div id="work-formset">
+              {{ work_formset.management_form }}
+              {% for form in work_formset %}
+                <div class="formset-item" data-formset-item>
+                  <button type="button" class="delete-btn" onclick="removeFormsetItem(this)">
+                    <i class="fas fa-times"></i>
+                  </button>
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label required">Job Title</label>
+                      {{ form.job_title }}
+                      {% if form.job_title.errors %}
+                        <div class="invalid-feedback d-block">{{ form.job_title.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label required">Company Name</label>
+                      {{ form.company_name }}
+                      {% if form.company_name.errors %}
+                        <div class="invalid-feedback d-block">{{ form.company_name.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label required">Company City</label>
+                      {{ form.company_city }}
+                      {% if form.company_city.errors %}
+                        <div class="invalid-feedback d-block">{{ form.company_city.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label required">Company Country</label>
+                      {{ form.company_country }}
+                      {% if form.company_country.errors %}
+                        <div class="invalid-feedback d-block">{{ form.company_country.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label required">Start Date</label>
+                      {{ form.start_date }}
+                      {% if form.start_date.errors %}
+                        <div class="invalid-feedback d-block">{{ form.start_date.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label">End Date</label>
+                      {{ form.end_date }}
+                      {% if form.end_date.errors %}
+                        <div class="invalid-feedback d-block">{{ form.end_date.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="col-md-4 current-checkbox">
+                      <div class="form-check">
+                        {{ form.is_current }}
+                        <label class="form-check-label">Current position</label>
+                      </div>
+                    </div>
+                    <div class="col-12 mb-3">
+                      <label class="form-label required">Responsibilities & Achievements</label>
+                      {{ form.responsibilities }}
+                      <div class="form-text">Enter 3-5 bullet points describing key accomplishments, technologies used, and metrics</div>
+                      {% if form.responsibilities.errors %}
+                        <div class="invalid-feedback d-block">{{ form.responsibilities.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  {{ form.DELETE }}
+                </div>
+              {% endfor %}
+            </div>
+            <button type="button" class="add-btn" onclick="addFormsetItem('work')">
+              <i class="fas fa-plus"></i> Add Another Position
+            </button>
+          </div>
+        </div>
+
+        <!-- Projects Section (Optional) -->
+        <div class="form-section">
+          <div class="section-header" onclick="toggleSection('projects')">
+            <div class="section-title-group">
+              <i class="fas fa-project-diagram section-icon"></i>
+              <h3>Projects (Optional)</h3>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <button type="button" class="add-section-btn" onclick="showOptionalSection('projects')">
+                <i class="fas fa-plus"></i> Add Project
+              </button>
+              <i class="fas fa-chevron-down toggle-icon" id="projects-toggle"></i>
+            </div>
+          </div>
+          <div class="section-content optional-section" id="projects-content">
+            <div id="projects-formset">
+              {{ project_formset.management_form }}
+              {% for form in project_formset %}
+                <div class="formset-item" data-formset-item>
+                  <button type="button" class="delete-btn" onclick="removeFormsetItem(this)">
+                    <i class="fas fa-times"></i>
+                  </button>
+                  <div class="row">
+                    <div class="col-md-8 mb-3">
+                      <label class="form-label required">Project Title</label>
+                      {{ form.title }}
+                      {% if form.title.errors %}
+                        <div class="invalid-feedback d-block">{{ form.title.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label required">Your Role</label>
+                      {{ form.role }}
+                      {% if form.role.errors %}
+                        <div class="invalid-feedback d-block">{{ form.role.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label required">Start Date</label>
+                      {{ form.start_date }}
+                      {% if form.start_date.errors %}
+                        <div class="invalid-feedback d-block">{{ form.start_date.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label">End Date</label>
+                      {{ form.end_date }}
+                      {% if form.end_date.errors %}
+                        <div class="invalid-feedback d-block">{{ form.end_date.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="col-md-4 current-checkbox">
+                      <div class="form-check">
+                        {{ form.is_ongoing }}
+                        <label class="form-check-label">Ongoing project</label>
+                      </div>
+                    </div>
+                    <div class="col-12 mb-3">
+                      <label class="form-label required">Description</label>
+                      {{ form.description }}
+                      <div class="form-text">Describe objectives, technologies used, and outcomes/impact</div>
+                      {% if form.description.errors %}
+                        <div class="invalid-feedback d-block">{{ form.description.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="col-12 mb-3">
+                      <label class="form-label">Demo/Repository URL (optional)</label>
+                      {{ form.demo_url }}
+                      {% if form.demo_url.errors %}
+                        <div class="invalid-feedback d-block">{{ form.demo_url.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  {{ form.DELETE }}
+                </div>
+              {% endfor %}
+            </div>
+            <button type="button" class="add-btn" onclick="addFormsetItem('projects')">
+              <i class="fas fa-plus"></i> Add Another Project
+            </button>
+          </div>
+        </div>
+
+        <!-- Skills Section -->
+        <div class="form-section">
+          <div class="section-header" onclick="toggleSection('skills')">
+            <div class="section-title-group">
+              <i class="fas fa-cogs section-icon"></i>
+              <h3 class="required">Skills</h3>
+            </div>
+            <i class="fas fa-chevron-down toggle-icon" id="skills-toggle"></i>
+          </div>
+          <div class="section-content" id="skills-content">
+            <div id="skills-formset">
+              {{ skill_formset.management_form }}
+              <div class="row">
+                {% for form in skill_formset %}
+                  <div class="col-md-6 mb-3 formset-item-inline" data-formset-item>
+                    <div class="d-flex gap-2 align-items-end">
+                      <div class="flex-grow-1">
+                        <label class="form-label required">{{ form.skill_type.label }}</label>
+                        {{ form.skill_type }}
+                        {% if form.skill_type.errors %}
+                          <div class="invalid-feedback d-block">{{ form.skill_type.errors.0 }}</div>
+                        {% endif %}
+                      </div>
+                      <div class="flex-grow-1">
+                        <label class="form-label required">Skill Name</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                          <div class="invalid-feedback d-block">{{ form.name.errors.0 }}</div>
+                        {% endif %}
+                      </div>
+                      <div class="flex-grow-1">
+                        <label class="form-label required">Proficiency</label>
+                        {{ form.proficiency }}
+                        {% if form.proficiency.errors %}
+                          <div class="invalid-feedback d-block">{{ form.proficiency.errors.0 }}</div>
+                        {% endif %}
+                      </div>
+                      {% if not forloop.first and not forloop.second and not forloop.counter == 3 %}
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeFormsetItem(this)">
+                          <i class="fas fa-times"></i>
+                        </button>
+                      {% endif %}
+                    </div>
+                    {{ form.DELETE }}
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+            <button type="button" class="add-btn" onclick="addFormsetItem('skills')">
+              <i class="fas fa-plus"></i> Add Another Skill
+            </button>
+          </div>
+        </div>
+
+        <!-- Certifications Section (Optional) -->
+        <div class="form-section">
+          <div class="section-header" onclick="toggleSection('certifications')">
+            <div class="section-title-group">
+              <i class="fas fa-certificate section-icon"></i>
+              <h3>Certifications (Optional)</h3>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <button type="button" class="add-section-btn" onclick="showOptionalSection('certifications')">
+                <i class="fas fa-plus"></i> Add Certification
+              </button>
+              <i class="fas fa-chevron-down toggle-icon" id="certifications-toggle"></i>
+            </div>
+          </div>
+          <div class="section-content optional-section" id="certifications-content">
+            <div id="certifications-formset">
+              {{ cert_formset.management_form }}
+              {% for form in cert_formset %}
+                <div class="formset-item" data-formset-item>
+                  <button type="button" class="delete-btn" onclick="removeFormsetItem(this)">
+                    <i class="fas fa-times"></i>
+                  </button>
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label required">Certification Name</label>
+                      {{ form.name }}
+                      {% if form.name.errors %}
+                        <div class="invalid-feedback d-block">{{ form.name.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label required">Issuing Organization</label>
+                      {{ form.issuing_organization }}
+                      {% if form.issuing_organization.errors %}
+                        <div class="invalid-feedback d-block">{{ form.issuing_organization.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label required">Date Obtained</label>
+                      {{ form.date_obtained }}
+                      {% if form.date_obtained.errors %}
+                        <div class="invalid-feedback d-block">{{ form.date_obtained.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Expiration Date (optional)</label>
+                      {{ form.expiration_date }}
+                      {% if form.expiration_date.errors %}
+                        <div class="invalid-feedback d-block">{{ form.expiration_date.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  {{ form.DELETE }}
+                </div>
+              {% endfor %}
+            </div>
+            <button type="button" class="add-btn" onclick="addFormsetItem('certifications')">
+              <i class="fas fa-plus"></i> Add Another Certification
+            </button>
+          </div>
+        </div>
+
+        <!-- Languages Section (Optional) -->
+        <div class="form-section">
+          <div class="section-header" onclick="toggleSection('languages')">
+            <div class="section-title-group">
+              <i class="fas fa-language section-icon"></i>
+              <h3>Languages (Optional)</h3>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <button type="button" class="add-section-btn" onclick="showOptionalSection('languages')">
+                <i class="fas fa-plus"></i> Add Language
+              </button>
+              <i class="fas fa-chevron-down toggle-icon" id="languages-toggle"></i>
+            </div>
+          </div>
+          <div class="section-content optional-section" id="languages-content">
+            <div id="languages-formset">
+              {{ lang_formset.management_form }}
+              <div class="row">
+                {% for form in lang_formset %}
+                  <div class="col-md-6 mb-3 formset-item-inline" data-formset-item>
+                    <div class="d-flex gap-2 align-items-end">
+                      <div class="flex-grow-1">
+                        <label class="form-label required">Language</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                          <div class="invalid-feedback d-block">{{ form.name.errors.0 }}</div>
+                        {% endif %}
+                      </div>
+                      <div class="flex-grow-1">
+                        <label class="form-label required">Proficiency</label>
+                        {{ form.proficiency }}
+                        {% if form.proficiency.errors %}
+                          <div class="invalid-feedback d-block">{{ form.proficiency.errors.0 }}</div>
+                        {% endif %}
+                      </div>
+                      <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeFormsetItem(this)">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                    {{ form.DELETE }}
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+            <button type="button" class="add-btn" onclick="addFormsetItem('languages')">
+              <i class="fas fa-plus"></i> Add Another Language
+            </button>
+          </div>
+        </div>
+
+        <!-- Submit Section -->
+        <div class="form-section text-center">
+          <button type="submit" class="btn btn-primary btn-lg">
+            <i class="fas fa-save"></i> Save & Preview Resume
+          </button>
+          <div class="mt-3">
+            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+              <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Section toggle functionality
+    function toggleSection(sectionId) {
+      const content = document.getElementById(sectionId + '-content');
+      const toggle = document.getElementById(sectionId + '-toggle');
+      const header = document.querySelector(`[onclick="toggleSection('${sectionId}')"]`);
+      
+      content.classList.toggle('collapsed');
+      header.classList.toggle('collapsed');
+      
+      if (content.classList.contains('collapsed')) {
+        content.style.maxHeight = '0';
+        toggle.style.transform = 'rotate(-90deg)';
+      } else {
+        content.style.maxHeight = content.scrollHeight + 'px';
+        toggle.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    // Show optional sections
+    function showOptionalSection(sectionId) {
+      const content = document.getElementById(sectionId + '-content');
+      const button = event.target.closest('.add-section-btn');
+      
+      content.classList.add('show');
+      button.style.display = 'none';
+      
+      // Add first form if none exist
+      if (content.querySelectorAll('[data-formset-item]').length === 0) {
+        addFormsetItem(sectionId);
+      }
+    }
+
+    // Formset management JavaScript
+    function updateFormsetIndices(formsetPrefix) {
+      const formset = document.getElementById(formsetPrefix + '-formset');
+      const items = formset.querySelectorAll('[data-formset-item]');
+      const totalForms = document.getElementById('id_' + formsetPrefix + '-TOTAL_FORMS');
+      
+      items.forEach((item, index) => {
+        const inputs = item.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+          if (input.name) {
+            input.name = input.name.replace(/\d+/, index);
+            if (input.id) {
+              input.id = input.id.replace(/\d+/, index);
+            }
+          }
+        });
+        
+        const labels = item.querySelectorAll('label');
+        labels.forEach(label => {
+          if (label.getAttribute('for')) {
+            label.setAttribute('for', label.getAttribute('for').replace(/\d+/, index));
+          }
+        });
+      });
+      
+      totalForms.value = items.length;
+    }
+
+    function addFormsetItem(formsetPrefix) {
+      const formset = document.getElementById(formsetPrefix + '-formset');
+      const lastItem = formset.querySelector('[data-formset-item]:last-child');
+      
+      if (!lastItem) {
+        console.error('No existing form to clone');
+        return;
+      }
+      
+      const emptyForm = lastItem.cloneNode(true);
+      
+      // Clear values
+      const inputs = emptyForm.querySelectorAll('input, select, textarea');
+      inputs.forEach(input => {
+        if (input.type === 'checkbox') {
+          input.checked = false;
+        } else {
+          input.value = '';
+        }
+        
+        // Remove error classes
+        input.classList.remove('is-invalid', 'is-valid');
+      });
+      
+      // Remove errors
+      const errors = emptyForm.querySelectorAll('.invalid-feedback');
+      errors.forEach(error => error.remove());
+      
+      // Ensure delete button is visible
+      const deleteBtn = emptyForm.querySelector('.delete-btn');
+      if (deleteBtn) {
+        deleteBtn.style.display = 'flex';
+      }
+      
+      formset.appendChild(emptyForm);
+      updateFormsetIndices(formsetPrefix);
+    }
+
+    function removeFormsetItem(button) {
+      const item = button.closest('[data-formset-item]');
+      const formset = item.closest('[id$="-formset"]');
+      const formsetPrefix = formset.id.replace('-formset', '');
+      
+      // Check if this is the only item in required formsets
+      const items = formset.querySelectorAll('[data-formset-item]');
+      if (['education', 'skills'].includes(formsetPrefix) && items.length <= 1) {
+        alert('At least one entry is required for this section.');
+        return;
+      }
+      
+      // Mark for deletion if it has an ID (existing item)
+      const deleteInput = item.querySelector('input[name$="-DELETE"]');
+      if (deleteInput) {
+        deleteInput.checked = true;
+        item.style.display = 'none';
+      } else {
+        item.remove();
+      }
+      
+      updateFormsetIndices(formsetPrefix);
+    }
+
+    // Handle current position/enrollment checkboxes
+    document.addEventListener('change', function(e) {
+      if (e.target.name && e.target.name.includes('is_current')) {
+        const endDateField = e.target.closest('.formset-item').querySelector('input[name*="end_date"]');
+        if (endDateField) {
+          endDateField.disabled = e.target.checked;
+          if (e.target.checked) {
+            endDateField.value = '';
+          }
+        }
+      }
+    });
+
+    // Form validation
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('manualResumeForm');
+      const inputs = form.querySelectorAll('input, select, textarea');
+      
+      // Add validation classes based on errors
+      inputs.forEach(input => {
+        const errorDiv = input.parentElement.querySelector('.invalid-feedback');
+        if (errorDiv) {
+          input.classList.add('is-invalid');
+        }
+        
+        // Real-time validation
+        input.addEventListener('blur', function() {
+          validateField(this);
+        });
+        
+        input.addEventListener('input', function() {
+          if (this.classList.contains('is-invalid')) {
+            validateField(this);
+          }
+        });
+      });
+    });
+
+    function validateField(field) {
+      const value = field.value.trim();
+      const isRequired = field.hasAttribute('required');
+      
+      // Remove existing validation classes
+      field.classList.remove('is-invalid', 'is-valid');
+      
+      // Check if field is required and empty
+      if (isRequired && !value) {
+        field.classList.add('is-invalid');
+        return false;
+      }
+      
+      // Email validation
+      if (field.type === 'email' && value) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) {
+          field.classList.add('is-invalid');
+          return false;
+        }
+      }
+      
+      // URL validation
+      if (field.type === 'url' && value) {
+        try {
+          new URL(value);
+        } catch {
+          field.classList.add('is-invalid');
+          return false;
+        }
+      }
+      
+      if (value) {
+        field.classList.add('is-valid');
+      }
+      
+      return true;
+    }
+
+    // Initialize sections - collapse optional sections by default
+    document.addEventListener('DOMContentLoaded', function() {
+      const optionalSections = ['work', 'projects', 'certifications', 'languages'];
+      optionalSections.forEach(sectionId => {
+        const content = document.getElementById(sectionId + '-content');
+        if (content && !content.querySelector('[data-formset-item]')) {
+          content.classList.add('collapsed');
+          content.style.maxHeight = '0';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!-- templates/emails/first_resume_notification.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New User First Resume Upload</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .email-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #3F72AF, #112D4E);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .header p {
+            margin: 10px 0 0;
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #3F72AF;
+            background: #f8f9fa;
+        }
+        .section h2 {
+            color: #112D4E;
+            margin: 0 0 15px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .info-item {
+            background: white;
+            padding: 12px;
+            border-radius: 5px;
+            border: 1px solid #e9ecef;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #3F72AF;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .info-value {
+            color: #112D4E;
+            font-size: 15px;
+        }
+        .highlight {
+            background: linear-gradient(135deg, #112D4E, #3F72AF);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .highlight h3 {
+            margin: 0 0 10px;
+            font-size: 18px;
+        }
+        .file-info {
+            background: #e8f4fd;
+            border: 1px solid #b8daff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #dee2e6;
+            text-align: center;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .timestamp {
+            color: #6c757d;
+            font-size: 13px;
+            font-style: italic;
+        }
+        @media (max-width: 600px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>🎯 New User First Resume Upload</h1>
+            <p>A new user has uploaded their first resume to the platform</p>
+        </div>
+
+        <div class="content">
+            <!-- User Information Section -->
+            <div class="section">
+                <h2>👤 User Information</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Username</div>
+                        <div class="info-value">{{ user.username }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Email</div>
+                        <div class="info-value">{{ user.email }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Date Joined</div>
+                        <div class="info-value">{{ user_info.date_joined|date:"F d, Y H:i" }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Last Login</div>
+                        <div class="info-value">
+                            {% if user_info.last_login %}
+                                {{ user_info.last_login|date:"F d, Y H:i" }}
+                            {% else %}
+                                First login
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Signup Form Details Section -->
+            <div class="section">
+                <h2>📝 Signup Form Details</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Phone Number</div>
+                        <div class="info-value">{{ signup_data.full_phone }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">City</div>
+                        <div class="info-value">{{ signup_data.city }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Country</div>
+                        <div class="info-value">{{ signup_data.country }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Signup Time</div>
+                        <div class="info-value">
+                            {% if signup_data.signup_time %}
+                                {{ signup_data.signup_time|slice:":19" }}
+                            {% else %}
+                                {{ user_info.date_joined|date:"F d, Y H:i" }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                {% if signup_data.country_code %}
+                <div class="info-item" style="margin-top: 15px;">
+                    <div class="info-label">Country Code</div>
+                    <div class="info-value">{{ signup_data.country_code }}</div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Resume Upload Information -->
+            <div class="section">
+                <h2>📄 Resume Upload Details</h2>
+                <div class="file-info">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Filename</div>
+                            <div class="info-value">{{ resume_filename }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">File Size</div>
+                            <div class="info-value">
+                                {% if resume_file_size %}
+                                    {{ resume_file_size|filesizeformat }}
+                                {% else %}
+                                    Unknown
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Upload Time</div>
+                            <div class="info-value">{{ upload_time|date:"F d, Y H:i:s" }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Time Zone</div>
+                            <div class="info-value">{{ upload_time|date:"T" }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Status -->
+            <div class="highlight">
+                <h3>Account Status</h3>
+                <p>
+                    <strong>Status:</strong> 
+                    {% if user_info.is_active %}✅ Active{% else %}❌ Inactive{% endif %}
+                    {% if user_info.is_staff %} | 👑 Staff Member{% endif %}
+                </p>
+                <p style="margin: 10px 0 0; font-size: 14px; opacity: 0.9;">
+                    This is the user's <strong>FIRST RESUME UPLOAD</strong> - they are a new user to the platform!
+                </p>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="section">
+                <h2>🚀 Quick Actions</h2>
+                <p>You can take the following actions:</p>
+                <ul style="margin: 15px 0; padding-left: 20px; color: #495057;">
+                    <li>Check the attached resume file for quality</li>
+                    <li>Review user's signup information for completeness</li>
+                    <li>Send welcome email if needed</li>
+                    <li>Monitor user's activity for engagement</li>
+                    <li>Contact user if assistance is needed: <a href="mailto:{{ user.email }}" style="color: #3F72AF;">{{ user.email }}</a></li>
+                </ul>
+            </div>
+
+            <!-- Additional Information -->
+            {% if profile %}
+            <div class="section">
+                <h2>👤 Additional Profile Information</h2>
+                <div class="info-grid">
+                    <!-- Add any additional profile fields here if available -->
+                    <div class="info-item">
+                        <div class="info-label">Profile Status</div>
+                        <div class="info-value">{% if profile %}Profile Created{% else %}No Profile{% endif %}</div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="footer">
+            <p><strong>ATS Resume Optimizer Platform</strong></p>
+            <p>Admin notification sent to: {{ admin_email }}</p>
+            <p class="timestamp">Generated on {{ upload_time|date:"F d, Y \a\t H:i:s T" }}</p>
+        </div>
+    </div>
+</body>
+</html>

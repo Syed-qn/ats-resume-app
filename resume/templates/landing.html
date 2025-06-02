@@ -1,0 +1,910 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>ATS Resume Optimizer & Job Application Service</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #DBE2EF 0%, #F9F7F7 100%);
+      color: #112D4E;
+      line-height: 1.6;
+    }
+    
+    /* WhatsApp Float Button - Task 12: RIGHT SIDE */
+    .whatsapp-float {
+      position: fixed;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3);
+      z-index: 1000;
+      transition: all 0.3s ease;
+      animation: pulse 2s infinite;
+      text-decoration: none;
+    }
+    .whatsapp-float:hover {
+      transform: translateY(-50%) scale(1.1);
+      box-shadow: 0 12px 35px rgba(37, 211, 102, 0.5);
+    }
+    .whatsapp-float i {
+      color: white;
+      font-size: 24px;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3); }
+      50% { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.6), 0 0 0 10px rgba(37, 211, 102, 0.1); }
+      100% { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3); }
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #3F72AF, #112D4E);
+      color: #F9F7F7;
+      padding: 100px 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/></svg>') repeat;
+      animation: float 20s infinite linear;
+    }
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-100px); }
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+    }
+    .hero h1 {
+      font-size: 3.8rem;
+      margin-bottom: 20px;
+      font-weight: 800;
+      text-shadow: 0 2px 4px rgba(17,45,78,0.3);
+    }
+    .hero-subtitle {
+      font-size: 1.4rem;
+      margin-bottom: 40px;
+      opacity: 0.95;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 40px;
+      flex-wrap: wrap;
+    }
+    .cta {
+      display: inline-block;
+      background: linear-gradient(135deg, #F9F7F7, #DBE2EF);
+      color: #112D4E;
+      padding: 18px 40px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(17,45,78,0.2);
+    }
+    .cta:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(17,45,78,0.3);
+      color: #112D4E;
+    }
+    .cta-secondary {
+      background: transparent;
+      color: #F9F7F7;
+      border: 2px solid #F9F7F7;
+    }
+    .cta-secondary:hover {
+      background: #F9F7F7;
+      color: #112D4E;
+    }
+
+    /* ATS Explanation Section */
+    .ats-explanation {
+      padding: 100px 0;
+      background: #F9F7F7;
+    }
+    .section-header {
+      text-align: center;
+      margin-bottom: 80px;
+    }
+    .section-title {
+      font-size: 3rem;
+      color: #112D4E;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+    .section-subtitle {
+      font-size: 1.3rem;
+      color: #3F72AF;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    
+    .ats-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 40px;
+      margin-top: 60px;
+    }
+    
+    .ats-card {
+      background: linear-gradient(135deg, #DBE2EF, #F9F7F7);
+      padding: 40px 30px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 15px 40px rgba(17,45,78,0.1);
+      border: 1px solid #DBE2EF;
+      transition: all 0.4s ease;
+    }
+    
+    .ats-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 25px 60px rgba(17,45,78,0.2);
+    }
+    
+    .ats-icon {
+      font-size: 3.5rem;
+      color: #3F72AF;
+      margin-bottom: 25px;
+    }
+    
+    .ats-title {
+      font-size: 1.8rem;
+      color: #112D4E;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+    
+    .ats-description {
+      color: #3F72AF;
+      font-size: 1.1rem;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+    
+    .ats-stats {
+      background: #112D4E;
+      color: #F9F7F7;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+    
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #DBE2EF;
+    }
+    
+    .stat-label {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    /* Problem-Solution Section */
+    .problem-solution {
+      padding: 100px 0;
+      background: linear-gradient(135deg, #112D4E, #3F72AF);
+      color: #F9F7F7;
+    }
+    
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      margin-top: 60px;
+    }
+    
+    .problem-card, .solution-card {
+      padding: 40px;
+      border-radius: 20px;
+      position: relative;
+    }
+    
+    .problem-card {
+      background: rgba(249, 247, 247, 0.1);
+      border: 2px solid rgba(219, 226, 239, 0.3);
+    }
+    
+    .solution-card {
+      background: linear-gradient(135deg, #3F72AF, #112D4E);
+      border: 2px solid #DBE2EF;
+    }
+    
+    .card-icon {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+    
+    .problem-card .card-icon {
+      color: #DBE2EF;
+    }
+    
+    .solution-card .card-icon {
+      color: #F9F7F7;
+    }
+    
+    .card-title {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+    
+    .card-list {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .card-list li {
+      margin-bottom: 15px;
+      padding-left: 30px;
+      position: relative;
+      font-size: 1.1rem;
+    }
+    
+    .problem-card .card-list li::before {
+      content: '✗';
+      position: absolute;
+      left: 0;
+      color: #DBE2EF;
+      font-weight: bold;
+      font-size: 1.3rem;
+    }
+    
+    .solution-card .card-list li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: #F9F7F7;
+      font-weight: bold;
+      font-size: 1.3rem;
+    }
+
+    /* Services Section */
+    .services-section {
+      padding: 100px 0;
+      background: #F9F7F7;
+    }
+    
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 60px;
+      margin-top: 80px;
+    }
+    .service-card {
+      background: linear-gradient(135deg, #DBE2EF, #F9F7F7);
+      padding: 50px 40px;
+      border-radius: 25px;
+      text-align: center;
+      box-shadow: 0 15px 40px rgba(17,45,78,0.1);
+      border: 1px solid #DBE2EF;
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(63,114,175,0.1), transparent);
+      transform: rotate(45deg);
+      transition: all 0.6s ease;
+      opacity: 0;
+    }
+    .service-card:hover::before {
+      animation: shimmer 1.5s ease-in-out;
+    }
+    @keyframes shimmer {
+      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: translateX(100%) translateY(100%) rotate(45deg); opacity: 0; }
+    }
+    .service-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 25px 60px rgba(17,45,78,0.2);
+      border-color: #3F72AF;
+    }
+    .service-icon {
+      font-size: 4rem;
+      color: #3F72AF;
+      margin-bottom: 30px;
+      position: relative;
+      z-index: 2;
+    }
+    .service-title {
+      font-size: 2rem;
+      color: #112D4E;
+      margin-bottom: 20px;
+      font-weight: 700;
+      position: relative;
+      z-index: 2;
+    }
+    .service-description {
+      color: #3F72AF;
+      font-size: 1.1rem;
+      line-height: 1.7;
+      margin-bottom: 30px;
+      position: relative;
+      z-index: 2;
+    }
+    .service-features {
+      list-style: none;
+      text-align: left;
+      margin: 30px 0;
+      position: relative;
+      z-index: 2;
+    }
+    .service-features li {
+      color: #112D4E;
+      margin-bottom: 12px;
+      font-size: 1rem;
+      position: relative;
+      padding-left: 25px;
+    }
+    .service-features li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: #3F72AF;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+    .service-btn {
+      background: linear-gradient(135deg, #3F72AF, #112D4E);
+      color: #F9F7F7;
+      padding: 15px 35px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+      z-index: 2;
+    }
+    .service-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(63,114,175,0.4);
+      color: #F9F7F7;
+    }
+
+    /* Job Application Service Specific */
+    .job-service {
+      background: linear-gradient(135deg, #112D4E, #3F72AF);
+      color: #F9F7F7;
+    }
+    .job-service .service-title,
+    .job-service .service-features li {
+      color: #F9F7F7;
+    }
+    .job-service .service-description {
+      color: #DBE2EF;
+    }
+    .job-service .service-features li::before {
+      color: #DBE2EF;
+    }
+    .job-service .service-btn {
+      background: linear-gradient(135deg, #F9F7F7, #DBE2EF);
+      color: #112D4E;
+    }
+    .job-service .service-btn:hover {
+      background: linear-gradient(135deg, #DBE2EF, #F9F7F7);
+      color: #112D4E;
+    }
+
+    /* How It Works */
+    .how-it-works {
+      padding: 100px 0;
+      background: linear-gradient(135deg, #DBE2EF, #F9F7F7);
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 40px;
+      margin-top: 60px;
+    }
+    .step {
+      text-align: center;
+      position: relative;
+      padding: 30px 20px;
+    }
+    .step-number {
+      background: linear-gradient(135deg, #3F72AF, #112D4E);
+      color: #F9F7F7;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin: 0 auto 25px;
+      box-shadow: 0 8px 20px rgba(63,114,175,0.3);
+    }
+    .step-title {
+      font-size: 1.4rem;
+      color: #112D4E;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+    .step-description {
+      color: #3F72AF;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    /* Stats Section */
+    .stats-section {
+      background: linear-gradient(135deg, #112D4E, #3F72AF);
+      color: #F9F7F7;
+      padding: 80px 0;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 40px;
+      text-align: center;
+    }
+    .stat {
+      padding: 20px;
+    }
+    .stat-number {
+      font-size: 3.5rem;
+      font-weight: 700;
+      color: #DBE2EF;
+      margin-bottom: 10px;
+    }
+    .stat-label {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    /* Footer CTA */
+    .footer-cta {
+      background: #F9F7F7;
+      padding: 80px 0;
+      text-align: center;
+    }
+    .footer-content h2 {
+      font-size: 2.5rem;
+      color: #112D4E;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+    .footer-content p {
+      font-size: 1.2rem;
+      color: #3F72AF;
+      margin-bottom: 40px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .footer-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .footer-btn {
+      padding: 18px 40px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .footer-btn.primary {
+      background: linear-gradient(135deg, #3F72AF, #112D4E);
+      color: #F9F7F7;
+    }
+    .footer-btn.secondary {
+      background: transparent;
+      color: #3F72AF;
+      border: 2px solid #3F72AF;
+    }
+    .footer-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(63,114,175,0.3);
+    }
+    .footer-btn.primary:hover {
+      color: #F9F7F7;
+    }
+    .footer-btn.secondary:hover {
+      background: #3F72AF;
+      color: #F9F7F7;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2.8rem;
+      }
+      .hero-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+      .services-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      .service-card {
+        padding: 40px 30px;
+      }
+      .section-title {
+        font-size: 2.2rem;
+      }
+      .whatsapp-float {
+        width: 50px;
+        height: 50px;
+        right: 15px;
+      }
+      .whatsapp-float i {
+        font-size: 20px;
+      }
+      .problem-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      .ats-content {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Task 13: Navigation Component -->
+  {% include 'components/navigation.html' %}
+
+  <!-- Task 12: WhatsApp Float Button - RIGHT SIDE -->
+  <a href="https://wa.me/916303858671?text=Hi! I'm interested in your job application service. Can you provide more details about pricing and process?" 
+     class="whatsapp-float" target="_blank" rel="noopener">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <h1><i class="fas fa-rocket"></i> Your Career Success Partner</h1>
+        <p class="hero-subtitle">
+          We don't just optimize your resume – we get you hired! Choose from our AI-powered resume optimization 
+          or let our experts handle your entire job application process while you focus on interview prep.
+        </p>
+        
+        <div class="hero-buttons">
+          <a href="{% url 'signup' %}" class="cta">
+            <i class="fas fa-user-plus"></i> Start Free Resume Tool
+          </a>
+          <a href="https://wa.me/916303858671?text=Hi! I'm interested in your job application service. Can you provide more details about pricing and process?" 
+             class="cta cta-secondary" target="_blank">
+            <i class="fas fa-handshake"></i> Get Jobs Applied For Me <u>3-Days Free Trail</u>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ATS Explanation Section -->
+  <section class="ats-explanation">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Understanding ATS: The Hidden Job Market Filter</h2>
+        <p class="section-subtitle">
+          Learn why 98% of Fortune 500 companies use Applicant Tracking Systems 
+          and how they impact your job search success
+        </p>
+      </div>
+      
+      <div class="ats-content">
+        <div class="ats-card">
+          <div class="ats-icon">
+            <i class="fas fa-robot"></i>
+          </div>
+          <h3 class="ats-title">What is an ATS?</h3>
+          <p class="ats-description">
+            An Applicant Tracking System (ATS) is software that automatically scans, 
+            parses, and ranks resumes before any human recruiter sees them. It looks 
+            for specific keywords, formatting, and job-relevant information.
+          </p>
+          <div class="ats-stats">
+            <div class="stat-number">98%</div>
+            <div class="stat-label">of Fortune 500 companies use ATS</div>
+          </div>
+        </div>
+
+        <div class="ats-card">
+          <div class="ats-icon">
+            <i class="fas fa-filter"></i>
+          </div>
+          <h3 class="ats-title">The Filtering Process</h3>
+          <p class="ats-description">
+            ATS systems automatically reject 75% of resumes within seconds based on 
+            keyword matching, formatting issues, and missing requirements. Only 
+            the top-ranking resumes reach human recruiters.
+          </p>
+          <div class="ats-stats">
+            <div class="stat-number">75%</div>
+            <div class="stat-label">of resumes never reach human eyes</div>
+          </div>
+        </div>
+
+        <div class="ats-card">
+          <div class="ats-icon">
+            <i class="fas fa-search"></i>
+          </div>
+          <h3 class="ats-title">Keyword Scanning</h3>
+          <p class="ats-description">
+            ATS software scans for exact keyword matches from the job description. 
+            Missing key terms means automatic rejection, even if you're perfectly 
+            qualified for the position.
+          </p>
+          <div class="ats-stats">
+            <div class="stat-number">6 sec</div>
+            <div class="stat-label">average time ATS spends on each resume</div>
+          </div>
+        </div>
+
+        <div class="ats-card">
+          <div class="ats-icon">
+            <i class="fas fa-file-code"></i>
+          </div>
+          <h3 class="ats-title">Format Requirements</h3>
+          <p class="ats-description">
+            ATS systems struggle with creative layouts, graphics, tables, and 
+            non-standard fonts. Clean, simple formatting with standard headings 
+            ensures proper parsing and higher compatibility scores.
+          </p>
+          <div class="ats-stats">
+            <div class="stat-number">43%</div>
+            <div class="stat-label">of resumes fail due to formatting issues</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problem-Solution Section -->
+  <section class="problem-solution">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title" style="color: #F9F7F7;">The ATS Challenge vs Our Solution</h2>
+        <p class="section-subtitle" style="color: #DBE2EF;">
+          See how traditional resumes fail ATS systems and how our AI-powered 
+          optimization solves these critical issues
+        </p>
+      </div>
+      
+      <div class="problem-grid">
+        <div class="problem-card">
+          <div class="card-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+          </div>
+          <h3 class="card-title">Common ATS Problems</h3>
+          <ul class="card-list">
+            <li>Generic resumes missing job-specific keywords</li>
+            <li>Poor formatting that ATS can't read properly</li>
+            <li>Missing industry terminology and buzzwords</li>
+            <li>Inadequate skills section optimization</li>
+            <li>Wrong section headings and structure</li>
+            <li>No quantified achievements or metrics</li>
+            <li>Template designs that confuse ATS parsers</li>
+          </ul>
+        </div>
+
+        <div class="solution-card">
+          <div class="card-icon">
+            <i class="fas fa-magic"></i>
+          </div>
+          <h3 class="card-title">Our AI Solution</h3>
+          <ul class="card-list">
+            <li>AI extracts exact keywords from job descriptions</li>
+            <li>University-approved, ATS-compatible templates</li>
+            <li>Automatic industry terminology integration</li>
+            <li>Intelligent skills section optimization</li>
+            <li>Standard ATS-friendly section structure</li>
+            <li>Achievement quantification suggestions</li>
+            <li>Real-time ATS compatibility scoring</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Section -->
+  <section class="services-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Two Ways to Beat the ATS</h2>
+        <p class="section-subtitle">
+          Whether you prefer a DIY approach or want our experts to handle everything, 
+          we have the perfect solution for your career goals.
+        </p>
+      </div>
+      
+      <div class="services-grid">
+        <!-- ATS Resume Optimizer -->
+        <div class="service-card">
+          <div class="service-icon">
+            <i class="fas fa-file-alt"></i>
+          </div>
+          <h3 class="service-title">AI Resume Optimizer</h3>
+          <p class="service-description">
+            Transform your resume with AI-powered optimization that beats ATS systems 
+            and gets you past the first screening every time.
+          </p>
+          <ul class="service-features">
+            <li>AI analyzes job descriptions for exact keyword matches</li>
+            <li>University-approved templates (Harvard, MIT, Stanford)</li>
+            <li>Real-time ATS compatibility scoring</li>
+            <li>Manual resume builder with guided forms</li>
+          </ul>
+          <a href="{% url 'signup' %}" class="service-btn">
+            <i class="fas fa-play"></i> Start Optimizing Now
+          </a>
+        </div>
+
+        <!-- Job Application Service -->
+        <div class="service-card job-service">
+          <div class="service-icon">
+            <i class="fas fa-handshake"></i>
+          </div>
+          <h3 class="service-title">Done-For-You Job Applications</h3>
+          <p class="service-description">
+            Sit back and relax while our experts apply to hundreds of relevant jobs on your behalf. 
+            You focus on interview prep, we handle the rest.
+          </p>
+          <ul class="service-features">
+            <li>Personal consultation to understand your profile</li>
+            <li>We apply to 50+ jobs per day for you</li>
+            <li>Custom cover letters for each application</li>
+            <li>Interview scheduling and coordination</li>
+            <li>Daily updates</li>
+          </ul>
+          <a href="https://wa.me/916303858671?text=Hi! I'm interested in your job application service. Can you provide more details about pricing and process?" 
+             class="service-btn" target="_blank">
+            <i class="fab fa-whatsapp"></i> Get Started on WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">How Our Job Application Service Works</h2>
+        <p class="section-subtitle">
+          A simple 4-step process that gets you interviews while you sleep
+        </p>
+      </div>
+      
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <h3 class="step-title">Discovery Call</h3>
+          <p class="step-description">
+            We have a detailed video/phone call to understand your background, 
+            desired roles, salary expectations, and target companies.
+          </p>
+        </div>
+        
+        <div class="step">
+          <div class="step-number">2</div>
+          <h3 class="step-title">Setup & Access</h3>
+          <p class="step-description">
+            You provide job board credentials (LinkedIn, Indeed, etc.) and we set up 
+            your optimized profiles and application strategy.
+          </p>
+        </div>
+        
+        <div class="step">
+          <div class="step-number">3</div>
+          <h3 class="step-title">We Apply For You</h3>
+          <p class="step-description">
+            Our team applies to 50+ relevant positions Daily 
+            while you focus on interview preparation.
+          </p>
+        </div>
+        
+        <div class="step">
+          <div class="step-number">4</div>
+          <h3 class="step-title">Interview Coordination</h3>
+          <p class="step-description">
+            Stay active on email for interview invitations. We coordinate schedules 
+            and provide Daily updates.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats-section">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat">
+          <div class="stat-number">92%</div>
+          <div class="stat-label">ATS Pass Rate</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">350+</div>
+          <div class="stat-label">Jobs Applied Weekly</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">15 Days</div>
+          <div class="stat-label">Average Response Time</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer CTA -->
+  <section class="footer-cta">
+    <div class="container">
+      <div class="footer-content">
+        <h2>Ready to Accelerate Your Career?</h2>
+        <p>Choose your path to success. Optimize your own resume or let us handle your entire job search.</p>
+        
+        <div class="footer-buttons">
+          <a href="{% url 'signup' %}" class="footer-btn primary">
+            <i class="fas fa-rocket"></i> Try Resume Optimizer Free
+          </a>
+          <a href="https://wa.me/916303858671?text=Hi! I'm interested in your job application service. Can you provide more details about pricing and process?" 
+             class="footer-btn secondary" target="_blank">
+            <i class="fab fa-whatsapp"></i> Chat About Job Service
+          </a>
+          <a href="{% url 'login' %}" class="footer-btn secondary">
+            <i class="fas fa-sign-in-alt"></i> Sign In
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>

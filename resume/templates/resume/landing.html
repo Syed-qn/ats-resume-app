@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Why ATS-Friendly Résumés Matter</title>
+<link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body>
+<header class="hero">
+  <h1>Beat the ATS. Get the Interview.</h1>
+  <p>75% + of companies use Applicant Tracking Systems to filter résumés before a human ever sees them.
+     Our AI-powered builder optimises your résumé’s keywords, structure, and formatting so it passes every scan.</p>
+  <a href="{% url 'signup' %}" class="cta">Create Free Account</a>
+</header>
+
+<section class="info">
+  <h2>What is an ATS?</h2>
+  <p>An Applicant Tracking System parses each résumé, searching for job-specific keywords and clear headings.
+     If your résumé isn’t ATS-friendly it may be rejected in seconds—even if you’re a great fit.</p>
+  <h2>How We Help</h2>
+  <ul>
+    <li>Analyses the job description → extracts must-have keywords</li>
+    <li>Re-writes bullet points with measurable achievements</li>
+    <li>Uses university-approved, ATS-ready templates (Harvard, MIT …)</li>
+    <li>Gives you an ATS score & job-match score before you apply</li>
+  </ul>
+</section>
+
+<footer class="footer">
+  <a href="{% url 'login' %}">Log in</a> ·
+  <a href="{% url 'signup' %}">Create Account</a>
+</footer>
+</body>
+</html>

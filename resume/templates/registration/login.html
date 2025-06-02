@@ -1,0 +1,631 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Log In | ATS Resume Optimizer</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #DBE2EF 0%, #F9F7F7 100%);
+      min-height: 100vh;
+      color: #112D4E;
+    }
+
+    /* Navigation will be included here */
+    .main-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 80px); /* Account for navigation height */
+      padding: 20px;
+    }
+
+    /* WhatsApp Float Button - Task 12: RIGHT SIDE */
+    .whatsapp-float {
+      position: fixed;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3);
+      z-index: 1000;
+      transition: all 0.3s ease;
+      animation: pulse 2s infinite;
+      text-decoration: none;
+    }
+    .whatsapp-float:hover {
+      transform: translateY(-50%) scale(1.1);
+      box-shadow: 0 12px 35px rgba(37, 211, 102, 0.5);
+    }
+    .whatsapp-float i {
+      color: white;
+      font-size: 24px;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3); }
+      50% { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.6), 0 0 0 10px rgba(37, 211, 102, 0.1); }
+      100% { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3); }
+    }
+
+    /* Main Container */
+    .login-container {
+      width: 100%;
+      max-width: 900px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: #F9F7F7;
+      border-radius: 25px;
+      box-shadow: 0 25px 50px rgba(17,45,78,.15);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Left Side - Welcome Message */
+    .welcome-section {
+      background: linear-gradient(135deg, #3F72AF, #112D4E);
+      color: #F9F7F7;
+      padding: 60px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .welcome-section::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/></svg>') repeat;
+      animation: float 20s infinite linear;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-100px) rotate(360deg); }
+    }
+
+    .welcome-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .welcome-icon {
+      width: 80px;
+      height: 80px;
+      background: rgba(249, 247, 247, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 30px;
+      backdrop-filter: blur(10px);
+    }
+
+    .welcome-icon i {
+      font-size: 2.5rem;
+      color: #F9F7F7;
+    }
+
+    .welcome-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+      line-height: 1.2;
+    }
+
+    .welcome-subtitle {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    .welcome-features {
+      list-style: none;
+      padding: 0;
+    }
+
+    .welcome-features li {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      font-size: 1rem;
+    }
+
+    .welcome-features li i {
+      margin-right: 12px;
+      color: #DBE2EF;
+      font-size: 1.1rem;
+    }
+
+    /* Right Side - Login Form */
+    .form-section {
+      padding: 60px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .form-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .form-header h1 {
+      color: #112D4E;
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .form-header p {
+      color: #3F72AF;
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .form-group {
+      position: relative;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      color: #112D4E;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 18px 20px;
+      padding-left: 55px;
+      border: 2px solid #DBE2EF;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: rgba(249, 247, 247, 0.8);
+      color: #112D4E;
+      outline: none;
+    }
+
+    .form-control:focus {
+      border-color: #3F72AF;
+      box-shadow: 0 0 0 4px rgba(63,114,175,.1);
+      background: #FFFFFF;
+      transform: translateY(-2px);
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #3F72AF;
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus + .input-icon {
+      color: #112D4E;
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .btn-login {
+      background: linear-gradient(135deg, #3F72AF, #112D4E);
+      color: #F9F7F7;
+      padding: 18px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+      position: relative;
+      overflow: hidden;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn-login::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn-login:hover::before {
+      left: 100%;
+    }
+
+    .btn-login:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 35px rgba(63,114,175,.4);
+    }
+
+    .btn-login:active {
+      transform: translateY(-1px);
+    }
+
+    .forgot-password {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .forgot-password a {
+      color: #3F72AF;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .forgot-password a:hover {
+      text-decoration: underline;
+      color: #112D4E;
+    }
+
+    .divider {
+      position: relative;
+      text-align: center;
+      margin: 30px 0;
+    }
+
+    .divider::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #DBE2EF, transparent);
+    }
+
+    .divider span {
+      background: #F9F7F7;
+      padding: 0 20px;
+      color: #3F72AF;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .signup-link {
+      text-align: center;
+      margin-top: 25px;
+    }
+
+    .signup-link p {
+      color: #3F72AF;
+      margin-bottom: 15px;
+      font-size: 1rem;
+    }
+
+    .btn-signup {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #112D4E;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 12px 25px;
+      border: 2px solid #3F72AF;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      background: transparent;
+    }
+
+    .btn-signup:hover {
+      background: #3F72AF;
+      color: #F9F7F7;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(63,114,175,.3);
+    }
+
+    .error-messages {
+      background: linear-gradient(135deg, #112D4E, #3F72AF);
+      color: #F9F7F7;
+      padding: 15px 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      border-left: 4px solid #DBE2EF;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .error-messages i {
+      font-size: 1.2rem;
+    }
+
+    .error-messages ul {
+      margin: 0;
+      padding-left: 15px;
+      list-style: none;
+    }
+
+    .error-messages li {
+      margin-bottom: 5px;
+      position: relative;
+      padding-left: 15px;
+    }
+
+    .error-messages li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: #DBE2EF;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .main-content {
+        min-height: calc(100vh - 60px);
+        padding: 10px;
+      }
+
+      .login-container {
+        grid-template-columns: 1fr;
+        max-width: 500px;
+        margin: 10px;
+      }
+
+      .welcome-section {
+        padding: 40px 30px;
+        text-align: center;
+      }
+
+      .welcome-title {
+        font-size: 2rem;
+      }
+
+      .form-section {
+        padding: 40px 30px;
+      }
+
+      .form-header h1 {
+        font-size: 1.8rem;
+      }
+
+      .whatsapp-float {
+        width: 50px;
+        height: 50px;
+        right: 15px;
+      }
+
+      .whatsapp-float i {
+        font-size: 20px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .main-content {
+        padding: 5px;
+      }
+
+      .login-container {
+        margin: 0;
+      }
+
+      .welcome-section {
+        padding: 30px 20px;
+      }
+
+      .form-section {
+        padding: 30px 20px;
+      }
+
+      .form-control {
+        padding: 15px 18px;
+        padding-left: 50px;
+      }
+
+      .input-icon {
+        left: 15px;
+        font-size: 1.1rem;
+      }
+    }
+
+    /* Loading Animation */
+    .btn-login.loading {
+      pointer-events: none;
+      opacity: 0.8;
+    }
+
+    .btn-login.loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      margin: -10px 0 0 -10px;
+      border: 2px solid transparent;
+      border-top: 2px solid #F9F7F7;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Task 13: Navigation Component -->
+  {% include 'components/navigation.html' %}
+
+  <!-- Task 12: WhatsApp Float Button - RIGHT SIDE -->
+  <a href="https://wa.me/916303858671?text=Hi! I'm interested in your job application service. Can you provide more details about pricing and process?" 
+     class="whatsapp-float" target="_blank" rel="noopener">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+
+  <div class="main-content">
+    <div class="login-container">
+      <!-- Left Side - Welcome Section -->
+      <div class="welcome-section">
+        <div class="welcome-content">
+          <div class="welcome-icon">
+            <i class="fas fa-rocket"></i>
+          </div>
+          <h2 class="welcome-title">Welcome Back!</h2>
+          <p class="welcome-subtitle">
+            Continue optimizing your career with our AI-powered resume tools 
+            and professional job application services.
+          </p>
+          <ul class="welcome-features">
+            <li><i class="fas fa-check"></i> AI Resume Optimization</li>
+            <li><i class="fas fa-check"></i> ATS Compatibility Scoring</li>
+            <li><i class="fas fa-check"></i> University-Approved Templates</li>
+            <li><i class="fas fa-check"></i> Professional Job Applications</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Right Side - Login Form -->
+      <div class="form-section">
+        <div class="form-header">
+          <h1>Sign In</h1>
+          <p>Access your career optimization dashboard</p>
+        </div>
+
+        <form method="post" class="login-form" id="loginForm">
+          {% csrf_token %}
+          
+          {% if form.non_field_errors %}
+            <div class="error-messages">
+              <i class="fas fa-exclamation-triangle"></i>
+              <div>
+                <ul>
+                  {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          {% endif %}
+
+          <div class="form-group">
+            <label for="id_username">Username</label>
+            <div class="input-wrapper">
+              {{ form.username }}
+              <i class="fas fa-user input-icon"></i>
+            </div>
+            {% if form.username.errors %}
+              <div class="error-messages">
+                <i class="fas fa-exclamation-circle"></i>
+                <div>
+                  <ul>
+                    {% for error in form.username.errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="form-group">
+            <label for="id_password">Password</label>
+            <div class="input-wrapper">
+              {{ form.password }}
+              <i class="fas fa-lock input-icon"></i>
+            </div>
+            {% if form.password.errors %}
+              <div class="error-messages">
+                <i class="fas fa-exclamation-circle"></i>
+                <div>
+                  <ul>
+                    {% for error in form.password.errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+
+          <button type="submit" class="btn-login">
+            <i class="fas fa-sign-in-alt"></i> Sign In to Dashboard
+          </button>
+
+          <div class="forgot-password">
+            <a href="{% url 'password_reset' %}">Forgot your password?</a>
+          </div>
+        </form>
+
+        <div class="divider">
+          <span>New to our platform?</span>
+        </div>
+
+        <div class="signup-link">
+          <p>Create your free account and start optimizing</p>
+          <a href="{% url 'signup' %}" class="btn-signup">
+            <i class="fas fa-user-plus"></i> Create Free Account
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Add loading animation to login button
+    document.getElementById('loginForm').addEventListener('submit', function() {
+      const btn = document.querySelector('.btn-login');
+      btn.classList.add('loading');
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing In...';
+    });
+
+    // Add form validation feedback
+    const inputs = document.querySelectorAll('.form-control');
+    inputs.forEach(input => {
+      input.addEventListener('blur', function() {
+        if (this.value.trim() === '') {
+          this.style.borderColor = '#dc3545';
+        } else {
+          this.style.borderColor = '#3F72AF';
+        }
+      });
+
+      input.addEventListener('focus', function() {
+        this.style.borderColor = '#3F72AF';
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,548 @@
+<!-- resume/templates/admin/settings.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>System Settings | Admin Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f8f9fa;
+      color: #212529;
+    }
+    
+    /* Sidebar styles */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 250px;
+      background: linear-gradient(180deg, #112D4E 0%, #3F72AF 100%);
+      color: white;
+      z-index: 1000;
+      overflow-y: auto;
+    }
+    
+    .sidebar-header {
+      padding: 20px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #3F72AF, #112D4E);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      margin: 0 auto 10px;
+    }
+    
+    .sidebar-header h3 {
+      margin: 10px 0 5px;
+      font-size: 1.2rem;
+    }
+    
+    .sidebar-header p {
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+    
+    .sidebar-nav {
+      padding: 20px 0;
+    }
+    
+    .nav-item {
+      margin: 5px 15px;
+    }
+    
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 12px 15px;
+      color: rgba(255,255,255,0.8);
+      text-decoration: none;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+    
+    .nav-link:hover,
+    .nav-link.active {
+      background: rgba(255,255,255,0.1);
+      color: white;
+      transform: translateX(5px);
+    }
+    
+    .nav-link i {
+      width: 20px;
+      margin-right: 15px;
+      text-align: center;
+    }
+    
+    /* Main content */
+    .main-content {
+      margin-left: 250px;
+      min-height: 100vh;
+    }
+    
+    .header {
+      background: white;
+      padding: 15px 25px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e9ecef;
+    }
+    
+    .header-title {
+      font-size: 1.5rem;
+      color: #112D4E;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+    
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: none;
+      font-weight: 500;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #112D4E, #3F72AF);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(17, 45, 78, 0.3);
+      color: white;
+      text-decoration: none;
+    }
+    
+    .btn-outline {
+      background: white;
+      color: #112D4E;
+      border: 1px solid #112D4E;
+    }
+    
+    .btn-outline:hover {
+      background: #112D4E;
+      color: white;
+    }
+    
+    /* Content area */
+    .content {
+      padding: 25px;
+    }
+    
+    /* Settings sections */
+    .settings-section {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 25px;
+    }
+    
+    .section-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #212529;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #e9ecef;
+    }
+    
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+    }
+    
+    .setting-group {
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    
+    .setting-group h4 {
+      color: #112D4E;
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #212529;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: #112D4E;
+      box-shadow: 0 0 0 3px rgba(17, 45, 78, 0.1);
+    }
+    
+    .form-text {
+      font-size: 0.8rem;
+      color: #6c757d;
+      margin-top: 5px;
+    }
+    
+    .current-value {
+      background: #f8f9fa;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      color: #112D4E;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+    
+    /* Alert messages */
+    .alert {
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border: 1px solid transparent;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .alert-success {
+      background: rgba(40, 167, 69, 0.1);
+      border-color: #28a745;
+      color: #155724;
+    }
+    
+    .alert-danger {
+      background: rgba(220, 53, 69, 0.1);
+      border-color: #dc3545;
+      color: #721c24;
+    }
+    
+    .alert-warning {
+      background: rgba(255, 193, 7, 0.1);
+      border-color: #ffc107;
+      color: #856404;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .main-content {
+        margin-left: 0;
+      }
+      
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      
+      .settings-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <div class="user-avatar">{{ request.user.username.0|upper }}</div>
+      <h3>Admin Panel</h3>
+      <p>{{ request.user.username }}</p>
+    </div>
+    
+    <div class="sidebar-nav">
+      <div class="nav-item">
+        <a href="{% url 'admin_dashboard' %}" class="nav-link">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Dashboard</span>
+        </a>
+      </div>
+      <div class="nav-item">
+        <a href="{% url 'admin_users' %}" class="nav-link">
+          <i class="fas fa-users"></i>
+          <span>Users</span>
+        </a>
+      </div>
+      <div class="nav-item">
+        <a href="{% url 'admin_settings' %}" class="nav-link active">
+          <i class="fas fa-cogs"></i>
+          <span>Settings</span>
+        </a>
+      </div>
+      <div class="nav-item">
+        <a href="{% url 'admin_analytics' %}" class="nav-link">
+          <i class="fas fa-chart-bar"></i>
+          <span>Analytics</span>
+        </a>
+      </div>
+      <div class="nav-item">
+        <a href="{% url 'admin_system_logs' %}" class="nav-link">
+          <i class="fas fa-list-alt"></i>
+          <span>System Logs</span>
+        </a>
+      </div>
+      <div class="nav-item">
+        <a href="{% url 'admin_create_user' %}" class="nav-link">
+          <i class="fas fa-user-plus"></i>
+          <span>Create User</span>
+        </a>
+      </div>
+      <div class="nav-item">
+        <a href="{% url 'dashboard' %}" class="nav-link">
+          <i class="fas fa-home"></i>
+          <span>Main App</span>
+        </a>
+      </div>
+      <div class="nav-item">
+        <a href="{% url 'logout' %}" class="nav-link">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Header -->
+    <header class="header">
+      <h1 class="header-title">
+        <i class="fas fa-cogs"></i>
+        System Settings
+      </h1>
+      <div class="header-actions">
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline">
+          <i class="fas fa-arrow-left"></i>
+          Back to Dashboard
+        </a>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- Messages -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }}">
+            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- Resume & LLM Settings -->
+      <div class="settings-section">
+        <h3 class="section-title">
+          <i class="fas fa-brain"></i>
+          AI Resume Generation Settings
+        </h3>
+        
+        <form method="post">
+          {% csrf_token %}
+          <div class="settings-grid">
+            <div class="setting-group">
+              <h4><i class="fas fa-target"></i> Target Scores</h4>
+              
+              <div class="form-group">
+                <label class="form-label">Target ATS Score (%)</label>
+                <div class="current-value">Current: {{ settings.TARGET_ATS_SCORE }}%</div>
+                <input type="number" 
+                       name="target_ats_score" 
+                       class="form-control" 
+                       value="{{ settings.TARGET_ATS_SCORE }}" 
+                       min="70" max="100" required>
+                <div class="form-text">Minimum ATS compatibility score the system should achieve</div>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Target Job Score (%)</label>
+                <div class="current-value">Current: {{ settings.TARGET_JOB_SCORE }}%</div>
+                <input type="number" 
+                       name="target_job_score" 
+                       class="form-control" 
+                       value="{{ settings.TARGET_JOB_SCORE }}" 
+                       min="70" max="100" required>
+                <div class="form-text">Minimum job match score the system should achieve</div>
+              </div>
+            </div>
+
+            <div class="setting-group">
+              <h4><i class="fas fa-download"></i> Download Limits</h4>
+              
+              <div class="form-group">
+                <label class="form-label">Downloads per 15 Days</label>
+                <div class="current-value">Current: {{ settings.DOWNLOADS_PER_15_DAYS }}</div>
+                <input type="number" 
+                       name="downloads_15_days" 
+                       class="form-control" 
+                       value="{{ settings.DOWNLOADS_PER_15_DAYS }}" 
+                       min="1" max="50" required>
+                <div class="form-text">Maximum downloads allowed per user in 15 days</div>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Downloads per Month</label>
+                <div class="current-value">Current: {{ settings.DOWNLOADS_PER_MONTH }}</div>
+                <input type="number" 
+                       name="downloads_month" 
+                       class="form-control" 
+                       value="{{ settings.DOWNLOADS_PER_MONTH }}" 
+                       min="1" max="100" required>
+                <div class="form-text">Maximum downloads allowed per user per month</div>
+              </div>
+            </div>
+
+            <div class="setting-group">
+              <h4><i class="fas fa-file-upload"></i> File Upload Settings</h4>
+              
+              <div class="form-group">
+                <label class="form-label">Max File Size (MB)</label>
+                <div class="current-value">Current: {{ settings.MAX_FILE_SIZE_MB }}MB</div>
+                <input type="number" 
+                       name="max_file_size" 
+                       class="form-control" 
+                       value="{{ settings.MAX_FILE_SIZE_MB }}" 
+                       min="1" max="50" required>
+                <div class="form-text">Maximum file size for resume uploads</div>
+              </div>
+            </div>
+
+            <div class="setting-group">
+              <h4><i class="fas fa-robot"></i> LLM Configuration</h4>
+              
+              <div class="form-group">
+                <label class="form-label">Max Tokens</label>
+                <div class="current-value">Current: {{ settings.LLM_MAX_TOKENS }}</div>
+                <input type="number" 
+                       name="llm_max_tokens" 
+                       class="form-control" 
+                       value="{{ settings.LLM_MAX_TOKENS }}" 
+                       min="1000" max="8000" required>
+                <div class="form-text">Maximum tokens for LLM responses</div>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Temperature</label>
+                <div class="current-value">Current: {{ settings.LLM_TEMPERATURE }}</div>
+                <input type="number" 
+                       name="llm_temperature" 
+                       class="form-control" 
+                       value="{{ settings.LLM_TEMPERATURE }}" 
+                       min="0" max="1" step="0.1" required>
+                <div class="form-text">LLM temperature for response creativity (0.0-1.0)</div>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Max Iterations</label>
+                <div class="current-value">Current: {{ settings.LLM_MAX_ITERATIONS }}</div>
+                <input type="number" 
+                       name="llm_max_iterations" 
+                       class="form-control" 
+                       value="{{ settings.LLM_MAX_ITERATIONS }}" 
+                       min="1" max="10" required>
+                <div class="form-text">Maximum optimization iterations per resume</div>
+              </div>
+            </div>
+          </div>
+          
+          <div style="text-align: center; margin-top: 30px;">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i>
+              Save All Settings
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- System Information -->
+      <div class="settings-section">
+        <h3 class="section-title">
+          <i class="fas fa-info-circle"></i>
+          System Information
+        </h3>
+        
+        <div class="settings-grid">
+          <div class="setting-group">
+            <h4><i class="fas fa-server"></i> Application Info</h4>
+            <p><strong>Environment:</strong> {% if debug %}Development{% else %}Production{% endif %}</p>
+            <p><strong>Debug Mode:</strong> {{ debug|yesno:"Enabled,Disabled" }}</p>
+            <p><strong>Database:</strong> SQLite</p>
+            <p><strong>Cache Backend:</strong> Default</p>
+          </div>
+          
+          <div class="setting-group">
+            <h4><i class="fas fa-key"></i> API Status</h4>
+            <p><strong>OpenAI API:</strong> {% if openai_configured %}✅ Configured{% else %}❌ Not Configured{% endif %}</p>
+            <p><strong>DeepSeek API:</strong> {% if deepseek_configured %}✅ Configured{% else %}❌ Not Configured{% endif %}</p>
+            <p><strong>Email Service:</strong> {% if email_configured %}✅ Configured{% else %}❌ Not Configured{% endif %}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Warning Notice -->
+      <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div>
+          <strong>Important:</strong> Changes to system settings will take effect immediately. 
+          Some settings may require application restart for full implementation.
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

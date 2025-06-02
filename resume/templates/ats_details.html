@@ -1,0 +1,728 @@
+<!-- templates/ats_details.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Understanding ATS Systems | ATS Resume Optimizer</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #DBE2EF 0%, #F9F7F7 100%);
+      color: #112D4E;
+      line-height: 1.6;
+    }
+
+    /* WhatsApp Float Button - RIGHT SIDE */
+    .whatsapp-float {
+      position: fixed;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3);
+      z-index: 1000;
+      transition: all 0.3s ease;
+      animation: pulse 2s infinite;
+    }
+    .whatsapp-float:hover {
+      transform: translateY(-50%) scale(1.1);
+      box-shadow: 0 12px 35px rgba(37, 211, 102, 0.5);
+    }
+    .whatsapp-float i {
+      color: white;
+      font-size: 24px;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3); }
+      50% { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.6), 0 0 0 10px rgba(37, 211, 102, 0.1); }
+      100% { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3); }
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #3F72AF, #112D4E);
+      color: #F9F7F7;
+      padding: 100px 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/></svg>') repeat;
+      animation: float 20s infinite linear;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-100px); }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero h1 {
+      font-size: 3.5rem;
+      margin-bottom: 20px;
+      font-weight: 800;
+    }
+
+    .hero-subtitle {
+      font-size: 1.3rem;
+      margin-bottom: 40px;
+      opacity: 0.95;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .section {
+      padding: 80px 0;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      color: #112D4E;
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .section-subtitle {
+      font-size: 1.2rem;
+      color: #3F72AF;
+      text-align: center;
+      margin-bottom: 60px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* What is ATS Section */
+    .ats-definition {
+      background: #F9F7F7;
+    }
+
+    .definition-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .definition-content h3 {
+      font-size: 2rem;
+      color: #112D4E;
+      margin-bottom: 20px;
+    }
+
+    .definition-content p {
+      font-size: 1.1rem;
+      color: #3F72AF;
+      margin-bottom: 20px;
+      line-height: 1.7;
+    }
+
+    .definition-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #112D4E, #3F72AF);
+      color: #F9F7F7;
+      padding: 25px;
+      border-radius: 15px;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .ats-visual {
+      text-align: center;
+    }
+
+    .ats-icon {
+      font-size: 8rem;
+      color: #3F72AF;
+      margin-bottom: 30px;
+      animation: robotMove 3s ease-in-out infinite;
+    }
+
+    @keyframes robotMove {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* How ATS Works */
+    .ats-process {
+      background: linear-gradient(135deg, #DBE2EF, #F9F7F7);
+    }
+
+    .process-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 40px;
+      margin-top: 60px;
+    }
+
+    .process-step {
+      background: #F9F7F7;
+      padding: 40px 30px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 15px 40px rgba(17,45,78,0.1);
+      border: 1px solid #DBE2EF;
+      transition: all 0.4s ease;
+      position: relative;
+    }
+
+    .process-step:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 25px 60px rgba(17,45,78,0.2);
+    }
+
+    .step-number {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #3F72AF, #112D4E);
+      color: #F9F7F7;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+
+    .step-icon {
+      font-size: 3rem;
+      color: #3F72AF;
+      margin: 20px 0;
+    }
+
+    .step-title {
+      font-size: 1.5rem;
+      color: #112D4E;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    .step-description {
+      color: #3F72AF;
+      line-height: 1.6;
+    }
+
+    /* ATS Problems Section */
+    .ats-problems {
+      background: linear-gradient(135deg, #112D4E, #3F72AF);
+      color: #F9F7F7;
+    }
+
+    .problems-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 40px;
+      margin-top: 60px;
+    }
+
+    .problem-card {
+      background: rgba(249, 247, 247, 0.1);
+      padding: 40px 30px;
+      border-radius: 20px;
+      border: 2px solid rgba(219, 226, 239, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .problem-icon {
+      font-size: 3rem;
+      color: #DBE2EF;
+      margin-bottom: 20px;
+    }
+
+    .problem-title {
+      font-size: 1.6rem;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    .problem-description {
+      color: #DBE2EF;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .problem-impact {
+      background: rgba(219, 226, 239, 0.1);
+      padding: 15px;
+      border-radius: 10px;
+      border-left: 4px solid #DBE2EF;
+    }
+
+    .problem-impact strong {
+      color: #F9F7F7;
+    }
+
+    /* Solutions Section */
+    .ats-solutions {
+      background: #F9F7F7;
+    }
+
+    .solutions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 40px;
+      margin-top: 60px;
+    }
+
+    .solution-card {
+      background: linear-gradient(135deg, #DBE2EF, #F9F7F7);
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 15px 40px rgba(17,45,78,0.1);
+      border: 1px solid #DBE2EF;
+      transition: all 0.4s ease;
+    }
+
+    .solution-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 25px 60px rgba(17,45,78,0.2);
+      border-color: #3F72AF;
+    }
+
+    .solution-icon {
+      font-size: 3rem;
+      color: #3F72AF;
+      margin-bottom: 20px;
+    }
+
+    .solution-title {
+      font-size: 1.6rem;
+      color: #112D4E;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    .solution-description {
+      color: #3F72AF;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .solution-features {
+      list-style: none;
+      padding: 0;
+    }
+
+    .solution-features li {
+      color: #112D4E;
+      margin-bottom: 10px;
+      padding-left: 25px;
+      position: relative;
+    }
+
+    .solution-features li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: #3F72AF;
+      font-weight: bold;
+    }
+
+    /* CTA Section */
+    .cta-section {
+      background: linear-gradient(135deg, #3F72AF, #112D4E);
+      color: #F9F7F7;
+      padding: 80px 0;
+      text-align: center;
+    }
+
+    .cta-title {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .cta-description {
+      font-size: 1.2rem;
+      margin-bottom: 40px;
+      opacity: 0.9;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 18px 35px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+    }
+
+    .cta-btn.primary {
+      background: linear-gradient(135deg, #F9F7F7, #DBE2EF);
+      color: #112D4E;
+    }
+
+    .cta-btn.secondary {
+      background: transparent;
+      color: #F9F7F7;
+      border: 2px solid #F9F7F7;
+    }
+
+    .cta-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+
+    .cta-btn.primary:hover {
+      color: #112D4E;
+    }
+
+    .cta-btn.secondary:hover {
+      background: #F9F7F7;
+      color: #112D4E;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+      
+      .definition-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      
+      .process-steps,
+      .problems-grid,
+      .solutions-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .section-title {
+        font-size: 2rem;
+      }
+      
+      .ats-icon {
+        font-size: 5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  {% include 'components/navigation.html' %}
+
+  <!-- WhatsApp Float Button -->
+  <a href="https://wa.me/916303858671?text=Hi! I'm interested in your job application service. Can you provide more details about pricing and process?" 
+     class="whatsapp-float" target="_blank" rel="noopener">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <h1><i class="fas fa-robot"></i> Understanding ATS Systems</h1>
+        <p class="hero-subtitle">
+          Master the hidden technology that screens 98% of job applications. 
+          Learn how Applicant Tracking Systems work and why they're crucial for your career success.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- What is ATS -->
+  <section class="section ats-definition">
+    <div class="container">
+      <h2 class="section-title">What is an ATS (Applicant Tracking System)?</h2>
+      <p class="section-subtitle">
+        The digital gatekeeper that determines whether your resume reaches human recruiters
+      </p>
+      
+      <div class="definition-grid">
+        <div class="definition-content">
+          <h3>The Digital Resume Scanner</h3>
+          <p>
+            An Applicant Tracking System (ATS) is software used by companies to automatically 
+            collect, scan, organize, and rank job applications. It acts as the first filter 
+            between you and your dream job.
+          </p>
+          <p>
+            Before any human recruiter sees your resume, the ATS scans it for keywords, 
+            analyzes the format, and assigns it a compatibility score. Only the highest-scoring 
+            resumes make it to the next round.
+          </p>
+          
+          <div class="definition-stats">
+            <div class="stat-card">
+              <div class="stat-number">98%</div>
+              <div class="stat-label">Fortune 500 companies use ATS</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">75%</div>
+              <div class="stat-label">Resumes rejected by ATS</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="ats-visual">
+          <i class="fas fa-robot ats-icon"></i>
+          <h4 style="color: #112D4E; font-size: 1.5rem; margin-bottom: 15px;">ATS in Action</h4>
+          <p style="color: #3F72AF; font-size: 1.1rem;">
+            Every second, thousands of resumes are being automatically scanned, 
+            parsed, and ranked by ATS systems worldwide.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How ATS Works -->
+  <section class="section ats-process">
+    <div class="container">
+      <h2 class="section-title">How Does ATS Work?</h2>
+      <p class="section-subtitle">
+        Understanding the 4-step process that determines your resume's fate
+      </p>
+      
+      <div class="process-steps">
+        <div class="process-step">
+          <div class="step-number">1</div>
+          <i class="fas fa-upload step-icon"></i>
+          <h3 class="step-title">Resume Submission</h3>
+          <p class="step-description">
+            You submit your resume through a job portal or company website. 
+            The ATS immediately receives and begins processing your application.
+          </p>
+        </div>
+        
+        <div class="process-step">
+          <div class="step-number">2</div>
+          <i class="fas fa-search step-icon"></i>
+          <h3 class="step-title">Parsing & Analysis</h3>
+          <p class="step-description">
+            The system extracts information from your resume, including contact details, 
+            work experience, education, and skills. Poor formatting can cause parsing errors.
+          </p>
+        </div>
+        
+        <div class="process-step">
+          <div class="step-number">3</div>
+          <i class="fas fa-filter step-icon"></i>
+          <h3 class="step-title">Keyword Matching</h3>
+          <p class="step-description">
+            ATS compares your resume against the job description, looking for specific keywords, 
+            skills, and qualifications. Missing keywords = automatic rejection.
+          </p>
+        </div>
+        
+        <div class="process-step">
+          <div class="step-number">4</div>
+          <i class="fas fa-chart-line step-icon"></i>
+          <h3 class="step-title">Scoring & Ranking</h3>
+          <p class="step-description">
+            Your resume receives a compatibility score. Only the highest-scoring candidates 
+            are forwarded to human recruiters for review.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ATS Problems -->
+  <section class="section ats-problems">
+    <div class="container">
+      <h2 class="section-title" style="color: #F9F7F7;">Common ATS Problems That Kill Your Chances</h2>
+      <p class="section-subtitle" style="color: #DBE2EF;">
+        Avoid these critical mistakes that cause 75% of resumes to be automatically rejected
+      </p>
+      
+      <div class="problems-grid">
+        <div class="problem-card">
+          <i class="fas fa-exclamation-triangle problem-icon"></i>
+          <h3 class="problem-title">Keyword Mismatch</h3>
+          <p class="problem-description">
+            Your resume uses different terminology than the job description. 
+            For example, you write "customer service" but the job requires "client relations."
+          </p>
+          <div class="problem-impact">
+            <strong>Impact:</strong> Automatic rejection despite being qualified
+          </div>
+        </div>
+        
+        <div class="problem-card">
+          <i class="fas fa-file-excel problem-icon"></i>
+          <h3 class="problem-title">Poor Formatting</h3>
+          <p class="problem-description">
+            Creative layouts, graphics, tables, and unusual fonts confuse ATS systems. 
+            The software can't properly parse your information.
+          </p>
+          <div class="problem-impact">
+            <strong>Impact:</strong> 43% of resumes fail due to formatting issues
+          </div>
+        </div>
+        
+        <div class="problem-card">
+          <i class="fas fa-clock problem-icon"></i>
+          <h3 class="problem-title">Inadequate Skills Section</h3>
+          <p class="problem-description">
+            Missing technical skills, certifications, or using outdated terminology 
+            causes your resume to score poorly in ATS systems.
+          </p>
+          <div class="problem-impact">
+            <strong>Impact:</strong> Lower ranking compared to optimized resumes
+          </div>
+        </div>
+        
+        <div class="problem-card">
+          <i class="fas fa-ban problem-icon"></i>
+          <h3 class="problem-title">Wrong Section Headers</h3>
+          <p class="problem-description">
+            Using non-standard section names like "My Journey" instead of "Work Experience" 
+            prevents ATS from categorizing your information correctly.
+          </p>
+          <div class="problem-impact">
+            <strong>Impact:</strong> Critical information gets misclassified or ignored
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Solutions -->
+  <section class="section ats-solutions">
+    <div class="container">
+      <h2 class="section-title">How to Beat ATS Systems</h2>
+      <p class="section-subtitle">
+        Proven strategies to ensure your resume passes ATS screening every time
+      </p>
+      
+      <div class="solutions-grid">
+        <div class="solution-card">
+          <i class="fas fa-magic solution-icon"></i>
+          <h3 class="solution-title">AI-Powered Keyword Optimization</h3>
+          <p class="solution-description">
+            Our AI analyzes job descriptions and automatically integrates the exact keywords 
+            and phrases that ATS systems are programmed to find.
+          </p>
+          <ul class="solution-features">
+            <li>Extracts exact keywords from job postings</li>
+            <li>Natural integration without keyword stuffing</li>
+            <li>Industry-specific terminology matching</li>
+            <li>Real-time ATS compatibility scoring</li>
+          </ul>
+        </div>
+        
+        <div class="solution-card">
+          <i class="fas fa-university solution-icon"></i>
+          <h3 class="solution-title">ATS-Optimized Templates</h3>
+          <p class="solution-description">
+            University-approved resume templates specifically designed to pass ATS screening 
+            while maintaining professional appearance.
+          </p>
+          <ul class="solution-features">
+            <li>Clean, parsable formatting</li>
+            <li>Standard section headers</li>
+            <li>Optimal font and spacing</li>
+            <li>Compatible with all major ATS platforms</li>
+          </ul>
+        </div>
+        
+        <div class="solution-card">
+          <i class="fas fa-chart-line solution-icon"></i>
+          <h3 class="solution-title">Real-Time ATS Testing</h3>
+          <p class="solution-description">
+            Test your resume against actual ATS algorithms and receive detailed feedback 
+            on areas that need improvement.
+          </p>
+          <ul class="solution-features">
+            <li>Compatibility score for major ATS systems</li>
+            <li>Detailed parsing analysis</li>
+            <li>Keyword density optimization</li>
+            <li>Section-by-section feedback</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Call to Action -->
+  <section class="cta-section">
+    <div class="container">
+      <h2 class="cta-title">Ready to Beat the ATS?</h2>
+      <p class="cta-description">
+        Don't let an algorithm kill your career dreams. Use our AI-powered tool to create 
+        resumes that pass ATS screening and land interviews.
+      </p>
+      
+      <div class="cta-buttons">
+        <a href="{% url 'signup' %}" class="cta-btn primary">
+          <i class="fas fa-rocket"></i> Optimize My Resume Now
+        </a>
+        <a href="{% url 'our_services' %}" class="cta-btn secondary">
+          <i class="fas fa-star"></i> View All Services
+        </a>
+      </div>
+    </div>
+  </section>
+</body>
+</html>

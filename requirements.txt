@@ -43,7 +43,7 @@ psycopg2-binary==2.9.9     # uncomment if DATABASE_URL is postgres://…
 requests==2.31.0
 urllib3==2.1.0
 
-##############################################################################
+#################
 # Config / Env helpers
 python-decouple==3.8
 python-dotenv==1.0.0
@@ -58,7 +58,7 @@ django-cors-headers==4.3.1
 whitenoise==6.6.0
 gunicorn==21.2.0
 
-##############################################################################
+####################################
 # Utilities
 chardet==5.2.0
 python-slugify==8.0.1

@@ -5,9 +5,109 @@ services:
     plan: free
     region: oregon
     envVars:
-      - key: OPENAI_API_KEY
-        value: ${OPENAI_API_KEY}
-      - key: PORT
-        value: "8000"
+      # ───── Required for Django itself ─────
       - key: DJANGO_SETTINGS_MODULE
         value: ats_resume_app.settings
+      - key: SECRET_KEY
+        value: ${SECRET_KEY}            # e.g. define SECRET_KEY in Render’s “Environment” tab
+      - key: DEBUG
+        value: "False"                   # ensure DEBUG is false in production
+      - key: ALLOWED_HOSTS
+        value: ${ALLOWED_HOSTS}          # e.g. "atsresumeapp.onrender.com"
+
+      # ───── Port and Optional Business Logic ─────
+      - key: PORT
+        value: "8000"
+      - key: OPENAI_API_KEY
+        value: ${OPENAI_API_KEY}
+      - key: DEEPSEEK_API_KEY
+        value: ${DEEPSEEK_API_KEY}
+
+      # ───── Database ─────
+      - key: DATABASE_URL
+        value: ${DATABASE_URL}           # e.g. "postgres://user:pass@host:5432/dbname"
+
+      # ───── Email Configuration ─────
+      - key: EMAIL_HOST
+        value: ${EMAIL_HOST}             # e.g. "smtp.gmail.com"
+      - key: EMAIL_PORT
+        value: ${EMAIL_PORT}             # e.g. "587"
+      - key: EMAIL_USE_TLS
+        value: ${EMAIL_USE_TLS}          # e.g. "True"
+      - key: EMAIL_HOST_USER
+        value: ${EMAIL_HOST_USER}        # e.g. "your_email@gmail.com"
+      - key: EMAIL_HOST_PASSWORD
+        value: ${EMAIL_HOST_PASSWORD}    # e.g. your app password
+      - key: DEFAULT_FROM_EMAIL
+        value: ${DEFAULT_FROM_EMAIL}     # e.g. "noreply@atsresume.com"
+      - key: ADMIN_EMAIL
+        value: ${ADMIN_EMAIL}            # e.g. "admin@yourdomain.com"
+
+      # ───── File‐upload / S3 (if used) ─────
+      - key: AWS_ACCESS_KEY_ID
+        value: ${AWS_ACCESS_KEY_ID}
+      - key: AWS_SECRET_ACCESS_KEY
+        value: ${AWS_SECRET_ACCESS_KEY}
+      - key: AWS_STORAGE_BUCKET_NAME
+        value: ${AWS_STORAGE_BUCKET_NAME}
+      - key: AWS_S3_REGION_NAME
+        value: ${AWS_S3_REGION_NAME}
+
+      # ───── Redis (if used) ─────
+      - key: REDIS_URL
+        value: ${REDIS_URL}              # e.g. "redis://:password@redis:6379/0"
+
+      # ───── Session / Security ─────
+      - key: SESSION_COOKIE_AGE
+        value: "3600"
+      - key: SESSION_EXPIRE_AT_BROWSER_CLOSE
+        value: "True"
+      - key: SENTRY_DSN
+        value: ${SENTRY_DSN}             # if you use Sentry
+
+      # ───── PDF Generation Settings ─────
+      - key: PDF_PAGE_SIZE
+        value: "A4"
+      - key: PDF_MARGIN
+        value: "0.5in"
+      - key: PDF_DPI
+        value: "300"
+      - key: PDF_QUALITY
+        value: "high"
+
+      # ───── Downloads / Notifications ─────
+      - key: DOWNLOADS_PER_15_DAYS
+        value: "3"
+      - key: DOWNLOADS_PER_MONTH
+        value: "6"
+      - key: SEND_WELCOME_EMAIL
+        value: "True"
+      - key: SEND_RESUME_NOTIFICATION
+        value: "True"
+      - key: NOTIFY_ADMIN_NEW_USER
+        value: "True"
+
+      # ───── SEO / Analytics (optional) ─────
+      - key: GOOGLE_ANALYTICS_ID
+        value: ${GOOGLE_ANALYTICS_ID}    # if set
+      - key: MIXPANEL_TOKEN
+        value: ${MIXPANEL_TOKEN}
+
+      # ───── Other Optional Keys ─────
+      - key: WHATSAPP_PHONE_NUMBER
+        value: ${WHATSAPP_PHONE_NUMBER}
+      - key: WHATSAPP_DEFAULT_MESSAGE
+        value: ${WHATSAPP_DEFAULT_MESSAGE}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Below section is unchanged: build, collectstatic, migrations, and start up
+# ─────────────────────────────────────────────────────────────────────────────
+buildCommand: |
+  pip install --upgrade pip
+  pip install -r requirements.txt
+  mkdir -p /app/staticfiles
+  python manage.py collectstatic --noinput
+
+startCommand: |
+  python manage.py migrate
+  gunicorn ats_resume_app.wsgi:application --bind 0.0.0.0:$PORT --timeout 120 --workers 1

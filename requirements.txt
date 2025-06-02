@@ -1,60 +1,68 @@
-# Core Django and Web Framework
+##############################################################################
+# Core Django and REST
 Django==4.2.7
 djangorestframework==3.14.0
 
-# File Processing
+##############################################################################
+# File & Document Processing
 PyPDF2==3.0.1
 docx2txt==0.8
 python-docx==0.8.11
 
-# PDF Generation
-WeasyPrint==60.2
+##############################################################################
+# PDF & HTML Rendering  ➜  **Upgraded WeasyPrint stack**
+#   – WeasyPrint 62+ already depends on pydyf ≥0.10 and tinycss2 ≥1.3
+#   – These lines pin everything to versions known-good on Python 3.11
+weasyprint==62.3          # (latest at 2025-06-03)
+pydyf==0.10.0
+tinycss2==1.3.0
 html5lib==1.1
 
-# AI/LLM Integration
-openai>=1.3.7
-tiktoken==0.5.1
+##############################################################################
+# AI / LLM Integration
+openai>=1.3.7              # use environment variable OPENAI_API_KEY
+tiktoken==0.5.1            # token counting
 
-# Data Processing
+##############################################################################
+# Data Handling
 pandas==2.1.3
 numpy==1.24.3
 
+##############################################################################
 # Image Processing
 Pillow==10.1.0
 
-# Database (optional for basic usage)
-# psycopg2-binary==2.9.9
-
-# Caching and Background Tasks (optional)
+##############################################################################
+# Optional: PostgreSQL, caching, async tasks
+psycopg2-binary==2.9.9     # uncomment if DATABASE_URL is postgres://…
 # redis==5.0.1
 # celery==5.3.4
 
-# HTTP Requests
+##############################################################################
+# HTTP & Networking
 requests==2.31.0
 urllib3==2.1.0
 
-# Environment and Configuration
+##############################################################################
+# Config / Env helpers
 python-decouple==3.8
 python-dotenv==1.0.0
 
-# Security - use latest compatible version
+##############################################################################
+# Security
 cryptography>=3.4.8
 
-# CORS Headers
+##############################################################################
+# Misc Django add-ons
 django-cors-headers==4.3.1
-
-# Web Server
-gunicorn==21.2.0
 whitenoise==6.6.0
+gunicorn==21.2.0
 
+##############################################################################
 # Utilities
 chardet==5.2.0
 python-slugify==8.0.1
-beautifulsoup4
-django-countries>=7.5.1                                           
-django-phonenumber-field>=7.1.0
-phonenumbers>=8.13.0
-# requirements.txt  (excerpt)
-weasyprint>=62.0      # needs pydyf>=0.10, tinycss2>=1.3
-pydyf>=0.10.0
-tinycss2>=1.3.0
+beautifulsoup4==4.12.3
+django-countries==7.6.1
+django-phonenumber-field==7.2.0
+phonenumbers==9.0.6

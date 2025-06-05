@@ -85,9 +85,9 @@ services:
       - key: DOWNLOADS_PER_MONTH
         value: "6"
       - key: SEND_WELCOME_EMAIL
-        value: "True"
+        value: "False"
       - key: SEND_RESUME_NOTIFICATION
-        value: "True"
+        value: "False"
       - key: NOTIFY_ADMIN_NEW_USER
         value: "True"
 
@@ -124,63 +124,74 @@ startCommand: |
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/requirements.txt =====
 
-# Core Django and Web Framework
+##############################################################################
+# Core Django and REST
 Django==4.2.7
 djangorestframework==3.14.0
 
-# File Processing
+##############################################################################
+# File & Document Processing
 PyPDF2==3.0.1
 docx2txt==0.8
 python-docx==0.8.11
 
-# PDF Generation
-WeasyPrint==60.2
+##############################################################################
+# PDF & HTML Rendering  ➜  **Upgraded WeasyPrint stack**
+#   – WeasyPrint 62+ already depends on pydyf ≥0.10 and tinycss2 ≥1.3
+#   – These lines pin everything to versions known-good on Python 3.11
+weasyprint==62.3          # (latest at 2025-06-03)
+pydyf==0.10.0
+tinycss2==1.3.0
 html5lib==1.1
 
-# AI/LLM Integration
-openai>=1.3.7
-tiktoken==0.5.1
+##############################################################################
+# AI / LLM Integration
+openai>=1.3.7              # use environment variable OPENAI_API_KEY
+tiktoken==0.5.1            # token counting
 
-# Data Processing
+##############################################################################
+# Data Handling
 pandas==2.1.3
 numpy==1.24.3
 
+##############################################################################
 # Image Processing
 Pillow==10.1.0
 
-# Database (optional for basic usage)
-# psycopg2-binary==2.9.9
-
-# Caching and Background Tasks (optional)
+##############################################################################
+# Optional: PostgreSQL, caching, async tasks
+psycopg2-binary==2.9.9     # uncomment if DATABASE_URL is postgres://…
 # redis==5.0.1
 # celery==5.3.4
 
-# HTTP Requests
+##############################################################################
+# HTTP & Networking
 requests==2.31.0
 urllib3==2.1.0
 
-# Environment and Configuration
+#################
+# Config / Env helpers
 python-decouple==3.8
 python-dotenv==1.0.0
 
-# Security - use latest compatible version
+##############################################################################
+# Security
 cryptography>=3.4.8
 
-# CORS Headers
+##############################################################################
+# Misc Django add-ons
 django-cors-headers==4.3.1
-
-# Web Server
-gunicorn==21.2.0
 whitenoise==6.6.0
+gunicorn==21.2.0
 
+####################################
 # Utilities
 chardet==5.2.0
 python-slugify==8.0.1
-beautifulsoup4
-django-countries>=7.5.1                                           
-django-phonenumber-field>=7.1.0
-phonenumbers>=8.13.0
-
+beautifulsoup4==4.12.3
+django-countries==7.6.1
+django-phonenumber-field==7.2.0
+phonenumbers==9.0.6
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/combined_output.txt =====
 
@@ -478,6 +489,9 @@ OPTIONAL_SECTIONS_COLLAPSED=True
 # ====== DEVELOPMENT SETTINGS ======
 USE_DEBUG_TOOLBAR=False
 ENVIRONMENT=development
+
+
+
 
 # ====== OPTIONAL BACKUP SETTINGS ======
 # BACKUP_ENABLED=True
@@ -7272,8 +7286,7 @@ class Command(BaseCommand):
           </ul>
           
           <div class="service-pricing">
-            <div class="pricing-label">Starting From</div>
-            <div class="pricing-value">$299/week</div>
+            <div class="pricing-label">Contact for Price</div>
             <div class="pricing-note">3-day free trial included</div>
           </div>
           
@@ -20566,6 +20579,34 @@ else:
 
 print(f"📊 Tasks Completed: {sum(TASKS_COMPLETED.values())}/5")
 
+# ====== CUSTOM SETTINGS VALIDATION ======
+def validate_settings():
+    """Gracefully downgrade missing production secrets instead of killing the app."""
+    warnings = []
+
+    # Task 10 – notifications
+    if NOTIFICATIONS['SEND_RESUME_NOTIFICATION'] and not EMAIL_HOST_USER:
+        warnings.append(
+            "EMAIL_HOST_USER not set – disabling resume-upload notification e-mails."
+        )
+        NOTIFICATIONS['SEND_RESUME_NOTIFICATION'] = False
+
+    # Task 11 – password-reset e-mail
+    if not EMAIL_HOST_USER and not DEBUG:
+        warnings.append(
+            "EMAIL_HOST_USER not set – password-reset e-mails will be routed to the console backend."
+        )
+        EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+    # Task 14 – sanity-check middleware
+    if 'resume.middleware.SPAAuthenticationMiddleware' not in MIDDLEWARE:
+        warnings.append("SPAAuthenticationMiddleware missing from MIDDLEWARE list.")
+
+    for w in warnings:
+        print(f"⚠️  {w}")
+    print("✅ Settings validation finished – continuing startup.")
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/ats_resume_app/urls.py =====
 
 # ats_resume_app/urls.py - Main project URLs configuration
@@ -20693,7 +20734,12 @@ Unnamed repository; edit this file 'description' to name the repository.
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/COMMIT_EDITMSG =====
 
-Login, admin and all tasks-1
+admin superuser
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/FETCH_HEAD =====
+
+84622270eb964536384c4843ae1e307bc0476733		branch 'main' of https://github.com/Syed-qn/ats-resume-app
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/0d/84287d8e8a67d4b1fe581bb315172cd01881fc =====
@@ -20706,14 +20752,29 @@ Login, admin and all tasks-1
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/95/24bc036a858bdfc081e17cbe76e30340023d6f
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/3b/0fa9bb7faa11883b9e6d6ffd86f9622fdebd68 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/3b/0fa9bb7faa11883b9e6d6ffd86f9622fdebd68
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/6f/119e3ad0fe5242e55c67d5739aad6fb98d119f =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/6f/119e3ad0fe5242e55c67d5739aad6fb98d119f
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/03/cff532f95b3c783c6928dbfb4ce681d89f218d =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/03/cff532f95b3c783c6928dbfb4ce681d89f218d
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/9b/6fa262c4b9026ea409ad38ed9cb46b70c8d514 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/9b/6fa262c4b9026ea409ad38ed9cb46b70c8d514
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/9b/ff2ccd2922d2534d028dcc1f94ce85042f4d5c =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/9b/ff2ccd2922d2534d028dcc1f94ce85042f4d5c
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/35/75fdbfdc11ba90eabd370bef08fbc8eaf7094e =====
@@ -20756,6 +20817,11 @@ Login, admin and all tasks-1
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/b5/fbcd1aa536030be0fef1827dfce63a89c6a9ca
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/b5/fa9898b577e8ba6330fb33bce7fcb84bd56b26 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/b5/fa9898b577e8ba6330fb33bce7fcb84bd56b26
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/b5/ec5646f4b75d1c3a4b50057137e352509bc613 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/b5/ec5646f4b75d1c3a4b50057137e352509bc613
@@ -20764,6 +20830,16 @@ Login, admin and all tasks-1
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/bb/4d56566af915e161dfc27a8cd6701cea2bf834 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/bb/4d56566af915e161dfc27a8cd6701cea2bf834
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/bb/819bc00ff988edc71e4b9c980ad905fbe67735 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/bb/819bc00ff988edc71e4b9c980ad905fbe67735
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/be/e8bfb680c76ea3d0cdb9e41426a64632f7f067 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/be/e8bfb680c76ea3d0cdb9e41426a64632f7f067
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/da/7975672866100e273ab826840db449169e5cd9 =====
@@ -20791,6 +20867,11 @@ Login, admin and all tasks-1
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/e5/2e7a3baf75bce0fb7552a9a4f81acedcb6ac51
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/e2/a2801e7ff4ed33a43c80de264ade97edeac8de =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/e2/a2801e7ff4ed33a43c80de264ade97edeac8de
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/e2/714846edce11f490af75418e638c9b168dd61f =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/e2/714846edce11f490af75418e638c9b168dd61f
@@ -20809,6 +20890,11 @@ Login, admin and all tasks-1
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/ee/508ad6435245bad68f418e83f1fcd3b5aa1860 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/ee/508ad6435245bad68f418e83f1fcd3b5aa1860
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/fd/38196c04505054d9bdf6c7dfb98780b21925b7 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/fd/38196c04505054d9bdf6c7dfb98780b21925b7
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f2/e8684f80d73888b64932e773d9885602e2f1e1 =====
@@ -20834,6 +20920,11 @@ Login, admin and all tasks-1
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/cf/3960c6f59bc77540c94459e996e20765d93189 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/cf/3960c6f59bc77540c94459e996e20765d93189
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/ca/caaaf81384146378f377e528d9de0d6dc39987 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/ca/caaaf81384146378f377e528d9de0d6dc39987
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/e4/aab38f75d42d61a30c9c5dfca74c36189c6ed3 =====
@@ -20896,9 +20987,19 @@ Login, admin and all tasks-1
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/1f/c2d1b19e6da05c7c8e4ebbbd749cfa16281a10
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/73/3f08f0a47cf561d20b8b1971da3acd25c1b0c5 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/73/3f08f0a47cf561d20b8b1971da3acd25c1b0c5
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/80/00c86c2d97bd4707a7c30c7d4056f1020f1bb5 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/80/00c86c2d97bd4707a7c30c7d4056f1020f1bb5
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/80/9eaf8d5f300dd9f27545eacf17fc34e3ea8166 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/80/9eaf8d5f300dd9f27545eacf17fc34e3ea8166
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/74/e87b7dc559734d86c8badcf71c887226eb5653 =====
@@ -20909,6 +21010,11 @@ Login, admin and all tasks-1
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/74/2c3b746339ab4f4b0b671b9b870c5f3ec4b6bc =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/74/2c3b746339ab4f4b0b671b9b870c5f3ec4b6bc
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/28/e5a0b06f98639e2e90584aef597ac1e127daf2 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/28/e5a0b06f98639e2e90584aef597ac1e127daf2
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/7b/dd2c2a2bac5967419c42c612878c7304a7bc4b =====
@@ -20941,6 +21047,11 @@ Login, admin and all tasks-1
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/21/ea4f51b1be6d987bc839933e560815f38fb996
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/4d/678688a400a1012c4da35adf7bbe2359ee1ab7 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/4d/678688a400a1012c4da35adf7bbe2359ee1ab7
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/4d/0b2a034b162490318018cb45fe0c05bc6e465b =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/4d/0b2a034b162490318018cb45fe0c05bc6e465b
@@ -20949,6 +21060,11 @@ Login, admin and all tasks-1
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/2f/044714a84d65cb8ffbbdeda813ad651419333b =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/2f/044714a84d65cb8ffbbdeda813ad651419333b
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/9f/7c9ef97b19ea06bdca1c41e29c93ce3f83f3cf =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/9f/7c9ef97b19ea06bdca1c41e29c93ce3f83f3cf
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/6b/2410e683d710b8c21a5b6e39acde1a6ad30d4d =====
@@ -20964,6 +21080,11 @@ Login, admin and all tasks-1
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/38/9314b35bf4ed801a8e3e4543aa3f4ba2c32c70 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/38/9314b35bf4ed801a8e3e4543aa3f4ba2c32c70
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/9a/601a03985ef32c47eb91e93a746961c8ad73bb =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/9a/601a03985ef32c47eb91e93a746961c8ad73bb
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/9a/06261faa6b0163b4e9b32bdd29cdc59203201f =====
@@ -21000,6 +21121,16 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/53/384c4e009e0b42b9c70a3bbad120bf4ae66e94 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/53/384c4e009e0b42b9c70a3bbad120bf4ae66e94
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/5b/6c16729546cd62c7f4e146e9472fff89d18fad =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/5b/6c16729546cd62c7f4e146e9472fff89d18fad
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/08/f7849db958c48971f58555531ddfe14e106bf8 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/08/f7849db958c48971f58555531ddfe14e106bf8
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/6d/587cc260e23569d007a52e64e5f70541a3efee =====
@@ -21042,6 +21173,11 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/b8/e38795109a4441d4b796d2a4908c0ee63bf138
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/dd/b85393093a9604f1cfbaf48a48f6599daf8c4e =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/dd/b85393093a9604f1cfbaf48a48f6599daf8c4e
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/b6/2ff26df79e87405d901ddd6f31ea4d2f5054ab =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/b6/2ff26df79e87405d901ddd6f31ea4d2f5054ab
@@ -21077,6 +21213,11 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/ef/f71c207d81a1328fb248e60429ceb3282d5131
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/c4/3ba22e5f3b1f35a2077fa11cd68f8b899ad222 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/c4/3ba22e5f3b1f35a2077fa11cd68f8b899ad222
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f9/76e09a5defde43ed123b528e43c996adf7808a =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f9/76e09a5defde43ed123b528e43c996adf7808a
@@ -21085,6 +21226,11 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f0/474c9a6e839fee4087248521020fb0d60cab4d =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f0/474c9a6e839fee4087248521020fb0d60cab4d
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f7/8546abd21d5e4582178a5f752f1aaf66ff4666 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f7/8546abd21d5e4582178a5f752f1aaf66ff4666
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f7/8534072bbe65638fcc8d74f287d71efb2a4c1f =====
@@ -21132,6 +21278,11 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/2d/3c7b05d37ec5c73dd68e7adf693082ffc54fc7
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/2d/3da874e5154ab9c24854a43be73479f3963cf3 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/2d/3da874e5154ab9c24854a43be73479f3963cf3
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/2d/27d0d2c1d22afd46c922bc9036542025fb3612 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/2d/27d0d2c1d22afd46c922bc9036542025fb3612
@@ -21157,6 +21308,11 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/70/9e1ad7f7d08322b4342d77644a2c4907dee54e
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/84/622270eb964536384c4843ae1e307bc0476733 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/84/622270eb964536384c4843ae1e307bc0476733
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/4a/604ee7efb14a90fd0ec85b15ae5f2c6b6d9c98 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/4a/604ee7efb14a90fd0ec85b15ae5f2c6b6d9c98
@@ -21177,9 +21333,19 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/8d/2fb3822a496f33e7133e338b588eb2f3f6d3d2
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/8d/0972f96c352ca52fbf02a2836218ce5f5c00f6 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/8d/0972f96c352ca52fbf02a2836218ce5f5c00f6
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/1d/1a2254cd83d07a86dc9e34d3dbbe56608c44b9 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/1d/1a2254cd83d07a86dc9e34d3dbbe56608c44b9
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/76/fac12416ca2fd31a3b41ec4d5de9c6bd74f003 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/76/fac12416ca2fd31a3b41ec4d5de9c6bd74f003
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/82/157234ea53a6b9f74e79e7c3e140a3feb01299 =====
@@ -21235,6 +21401,12 @@ ff49db72d8006544cfadcaedf39e7add8f21aee0 1d1a2254cd83d07a86dc9e34d3dbbe56608c44b
 1d1a2254cd83d07a86dc9e34d3dbbe56608c44b9 384b630a42c04aa83815aecc484a06876103d712 Syed Khaja <syed@Syeds-MacBook-Air-2.local> 1748048196 +0400	commit: Fix Dockerfile for WeasyPrint deployment and add static/migrate support
 384b630a42c04aa83815aecc484a06876103d712 39c0cc092b7dce6659e880f0a8337d985240bb0a Syed-qn <snassirodinquadri@gmail.com> 1748868387 +0400	commit: Login, admin and all tasks
 39c0cc092b7dce6659e880f0a8337d985240bb0a 530e0569f5f9741edc41e734c166fd5157ea9b6e Syed-qn <snassirodinquadri@gmail.com> 1748869393 +0400	commit: Login, admin and all tasks-1
+530e0569f5f9741edc41e734c166fd5157ea9b6e bee8bfb680c76ea3d0cdb9e41426a64632f7f067 Syed-qn <snassirodinquadri@gmail.com> 1748870562 +0400	commit: Login, admin and all tasks-2
+bee8bfb680c76ea3d0cdb9e41426a64632f7f067 cacaaaf81384146378f377e528d9de0d6dc39987 Syed-qn <snassirodinquadri@gmail.com> 1748893485 +0400	commit: All tasks, download resolve
+cacaaaf81384146378f377e528d9de0d6dc39987 2d3da874e5154ab9c24854a43be73479f3963cf3 Syed-qn <snassirodinquadri@gmail.com> 1748894164 +0400	commit: All tasks, download resolve-1
+2d3da874e5154ab9c24854a43be73479f3963cf3 ddb85393093a9604f1cfbaf48a48f6599daf8c4e Syed-qn <snassirodinquadri@gmail.com> 1748894700 +0400	commit: All tasks, download resolve-2
+ddb85393093a9604f1cfbaf48a48f6599daf8c4e 733f08f0a47cf561d20b8b1971da3acd25c1b0c5 Syed-qn <snassirodinquadri@gmail.com> 1748894945 +0400	commit: All tasks, download resolve-2
+733f08f0a47cf561d20b8b1971da3acd25c1b0c5 84622270eb964536384c4843ae1e307bc0476733 Syed-qn <snassirodinquadri@gmail.com> 1748896424 +0400	commit: admin superuser
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/logs/refs/heads/main =====
@@ -21249,6 +21421,17 @@ ff49db72d8006544cfadcaedf39e7add8f21aee0 1d1a2254cd83d07a86dc9e34d3dbbe56608c44b
 1d1a2254cd83d07a86dc9e34d3dbbe56608c44b9 384b630a42c04aa83815aecc484a06876103d712 Syed Khaja <syed@Syeds-MacBook-Air-2.local> 1748048196 +0400	commit: Fix Dockerfile for WeasyPrint deployment and add static/migrate support
 384b630a42c04aa83815aecc484a06876103d712 39c0cc092b7dce6659e880f0a8337d985240bb0a Syed-qn <snassirodinquadri@gmail.com> 1748868387 +0400	commit: Login, admin and all tasks
 39c0cc092b7dce6659e880f0a8337d985240bb0a 530e0569f5f9741edc41e734c166fd5157ea9b6e Syed-qn <snassirodinquadri@gmail.com> 1748869393 +0400	commit: Login, admin and all tasks-1
+530e0569f5f9741edc41e734c166fd5157ea9b6e bee8bfb680c76ea3d0cdb9e41426a64632f7f067 Syed-qn <snassirodinquadri@gmail.com> 1748870562 +0400	commit: Login, admin and all tasks-2
+bee8bfb680c76ea3d0cdb9e41426a64632f7f067 cacaaaf81384146378f377e528d9de0d6dc39987 Syed-qn <snassirodinquadri@gmail.com> 1748893485 +0400	commit: All tasks, download resolve
+cacaaaf81384146378f377e528d9de0d6dc39987 2d3da874e5154ab9c24854a43be73479f3963cf3 Syed-qn <snassirodinquadri@gmail.com> 1748894164 +0400	commit: All tasks, download resolve-1
+2d3da874e5154ab9c24854a43be73479f3963cf3 ddb85393093a9604f1cfbaf48a48f6599daf8c4e Syed-qn <snassirodinquadri@gmail.com> 1748894700 +0400	commit: All tasks, download resolve-2
+ddb85393093a9604f1cfbaf48a48f6599daf8c4e 733f08f0a47cf561d20b8b1971da3acd25c1b0c5 Syed-qn <snassirodinquadri@gmail.com> 1748894945 +0400	commit: All tasks, download resolve-2
+733f08f0a47cf561d20b8b1971da3acd25c1b0c5 84622270eb964536384c4843ae1e307bc0476733 Syed-qn <snassirodinquadri@gmail.com> 1748896424 +0400	commit: admin superuser
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/logs/refs/remotes/origin/HEAD =====
+
+0000000000000000000000000000000000000000 733f08f0a47cf561d20b8b1971da3acd25c1b0c5 Syed-qn <snassirodinquadri@gmail.com> 1748895459 +0400	fetch
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/logs/refs/remotes/origin/main =====
@@ -21264,6 +21447,11 @@ ff49db72d8006544cfadcaedf39e7add8f21aee0 1d1a2254cd83d07a86dc9e34d3dbbe56608c44b
 1d1a2254cd83d07a86dc9e34d3dbbe56608c44b9 384b630a42c04aa83815aecc484a06876103d712 Syed Khaja <syed@Syeds-MacBook-Air-2.local> 1748048198 +0400	update by push
 384b630a42c04aa83815aecc484a06876103d712 39c0cc092b7dce6659e880f0a8337d985240bb0a Syed-qn <snassirodinquadri@gmail.com> 1748868391 +0400	update by push
 39c0cc092b7dce6659e880f0a8337d985240bb0a 530e0569f5f9741edc41e734c166fd5157ea9b6e Syed-qn <snassirodinquadri@gmail.com> 1748869395 +0400	update by push
+530e0569f5f9741edc41e734c166fd5157ea9b6e bee8bfb680c76ea3d0cdb9e41426a64632f7f067 Syed-qn <snassirodinquadri@gmail.com> 1748870563 +0400	update by push
+bee8bfb680c76ea3d0cdb9e41426a64632f7f067 cacaaaf81384146378f377e528d9de0d6dc39987 Syed-qn <snassirodinquadri@gmail.com> 1748893486 +0400	update by push
+cacaaaf81384146378f377e528d9de0d6dc39987 2d3da874e5154ab9c24854a43be73479f3963cf3 Syed-qn <snassirodinquadri@gmail.com> 1748894166 +0400	update by push
+2d3da874e5154ab9c24854a43be73479f3963cf3 733f08f0a47cf561d20b8b1971da3acd25c1b0c5 Syed-qn <snassirodinquadri@gmail.com> 1748895453 +0400	update by push
+733f08f0a47cf561d20b8b1971da3acd25c1b0c5 84622270eb964536384c4843ae1e307bc0476733 Syed-qn <snassirodinquadri@gmail.com> 1748896496 +0400	update by push
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/hooks/commit-msg.sample =====
@@ -22192,12 +22380,17 @@ fi
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/refs/heads/main =====
 
-530e0569f5f9741edc41e734c166fd5157ea9b6e
+84622270eb964536384c4843ae1e307bc0476733
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/refs/remotes/origin/HEAD =====
+
+ref: refs/remotes/origin/main
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/refs/remotes/origin/main =====
 
-530e0569f5f9741edc41e734c166fd5157ea9b6e
+84622270eb964536384c4843ae1e307bc0476733
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/media/resumes/AI_-_Syed_Nasirodin_Quadri_Resume.pdf =====

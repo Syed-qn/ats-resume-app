@@ -240,7 +240,9 @@ ENV DJANGO_SETTINGS_MODULE=ats_resume_app.settings
 
 # Collect static files and run migrations before starting server
 RUN mkdir -p /app/staticfiles
-RUN python manage.py collectstatic --noinput
+# after
+RUN python manage.py migrate --noinput && \
+    python manage.py collectstatic --noinput
 
 # Final entrypoint to apply migrations and start gunicorn
 CMD ["sh", "-c", "python manage.py migrate && gunicorn ats_resume_app.wsgi:application --bind 0.0.0.0:$PORT --timeout 120 --workers 1"]
@@ -597,6 +599,39 @@ web: gunicorn ats_resume_app.wsgi:application --log-file -
 
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/resume/signals.py =====
+
+# resume/signals.py
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.db.models.signals import post_migrate
+from django.dispatch import receiver
+
+@receiver(post_migrate)
+def create_or_update_bootstrap_admin(**kwargs):
+    cfg = getattr(settings, "ADMIN_CONFIG", {})
+    username = cfg.get("USERNAME")
+    email    = cfg.get("EMAIL")
+    password = cfg.get("PASSWORD")
+
+    if not all([username, email, password]):
+        # Missing secrets – silently skip
+        return
+
+    User = get_user_model()
+    user, _ = User.objects.update_or_create(
+        username=username,
+        defaults={
+            "email": email,
+            "is_staff": True,
+            "is_superuser": True,
+        },
+    )
+    if not user.check_password(password):
+        user.set_password(password)
+        user.save()
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/resume/.DS_Store =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/resume/.DS_Store
@@ -888,12 +923,40 @@ class VolunteerExperience(models.Model):
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/resume/apps.py =====
 
+# resume/apps.py
 from django.apps import AppConfig
-
+from django.conf import settings
+from django.contrib.auth import get_user_model
 
 class ResumeConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "resume"
+    name = "resume"           # ← keep your app label
+
+    def ready(self):
+        # Only registers the signal; nothing touches the DB yet
+        import resume.signals  # noqa
+
+    def ready(self):
+        """Create or update the bootstrap super-user on every boot."""
+        cfg = getattr(settings, "ADMIN_CONFIG", {})          # already in settings.py:contentReference[oaicite:7]{index=7}
+        username = cfg.get("USERNAME")
+        email    = cfg.get("EMAIL")
+        password = cfg.get("PASSWORD")
+
+        if username and email and password:
+            User = get_user_model()
+            user, created = User.objects.update_or_create(
+                username=username,
+                defaults={
+                    "email": email,
+                    "is_staff": True,
+                    "is_superuser": True,
+                },
+            )
+            if created or not user.check_password(password):
+                user.set_password(password)
+                user.save()
+
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/resume/deepseek_client.py =====
 
@@ -20164,7 +20227,7 @@ INSTALLED_APPS = [
     'corsheaders',
     "django_countries",
     "phonenumber_field",
-    'resume',  # Your app
+    "resume.apps.ResumeConfig",  # Your app
 ]
 
 # ====== MIDDLEWARE CONFIGURATION - Updated for Task 14 ======
@@ -20733,12 +20796,12 @@ Unnamed repository; edit this file 'description' to name the repository.
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/COMMIT_EDITMSG =====
 
-admin superuser 1
+admin superuser signal
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/FETCH_HEAD =====
 
-5165527ae5ba512a5360afe5cad0f4a8684c8be7		branch 'main' of https://github.com/Syed-qn/ats-resume-app
+719554cacfce2de67166cf21c82bbd22a63986d2		branch 'main' of https://github.com/Syed-qn/ats-resume-app
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/0d/84287d8e8a67d4b1fe581bb315172cd01881fc =====
@@ -20749,6 +20812,16 @@ admin superuser 1
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/95/24bc036a858bdfc081e17cbe76e30340023d6f =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/95/24bc036a858bdfc081e17cbe76e30340023d6f
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/95/8d3023b2bfeb25428102d8a94e9d7dc34e3cb2 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/95/8d3023b2bfeb25428102d8a94e9d7dc34e3cb2
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/92/e333f6d48636f658ceeb6230175c85bc249a5d =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/92/e333f6d48636f658ceeb6230175c85bc249a5d
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/3b/0fa9bb7faa11883b9e6d6ffd86f9622fdebd68 =====
@@ -20816,6 +20889,11 @@ admin superuser 1
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/5a/8a5d6eb8deccdfc6622f9e9574bf29dbd26934
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/9d/15b1467fc38b851419f3812bd6c51afe6faf93 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/9d/15b1467fc38b851419f3812bd6c51afe6faf93
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/b5/fbcd1aa536030be0fef1827dfce63a89c6a9ca =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/b5/fbcd1aa536030be0fef1827dfce63a89c6a9ca
@@ -20829,6 +20907,11 @@ admin superuser 1
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/b5/ec5646f4b75d1c3a4b50057137e352509bc613 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/b5/ec5646f4b75d1c3a4b50057137e352509bc613
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/b5/2bdc5b4b60554560e1c5657add9a51f7fd0644 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/b5/2bdc5b4b60554560e1c5657add9a51f7fd0644
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/bb/4d56566af915e161dfc27a8cd6701cea2bf834 =====
@@ -20859,6 +20942,11 @@ admin superuser 1
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/a2/22a4bc238191ce2e80cc47e56b3953c107e6fb =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/a2/22a4bc238191ce2e80cc47e56b3953c107e6fb
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/d1/f219475642fb51ff9251288d264a06ec87533b =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/d1/f219475642fb51ff9251288d264a06ec87533b
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/d1/6a318ca510ae45a945df6bc662082c63f0a6f1 =====
@@ -20914,6 +21002,11 @@ admin superuser 1
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f2/0f2845162bb9f90338ddf910dbff17e649fb67 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f2/0f2845162bb9f90338ddf910dbff17e649fb67
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f5/91bde0acde8ef0717e287116b6851806ca3876 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f5/91bde0acde8ef0717e287116b6851806ca3876
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f5/14c58769ea0945cb47fa60c1190bfe241ae85d =====
@@ -21051,6 +21144,11 @@ admin superuser 1
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/4c/716bb2363f8d90e1fae9f058481fb24e4a040e
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/26/f5267d9b3b5fea868759fb83f1934ab80e5ab6 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/26/f5267d9b3b5fea868759fb83f1934ab80e5ab6
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/21/ea4f51b1be6d987bc839933e560815f38fb996 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/21/ea4f51b1be6d987bc839933e560815f38fb996
@@ -21117,9 +21215,19 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/62/fea5172a8ff0cae54622d670207cdde7afa2b4 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/62/fea5172a8ff0cae54622d670207cdde7afa2b4
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/62/4d36fbe15f8f54670a250e97df69f806156d4d =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/62/4d36fbe15f8f54670a250e97df69f806156d4d
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/54/346f29980506795916467131c740cd4956d3a6 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/54/346f29980506795916467131c740cd4956d3a6
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/54/725b3d0af123908b90005c27aa98ba79a6ab13 =====
@@ -21167,6 +21275,11 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/99/2e58555b1160172938860484f7b39b30144341
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/55/bcbb3cb2f62a8ea51acd1ed93e8144996cc099 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/55/bcbb3cb2f62a8ea51acd1ed93e8144996cc099
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/97/22c1b826eafc45bfb6cfc7203e9981d26263fe =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/97/22c1b826eafc45bfb6cfc7203e9981d26263fe
@@ -21195,6 +21308,11 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/dd/b85393093a9604f1cfbaf48a48f6599daf8c4e =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/dd/b85393093a9604f1cfbaf48a48f6599daf8c4e
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/dc/d5e5e875e11416452b707aed1ccb6b584449bb =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/dc/d5e5e875e11416452b707aed1ccb6b584449bb
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/b6/2ff26df79e87405d901ddd6f31ea4d2f5054ab =====
@@ -21282,6 +21400,11 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f6/c802e9cdd297d3c8ec235b7e561f06132c19e5
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/e9/6e50e009bfb53f8cfb6f4437d1279a5a1d6359 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/e9/6e50e009bfb53f8cfb6f4437d1279a5a1d6359
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f1/f6fe7d31af57466c67fa14eb5470499514bf35 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f1/f6fe7d31af57466c67fa14eb5470499514bf35
@@ -21362,6 +21485,11 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/1d/1a2254cd83d07a86dc9e34d3dbbe56608c44b9
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/71/9554cacfce2de67166cf21c82bbd22a63986d2 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/71/9554cacfce2de67166cf21c82bbd22a63986d2
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/76/fac12416ca2fd31a3b41ec4d5de9c6bd74f003 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/76/fac12416ca2fd31a3b41ec4d5de9c6bd74f003
@@ -21427,6 +21555,8 @@ cacaaaf81384146378f377e528d9de0d6dc39987 2d3da874e5154ab9c24854a43be73479f3963cf
 ddb85393093a9604f1cfbaf48a48f6599daf8c4e 733f08f0a47cf561d20b8b1971da3acd25c1b0c5 Syed-qn <snassirodinquadri@gmail.com> 1748894945 +0400	commit: All tasks, download resolve-2
 733f08f0a47cf561d20b8b1971da3acd25c1b0c5 84622270eb964536384c4843ae1e307bc0476733 Syed-qn <snassirodinquadri@gmail.com> 1748896424 +0400	commit: admin superuser
 84622270eb964536384c4843ae1e307bc0476733 5165527ae5ba512a5360afe5cad0f4a8684c8be7 Syed-qn <snassirodinquadri@gmail.com> 1749144095 +0400	commit: admin superuser 1
+5165527ae5ba512a5360afe5cad0f4a8684c8be7 62fea5172a8ff0cae54622d670207cdde7afa2b4 Syed-qn <snassirodinquadri@gmail.com> 1749145790 +0400	commit: resume app admin
+62fea5172a8ff0cae54622d670207cdde7afa2b4 719554cacfce2de67166cf21c82bbd22a63986d2 Syed-qn <snassirodinquadri@gmail.com> 1749146173 +0400	commit: admin superuser signal
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/logs/refs/heads/main =====
@@ -21448,6 +21578,8 @@ cacaaaf81384146378f377e528d9de0d6dc39987 2d3da874e5154ab9c24854a43be73479f3963cf
 ddb85393093a9604f1cfbaf48a48f6599daf8c4e 733f08f0a47cf561d20b8b1971da3acd25c1b0c5 Syed-qn <snassirodinquadri@gmail.com> 1748894945 +0400	commit: All tasks, download resolve-2
 733f08f0a47cf561d20b8b1971da3acd25c1b0c5 84622270eb964536384c4843ae1e307bc0476733 Syed-qn <snassirodinquadri@gmail.com> 1748896424 +0400	commit: admin superuser
 84622270eb964536384c4843ae1e307bc0476733 5165527ae5ba512a5360afe5cad0f4a8684c8be7 Syed-qn <snassirodinquadri@gmail.com> 1749144095 +0400	commit: admin superuser 1
+5165527ae5ba512a5360afe5cad0f4a8684c8be7 62fea5172a8ff0cae54622d670207cdde7afa2b4 Syed-qn <snassirodinquadri@gmail.com> 1749145790 +0400	commit: resume app admin
+62fea5172a8ff0cae54622d670207cdde7afa2b4 719554cacfce2de67166cf21c82bbd22a63986d2 Syed-qn <snassirodinquadri@gmail.com> 1749146173 +0400	commit: admin superuser signal
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/logs/refs/remotes/origin/HEAD =====
@@ -21474,6 +21606,8 @@ cacaaaf81384146378f377e528d9de0d6dc39987 2d3da874e5154ab9c24854a43be73479f3963cf
 2d3da874e5154ab9c24854a43be73479f3963cf3 733f08f0a47cf561d20b8b1971da3acd25c1b0c5 Syed-qn <snassirodinquadri@gmail.com> 1748895453 +0400	update by push
 733f08f0a47cf561d20b8b1971da3acd25c1b0c5 84622270eb964536384c4843ae1e307bc0476733 Syed-qn <snassirodinquadri@gmail.com> 1748896496 +0400	update by push
 84622270eb964536384c4843ae1e307bc0476733 5165527ae5ba512a5360afe5cad0f4a8684c8be7 Syed-qn <snassirodinquadri@gmail.com> 1749144099 +0400	update by push
+5165527ae5ba512a5360afe5cad0f4a8684c8be7 62fea5172a8ff0cae54622d670207cdde7afa2b4 Syed-qn <snassirodinquadri@gmail.com> 1749145791 +0400	update by push
+62fea5172a8ff0cae54622d670207cdde7afa2b4 719554cacfce2de67166cf21c82bbd22a63986d2 Syed-qn <snassirodinquadri@gmail.com> 1749146175 +0400	update by push
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/hooks/commit-msg.sample =====
@@ -22402,7 +22536,7 @@ fi
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/refs/heads/main =====
 
-5165527ae5ba512a5360afe5cad0f4a8684c8be7
+719554cacfce2de67166cf21c82bbd22a63986d2
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/refs/remotes/origin/HEAD =====
@@ -22412,7 +22546,7 @@ ref: refs/remotes/origin/main
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/refs/remotes/origin/main =====
 
-5165527ae5ba512a5360afe5cad0f4a8684c8be7
+719554cacfce2de67166cf21c82bbd22a63986d2
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/media/resumes/AI_-_Syed_Nasirodin_Quadri_Resume.pdf =====

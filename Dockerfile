@@ -40,7 +40,9 @@ ENV DJANGO_SETTINGS_MODULE=ats_resume_app.settings
 
 # Collect static files and run migrations before starting server
 RUN mkdir -p /app/staticfiles
-RUN python manage.py collectstatic --noinput
+# after
+RUN python manage.py migrate --noinput && \
+    python manage.py collectstatic --noinput
 
 # Final entrypoint to apply migrations and start gunicorn
 CMD ["sh", "-c", "python manage.py migrate && gunicorn ats_resume_app.wsgi:application --bind 0.0.0.0:$PORT --timeout 120 --workers 1"]

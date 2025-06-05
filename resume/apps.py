@@ -8,6 +8,10 @@ class ResumeConfig(AppConfig):
     name = "resume"           # ← keep your app label
 
     def ready(self):
+        # Only registers the signal; nothing touches the DB yet
+        import resume.signals  # noqa
+
+    def ready(self):
         """Create or update the bootstrap super-user on every boot."""
         cfg = getattr(settings, "ADMIN_CONFIG", {})          # already in settings.py:contentReference[oaicite:7]{index=7}
         username = cfg.get("USERNAME")

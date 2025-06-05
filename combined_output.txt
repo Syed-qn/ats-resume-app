@@ -137,17 +137,15 @@ python-docx==0.8.11
 
 ##############################################################################
 # PDF & HTML Rendering  ➜  **Upgraded WeasyPrint stack**
-#   – WeasyPrint 62+ already depends on pydyf ≥0.10 and tinycss2 ≥1.3
-#   – These lines pin everything to versions known-good on Python 3.11
-weasyprint==62.3          # (latest at 2025-06-03)
+weasyprint==62.3
 pydyf==0.10.0
 tinycss2==1.3.0
 html5lib==1.1
 
 ##############################################################################
 # AI / LLM Integration
-openai>=1.3.7              # use environment variable OPENAI_API_KEY
-tiktoken==0.5.1            # token counting
+openai>=1.3.7
+tiktoken==0.5.1
 
 ##############################################################################
 # Data Handling
@@ -160,7 +158,7 @@ Pillow==10.1.0
 
 ##############################################################################
 # Optional: PostgreSQL, caching, async tasks
-psycopg2-binary==2.9.9     # uncomment if DATABASE_URL is postgres://…
+psycopg2-binary==2.9.9
 # redis==5.0.1
 # celery==5.3.4
 
@@ -169,7 +167,7 @@ psycopg2-binary==2.9.9     # uncomment if DATABASE_URL is postgres://…
 requests==2.31.0
 urllib3==2.1.0
 
-#################
+##############################################################################
 # Config / Env helpers
 python-decouple==3.8
 python-dotenv==1.0.0
@@ -184,7 +182,7 @@ django-cors-headers==4.3.1
 whitenoise==6.6.0
 gunicorn==21.2.0
 
-####################################
+##############################################################################
 # Utilities
 chardet==5.2.0
 python-slugify==8.0.1
@@ -192,6 +190,7 @@ beautifulsoup4==4.12.3
 django-countries==7.6.1
 django-phonenumber-field==7.2.0
 phonenumbers==9.0.6
+
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/combined_output.txt =====
 
@@ -20734,12 +20733,12 @@ Unnamed repository; edit this file 'description' to name the repository.
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/COMMIT_EDITMSG =====
 
-admin superuser
+admin superuser 1
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/FETCH_HEAD =====
 
-84622270eb964536384c4843ae1e307bc0476733		branch 'main' of https://github.com/Syed-qn/ats-resume-app
+5165527ae5ba512a5360afe5cad0f4a8684c8be7		branch 'main' of https://github.com/Syed-qn/ats-resume-app
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/0d/84287d8e8a67d4b1fe581bb315172cd01881fc =====
@@ -20785,6 +20784,11 @@ admin superuser
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/56/f1be8b29d0ceb0407457e5abb8edad098c7179 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/56/f1be8b29d0ceb0407457e5abb8edad098c7179
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/51/65527ae5ba512a5360afe5cad0f4a8684c8be7 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/51/65527ae5ba512a5360afe5cad0f4a8684c8be7
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/0b/1dd0f61954ca3778f7a2c93322eccc7bc8f938 =====
@@ -20845,6 +20849,11 @@ admin superuser
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/da/7975672866100e273ab826840db449169e5cd9 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/da/7975672866100e273ab826840db449169e5cd9
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/b4/cfbab1267de43887c57744f3b318bfa424e05a =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/b4/cfbab1267de43887c57744f3b318bfa424e05a
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/a2/22a4bc238191ce2e80cc47e56b3953c107e6fb =====
@@ -21113,6 +21122,11 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/62/4d36fbe15f8f54670a250e97df69f806156d4d
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/54/725b3d0af123908b90005c27aa98ba79a6ab13 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/54/725b3d0af123908b90005c27aa98ba79a6ab13
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/53/0e0569f5f9741edc41e734c166fd5157ea9b6e =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/53/0e0569f5f9741edc41e734c166fd5157ea9b6e
@@ -21151,6 +21165,11 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/99/2e58555b1160172938860484f7b39b30144341 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/99/2e58555b1160172938860484f7b39b30144341
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/97/22c1b826eafc45bfb6cfc7203e9981d26263fe =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/97/22c1b826eafc45bfb6cfc7203e9981d26263fe
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/0a/375fd57a2ef298b5b23209476e3585dd3ee2a0 =====
@@ -21407,6 +21426,7 @@ cacaaaf81384146378f377e528d9de0d6dc39987 2d3da874e5154ab9c24854a43be73479f3963cf
 2d3da874e5154ab9c24854a43be73479f3963cf3 ddb85393093a9604f1cfbaf48a48f6599daf8c4e Syed-qn <snassirodinquadri@gmail.com> 1748894700 +0400	commit: All tasks, download resolve-2
 ddb85393093a9604f1cfbaf48a48f6599daf8c4e 733f08f0a47cf561d20b8b1971da3acd25c1b0c5 Syed-qn <snassirodinquadri@gmail.com> 1748894945 +0400	commit: All tasks, download resolve-2
 733f08f0a47cf561d20b8b1971da3acd25c1b0c5 84622270eb964536384c4843ae1e307bc0476733 Syed-qn <snassirodinquadri@gmail.com> 1748896424 +0400	commit: admin superuser
+84622270eb964536384c4843ae1e307bc0476733 5165527ae5ba512a5360afe5cad0f4a8684c8be7 Syed-qn <snassirodinquadri@gmail.com> 1749144095 +0400	commit: admin superuser 1
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/logs/refs/heads/main =====
@@ -21427,6 +21447,7 @@ cacaaaf81384146378f377e528d9de0d6dc39987 2d3da874e5154ab9c24854a43be73479f3963cf
 2d3da874e5154ab9c24854a43be73479f3963cf3 ddb85393093a9604f1cfbaf48a48f6599daf8c4e Syed-qn <snassirodinquadri@gmail.com> 1748894700 +0400	commit: All tasks, download resolve-2
 ddb85393093a9604f1cfbaf48a48f6599daf8c4e 733f08f0a47cf561d20b8b1971da3acd25c1b0c5 Syed-qn <snassirodinquadri@gmail.com> 1748894945 +0400	commit: All tasks, download resolve-2
 733f08f0a47cf561d20b8b1971da3acd25c1b0c5 84622270eb964536384c4843ae1e307bc0476733 Syed-qn <snassirodinquadri@gmail.com> 1748896424 +0400	commit: admin superuser
+84622270eb964536384c4843ae1e307bc0476733 5165527ae5ba512a5360afe5cad0f4a8684c8be7 Syed-qn <snassirodinquadri@gmail.com> 1749144095 +0400	commit: admin superuser 1
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/logs/refs/remotes/origin/HEAD =====
@@ -21452,6 +21473,7 @@ bee8bfb680c76ea3d0cdb9e41426a64632f7f067 cacaaaf81384146378f377e528d9de0d6dc3998
 cacaaaf81384146378f377e528d9de0d6dc39987 2d3da874e5154ab9c24854a43be73479f3963cf3 Syed-qn <snassirodinquadri@gmail.com> 1748894166 +0400	update by push
 2d3da874e5154ab9c24854a43be73479f3963cf3 733f08f0a47cf561d20b8b1971da3acd25c1b0c5 Syed-qn <snassirodinquadri@gmail.com> 1748895453 +0400	update by push
 733f08f0a47cf561d20b8b1971da3acd25c1b0c5 84622270eb964536384c4843ae1e307bc0476733 Syed-qn <snassirodinquadri@gmail.com> 1748896496 +0400	update by push
+84622270eb964536384c4843ae1e307bc0476733 5165527ae5ba512a5360afe5cad0f4a8684c8be7 Syed-qn <snassirodinquadri@gmail.com> 1749144099 +0400	update by push
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/hooks/commit-msg.sample =====
@@ -22380,7 +22402,7 @@ fi
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/refs/heads/main =====
 
-84622270eb964536384c4843ae1e307bc0476733
+5165527ae5ba512a5360afe5cad0f4a8684c8be7
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/refs/remotes/origin/HEAD =====
@@ -22390,7 +22412,7 @@ ref: refs/remotes/origin/main
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/refs/remotes/origin/main =====
 
-84622270eb964536384c4843ae1e307bc0476733
+5165527ae5ba512a5360afe5cad0f4a8684c8be7
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/media/resumes/AI_-_Syed_Nasirodin_Quadri_Resume.pdf =====

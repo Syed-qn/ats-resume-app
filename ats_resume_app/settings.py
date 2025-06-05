@@ -22,7 +22,7 @@ INSTALLED_APPS = [
     'corsheaders',
     "django_countries",
     "phonenumber_field",
-    'resume',  # Your app
+    "resume.apps.ResumeConfig",  # Your app
 ]
 
 # ====== MIDDLEWARE CONFIGURATION - Updated for Task 14 ======

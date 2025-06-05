@@ -28,6 +28,8 @@ RUN set -eux; \
         libffi-dev \
         libcairo2 \
         libpango-1.0-0 \
+        libpangoft2-1.0-0 \
+        libpangocairo-1.0-0 \
         libharfbuzz0b \
         libgdk-pixbuf2.0-0 \
         libxml2 \

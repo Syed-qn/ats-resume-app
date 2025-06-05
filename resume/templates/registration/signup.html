@@ -216,9 +216,25 @@
       font-size: 0.95rem;
     }
 
-    .input-wrapper {
-      position: relative;
+    .input-wrapper{
+      display:flex;
+      align-items:center;
     }
+
+    .input-wrapper .input-icon{
+      position:static;          /* was absolute */
+      margin-left:1rem;
+      flex-shrink:0;
+    }
+
+    .input-wrapper .form-control{
+      flex:1 1 auto;
+      padding-left:0;           /* mobile */
+    }
+    @media (min-width:600px){
+      .input-wrapper .form-control{padding-left:.5rem;}
+    }
+
 
     .form-control {
       width: 100%;

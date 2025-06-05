@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>ATS Resume Optimizer</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <style>
     /* -------------  GENERIC  ------------- */
@@ -1049,20 +1050,53 @@
     }
 
     /* DOWNLOAD PDF */
-    async function downloadPDF(){
-      if(!currentResumeID) return;
-      const res=await fetch(`/api/download/${currentResumeID}/`);
-      if(!res.ok) return showError('Download failed');
-      const cd=res.headers.get('Content-Disposition')||'';
-      const m=cd.match(/filename="?([^"]+)"?/);
-      const fname=m?m[1]:'resume.pdf';
-      const blob=await res.blob(), url=URL.createObjectURL(blob);
-      const a=document.createElement('a');
-      a.href=url; a.download=fname;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+    async function downloadPDF () {
+      if (!currentResumeID) return;
+
+      try {
+        const res = await fetch(`/api/download/${currentResumeID}/`);
+
+        /* ----- 1. Handle non-200 responses ----- */
+        if (!res.ok) {
+          // Try to parse the JSON error payload; fallback to plain-text
+          let payload = {};
+          try { payload = await res.json(); } catch (_) { /* ignore */ }
+
+          // 429 from our quota guard
+          if (payload.contact_url) {
+            return Swal.fire({
+              icon: 'warning',
+              title: 'Download limit reached',
+              text: payload.message || 'You have crossed your free limit.',
+              confirmButtonText: 'Contact on WhatsApp',
+              confirmButtonColor: '#25D366'
+            }).then(() => window.open(payload.contact_url, '_blank'));
+          }
+
+          // Any other error → generic handler
+          return showError(payload.error || 'Download failed');
+        }
+
+        /* ----- 2. Success: stream the PDF to the user ----- */
+        const contentDisp = res.headers.get('Content-Disposition') || '';
+        const match      = contentDisp.match(/filename="?([^"]+)"?/i);
+        const filename   = match ? match[1] : 'resume.pdf';
+
+        const blob = await res.blob();
+        const url  = URL.createObjectURL(blob);
+
+        const a    = document.createElement('a');
+        a.href     = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+      catch (err) {
+        console.error(err);
+        showError('Network error while downloading PDF');
+      }
     }
 
     /* UTILS */

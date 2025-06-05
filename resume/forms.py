@@ -199,12 +199,12 @@ class EmailAuthenticationForm(AuthenticationForm):
     """
     Enhanced authentication form with better error handling and styling
     """
-    username = forms.CharField(
-        label="Username",
-        widget=forms.TextInput(attrs={
+    username = forms.EmailField(
+        label="Email",
+        widget=forms.EmailInput(attrs={
             "autofocus": True, 
             "class": "form-control",
-            "placeholder": "Enter your username"
+            "placeholder": "you@example.com"
         }),
         error_messages={
             'required': 'Username is required.',

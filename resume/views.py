@@ -1283,63 +1283,74 @@ def _create_intelligent_fallback(resume_text: str, template_html: str, job_analy
 
 @login_required(login_url="login")
 def download_pdf_ajax(request: HttpRequest, resume_id: int) -> HttpResponse:
-    """Send tailored resume PDF with login protection - Task 14"""
-    # Check download limits for non-superusers
+    """
+    Tailored-resume PDF download with:
+    • Per-user rate limits (configurable)
+    • Cache / session fallback
+    • Filename sanitising
+    """
+    # ── 1. Resolve rate-limit caps ───────────────────────────────────────
+    LIMIT_15, LIMIT_MONTH = 3, 6            # safe defaults
     if not request.user.is_superuser:
-        past_15 = now() - timedelta(days=15)
-        count_15 = DownloadLog.objects.filter(
-            user=request.user, downloaded__gte=past_15
-        ).count()
-        start_month = now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        count_month = DownloadLog.objects.filter(
-            user=request.user, downloaded__gte=start_month
-        ).count()
+        # a) user.profile fields (preferred – add IntegerFields to your profile model)
+        if hasattr(request.user, "profile"):
+            LIMIT_15 = request.user.profile.limit_15_days or LIMIT_15
+            LIMIT_MONTH = request.user.profile.limit_month or LIMIT_MONTH
+        # b) session override (set by your custom admin panel)
+        sess_key = f"user_{request.user.id}_download_limits"
+        if (custom := request.session.get(sess_key)):
+            LIMIT_15   = custom.get("per_15_days", LIMIT_15)
+            LIMIT_MONTH = custom.get("per_month", LIMIT_MONTH)
 
-        if count_15 >= 3 or count_month >= 6:
+        # actual usage counters
+        past_15      = now() - timedelta(days=15)
+        month_start  = now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        count_15     = DownloadLog.objects.filter(user=request.user,
+                                                  downloaded__gte=past_15).count()
+        count_month  = DownloadLog.objects.filter(user=request.user,
+                                                  downloaded__gte=month_start).count()
+
+        if count_15 >= LIMIT_15 or count_month >= LIMIT_MONTH:
+            wa_number  = settings.WHATSAPP_PHONE_NUMBER
+            wa_msg     = settings.WHATSAPP_DEFAULT_MESSAGE
+            contact_url = f"https://wa.me/916303858671?text=Hi! Can you please increase my qouta?"
             return JsonResponse({
-                "error": "Download limit reached: 3 per 15 days, 6 per month."
+                "message": (
+                    "🚫 You have crossed your free limit. "
+                    "Please contact us on WhatsApp to increase the quota."
+                ),
+                "contact_url": contact_url,
+                "limit_15": LIMIT_15,
+                "limit_month": LIMIT_MONTH,
             }, status=429)
 
-    # Try to get from cache first
-    session_key = f"tailored_resume_{request.user.id}_{resume_id}"
-    session_data = cache.get(session_key)
-    
-    if session_data:
-        html_resume = session_data.get("tailored_resume")
-        iterations_used = session_data.get("iterations_used", "unknown")
-    else:
-        # Fallback to session
-        html_resume = request.session.get("tailored_resume")
-        iterations_used = "unknown"
-    
+    # ── 2. Load pre-generated HTML (cache → session) ────────────────────
+    cache_key   = f"tailored_resume_{request.user.id}_{resume_id}"
+    session_key = "tailored_resume"
+    data        = cache.get(cache_key) or {"tailored_resume": request.session.get(session_key)}
+    html_resume = data.get("tailored_resume")
+
     if not html_resume:
         return JsonResponse({"error": "Generate resume first"}, status=400)
 
-    # Ensure this resume belongs to the user
+    # ── 3. Ensure resume belongs to user ─────────────────────────────────
     resume = get_object_or_404(Resume, id=resume_id, user=request.user)
 
-    # Build filename with optimization info
-    applicant = resume.user.username
-    tpl_meta = next(
-        (t for t in TEMPLATES_LIST if t["id"] == (session_data or request.session).get("template_id")),
-        None
-    )
-    style = (tpl_meta["name"].split()[0] + " style") if tpl_meta else "style"
+    # ── 4. Build safe filename -------------------------------------------------
     safe = lambda s: re.sub(r"[^A-Za-z0-9 _-]+", "", s).strip().lower()
-    filename = f"{safe(applicant)} - {safe(style)} - llm-optimized.pdf"
+    tpl_meta   = next((t for t in TEMPLATES_LIST if t["id"] == data.get("template_id")), None)
+    style_name = (tpl_meta["name"].split()[0] + " style") if tpl_meta else "style"
+    filename   = f"{safe(resume.user.username)} - {safe(style_name)} - llm-optimized.pdf"
 
-    # Render to PDF
-    pdf_html = render_to_string("resume/pdf_template.html", {"final_resume": html_resume})
-    pdf_file = HTML(string=pdf_html).write_pdf()
+    # ── 5. Render → PDF + log download ───────────────────────────────────
+    pdf_html  = render_to_string("resume/pdf_template.html", {"final_resume": html_resume})
+    pdf_bytes = HTML(string=pdf_html).write_pdf()
+    DownloadLog.objects.create(user=request.user, resume=resume)  # keep a trail
 
-    # Log download
-    DownloadLog.objects.create(user=request.user)
-
-    # Send as attachment
-    response = HttpResponse(pdf_file, content_type="application/pdf")
+    # ── 6. Ship it ───────────────────────────────────────────────────────
+    response = HttpResponse(pdf_bytes, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="{filename}"'
     return response
-
 
 # ─────────────────────  Template List AJAX  ─────────────────────
 

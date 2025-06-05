@@ -69,6 +69,12 @@ DATABASES = {
     }
 }
 
+# ======= Backend for email ======
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "resume.backends.EmailBackend",      # <-- add
+]
+
 # ====== PASSWORD VALIDATION ======
 AUTH_PASSWORD_VALIDATORS = [
     {

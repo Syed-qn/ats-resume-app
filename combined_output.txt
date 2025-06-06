@@ -228,6 +228,8 @@ RUN set -eux; \
         libffi-dev \
         libcairo2 \
         libpango-1.0-0 \
+        libpangoft2-1.0-0 \
+        libpangocairo-1.0-0 \
         libharfbuzz0b \
         libgdk-pixbuf2.0-0 \
         libxml2 \
@@ -1195,12 +1197,12 @@ class EmailAuthenticationForm(AuthenticationForm):
     """
     Enhanced authentication form with better error handling and styling
     """
-    username = forms.CharField(
-        label="Username",
-        widget=forms.TextInput(attrs={
+    username = forms.EmailField(
+        label="Email",
+        widget=forms.EmailInput(attrs={
             "autofocus": True, 
             "class": "form-control",
-            "placeholder": "Enter your username"
+            "placeholder": "you@example.com"
         }),
         error_messages={
             'required': 'Username is required.',
@@ -1578,6 +1580,34 @@ LanguageFormSet = inlineformset_factory(
     ManualResume, Language, form=LanguageForm,
     extra=0, can_delete=True, min_num=0, validate_min=False
 )
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/resume/backends.py =====
+
+from django.contrib.auth import get_user_model
+from django.contrib.auth.backends import BaseBackend
+
+User = get_user_model()
+
+class EmailBackend(BaseBackend):
+    def authenticate(self, request, username=None, password=None, **kwargs):
+        login = username or kwargs.get("email")
+        if not login:
+            return None
+        try:
+            user = User.objects.get(email__iexact=login)
+        except User.DoesNotExist:
+            try:
+                user = User.objects.get(username__iexact=login)
+            except User.DoesNotExist:
+                return None
+        return user if user.check_password(password) else None
+
+    def get_user(self, user_id):
+        try:
+            return User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return None
+
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/resume/admin.py =====
 
@@ -3455,11 +3485,18 @@ def download_pdf_ajax(request: HttpRequest, resume_id: int) -> HttpResponse:
                                                   downloaded__gte=month_start).count()
 
         if count_15 >= LIMIT_15 or count_month >= LIMIT_MONTH:
-            return JsonResponse(
-                {"error": f"Download limit reached: {LIMIT_15} per 15 days, "
-                          f"{LIMIT_MONTH} per month."},
-                status=429,
-            )
+            wa_number  = settings.WHATSAPP_PHONE_NUMBER
+            wa_msg     = settings.WHATSAPP_DEFAULT_MESSAGE
+            contact_url = f"https://wa.me/916303858671?text=Hi! Can you please increase my qouta?"
+            return JsonResponse({
+                "message": (
+                    "🚫 You have crossed your free limit. "
+                    "Please contact us on WhatsApp to increase the quota."
+                ),
+                "contact_url": contact_url,
+                "limit_15": LIMIT_15,
+                "limit_month": LIMIT_MONTH,
+            }, status=429)
 
     # ── 2. Load pre-generated HTML (cache → session) ────────────────────
     cache_key   = f"tailored_resume_{request.user.id}_{resume_id}"
@@ -6408,8 +6445,9 @@ class Command(BaseCommand):
       <div class="hero-content">
         <h1><i class="fas fa-rocket"></i> Your Career Success Partner</h1>
         <p class="hero-subtitle">
-          We don't just optimize your resume – we get you hired! Choose from our AI-powered resume optimization 
+          We don't just optimize your resume - we get you hired! Choose from our AI-powered resume optimization 
           or let our experts handle your entire job application process while you focus on interview prep.
+          Get guaranteed response! Try now, for free!
         </p>
         
         <div class="hero-buttons">
@@ -7744,9 +7782,25 @@ class Command(BaseCommand):
       font-size: 0.95rem;
     }
 
-    .input-wrapper {
-      position: relative;
+    .input-wrapper{
+      display:flex;
+      align-items:center;
     }
+
+    .input-wrapper .input-icon{
+      position:static;          /* was absolute */
+      margin-left:1rem;
+      flex-shrink:0;
+    }
+
+    .input-wrapper .form-control{
+      flex:1 1 auto;
+      padding-left:0;           /* mobile */
+    }
+    @media (min-width:600px){
+      .input-wrapper .form-control{padding-left:.5rem;}
+    }
+
 
     .form-control {
       width: 100%;
@@ -9975,9 +10029,25 @@ class Command(BaseCommand):
       font-size: 0.95rem;
     }
 
-    .input-wrapper {
-      position: relative;
+    .input-wrapper{
+      display:flex;
+      align-items:center;
     }
+
+    .input-wrapper .input-icon{
+      position:static;          /* was absolute */
+      margin-left:1rem;
+      flex-shrink:0;
+    }
+
+    .input-wrapper .form-control{
+      flex:1 1 auto;
+      padding-left:0;           /* mobile */
+    }
+    @media (min-width:600px){
+      .input-wrapper .form-control{padding-left:.5rem;}
+    }
+
 
     .form-control {
       width: 100%;
@@ -10943,6 +11013,7 @@ class Command(BaseCommand):
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>ATS Resume Optimizer</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <style>
     /* -------------  GENERIC  ------------- */
@@ -11986,20 +12057,53 @@ class Command(BaseCommand):
     }
 
     /* DOWNLOAD PDF */
-    async function downloadPDF(){
-      if(!currentResumeID) return;
-      const res=await fetch(`/api/download/${currentResumeID}/`);
-      if(!res.ok) return showError('Download failed');
-      const cd=res.headers.get('Content-Disposition')||'';
-      const m=cd.match(/filename="?([^"]+)"?/);
-      const fname=m?m[1]:'resume.pdf';
-      const blob=await res.blob(), url=URL.createObjectURL(blob);
-      const a=document.createElement('a');
-      a.href=url; a.download=fname;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+    async function downloadPDF () {
+      if (!currentResumeID) return;
+
+      try {
+        const res = await fetch(`/api/download/${currentResumeID}/`);
+
+        /* ----- 1. Handle non-200 responses ----- */
+        if (!res.ok) {
+          // Try to parse the JSON error payload; fallback to plain-text
+          let payload = {};
+          try { payload = await res.json(); } catch (_) { /* ignore */ }
+
+          // 429 from our quota guard
+          if (payload.contact_url) {
+            return Swal.fire({
+              icon: 'warning',
+              title: 'Download limit reached',
+              text: payload.message || 'You have crossed your free limit.',
+              confirmButtonText: 'Contact on WhatsApp',
+              confirmButtonColor: '#25D366'
+            }).then(() => window.open(payload.contact_url, '_blank'));
+          }
+
+          // Any other error → generic handler
+          return showError(payload.error || 'Download failed');
+        }
+
+        /* ----- 2. Success: stream the PDF to the user ----- */
+        const contentDisp = res.headers.get('Content-Disposition') || '';
+        const match      = contentDisp.match(/filename="?([^"]+)"?/i);
+        const filename   = match ? match[1] : 'resume.pdf';
+
+        const blob = await res.blob();
+        const url  = URL.createObjectURL(blob);
+
+        const a    = document.createElement('a');
+        a.href     = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+      catch (err) {
+        console.error(err);
+        showError('Network error while downloading PDF');
+      }
     }
 
     /* UTILS */
@@ -20291,6 +20395,12 @@ DATABASES = {
     }
 }
 
+# ======= Backend for email ======
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "resume.backends.EmailBackend",      # <-- add
+]
+
 # ====== PASSWORD VALIDATION ======
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -20813,12 +20923,12 @@ Unnamed repository; edit this file 'description' to name the repository.
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/COMMIT_EDITMSG =====
 
-ready conflict issue
+libpongo dockerfile
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/FETCH_HEAD =====
 
-dc2704029fe6a5f027da96a23bd9a8cc84904c9b		branch 'main' of https://github.com/Syed-qn/ats-resume-app
+5264081753ae9c7a32a65a2e925dc6f8d9d17b45		branch 'main' of https://github.com/Syed-qn/ats-resume-app
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/0d/84287d8e8a67d4b1fe581bb315172cd01881fc =====
@@ -20866,6 +20976,16 @@ dc2704029fe6a5f027da96a23bd9a8cc84904c9b		branch 'main' of https://github.com/Sy
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/9b/ff2ccd2922d2534d028dcc1f94ce85042f4d5c
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/9e/37535c79e58b28ce07b48575716f36c2b990cc =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/9e/37535c79e58b28ce07b48575716f36c2b990cc
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/04/e18f4033590e79b4091a69413f59a26060bd13 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/04/e18f4033590e79b4091a69413f59a26060bd13
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/04/0e06eab6b145675352eae11a7bd2f8b5454a21 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/04/0e06eab6b145675352eae11a7bd2f8b5454a21
@@ -20874,6 +20994,11 @@ dc2704029fe6a5f027da96a23bd9a8cc84904c9b		branch 'main' of https://github.com/Sy
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/35/75fdbfdc11ba90eabd370bef08fbc8eaf7094e =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/35/75fdbfdc11ba90eabd370bef08fbc8eaf7094e
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/69/e11f148f7ebbc36ba34e5415643291302a6abe =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/69/e11f148f7ebbc36ba34e5415643291302a6abe
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/56/f1be8b29d0ceb0407457e5abb8edad098c7179 =====
@@ -20936,6 +21061,11 @@ dc2704029fe6a5f027da96a23bd9a8cc84904c9b		branch 'main' of https://github.com/Sy
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/b5/2bdc5b4b60554560e1c5657add9a51f7fd0644
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/b2/3e218ee5f26dbfa3c0e3cdb6e93064e0ec4a01 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/b2/3e218ee5f26dbfa3c0e3cdb6e93064e0ec4a01
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/ad/39115f778ec8b336b2faea4b9578dc2baf682e =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/ad/39115f778ec8b336b2faea4b9578dc2baf682e
@@ -20956,6 +21086,11 @@ dc2704029fe6a5f027da96a23bd9a8cc84904c9b		branch 'main' of https://github.com/Sy
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/be/e8bfb680c76ea3d0cdb9e41426a64632f7f067
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/be/8b1f771e254447c8e02c85ff504f8ba896b154 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/be/8b1f771e254447c8e02c85ff504f8ba896b154
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/da/7975672866100e273ab826840db449169e5cd9 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/da/7975672866100e273ab826840db449169e5cd9
@@ -20964,6 +21099,11 @@ dc2704029fe6a5f027da96a23bd9a8cc84904c9b		branch 'main' of https://github.com/Sy
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/b4/cfbab1267de43887c57744f3b318bfa424e05a =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/b4/cfbab1267de43887c57744f3b318bfa424e05a
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/a2/3fbdd70c5b05e2d25aea290e768e41f30179ed =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/a2/3fbdd70c5b05e2d25aea290e768e41f30179ed
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/a2/22a4bc238191ce2e80cc47e56b3953c107e6fb =====
@@ -21051,6 +21191,11 @@ dc2704029fe6a5f027da96a23bd9a8cc84904c9b		branch 'main' of https://github.com/Sy
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/cf/3960c6f59bc77540c94459e996e20765d93189
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/cf/69289b5f3ff599be7136c61d3c3fba58d4f825 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/cf/69289b5f3ff599be7136c61d3c3fba58d4f825
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/ca/caaaf81384146378f377e528d9de0d6dc39987 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/ca/caaaf81384146378f377e528d9de0d6dc39987
@@ -21069,6 +21214,16 @@ dc2704029fe6a5f027da96a23bd9a8cc84904c9b		branch 'main' of https://github.com/Sy
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/c8/4e27d13e6c90713154bccbac2c1cf4f6f1a0ae =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/c8/4e27d13e6c90713154bccbac2c1cf4f6f1a0ae
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/c6/63fb0c0cb56af3d63af6db9a8fac59d798df9b =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/c6/63fb0c0cb56af3d63af6db9a8fac59d798df9b
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/4e/62af374c5bbec1f027953af72668dcb744fe4d =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/4e/62af374c5bbec1f027953af72668dcb744fe4d
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/20/0c502f7f61e7bf5ce1839a346127a6b1ccfd45 =====
@@ -21206,6 +21361,11 @@ dc2704029fe6a5f027da96a23bd9a8cc84904c9b		branch 'main' of https://github.com/Sy
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/9f/7c9ef97b19ea06bdca1c41e29c93ce3f83f3cf
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/6b/aae7a6a30304849ffcd72541cd325065b509cf =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/6b/aae7a6a30304849ffcd72541cd325065b509cf
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/6b/2410e683d710b8c21a5b6e39acde1a6ad30d4d =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/6b/2410e683d710b8c21a5b6e39acde1a6ad30d4d
@@ -21282,9 +21442,19 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/53/384c4e009e0b42b9c70a3bbad120bf4ae66e94
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/30/2b3c54ee5de4ee377a66729b28aa77d2e55de4 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/30/2b3c54ee5de4ee377a66729b28aa77d2e55de4
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/5b/6c16729546cd62c7f4e146e9472fff89d18fad =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/5b/6c16729546cd62c7f4e146e9472fff89d18fad
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/08/827ec60cfc48e0a15aacbb679920e3a6770d17 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/08/827ec60cfc48e0a15aacbb679920e3a6770d17
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/08/f7849db958c48971f58555531ddfe14e106bf8 =====
@@ -21310,6 +21480,11 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/99/2e58555b1160172938860484f7b39b30144341 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/99/2e58555b1160172938860484f7b39b30144341
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/52/64081753ae9c7a32a65a2e925dc6f8d9d17b45 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/52/64081753ae9c7a32a65a2e925dc6f8d9d17b45
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/55/bcbb3cb2f62a8ea51acd1ed93e8144996cc099 =====
@@ -21402,6 +21577,11 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f9/76e09a5defde43ed123b528e43c996adf7808a
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f0/14fd30d3503a37095a7367fc2ca8fa323adb85 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f0/14fd30d3503a37095a7367fc2ca8fa323adb85
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f0/474c9a6e839fee4087248521020fb0d60cab4d =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f0/474c9a6e839fee4087248521020fb0d60cab4d
@@ -21437,6 +21617,11 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/c5/e6193a6db0399ec84a7166f103649dc46e4a47
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/c5/d57a859788aba84ef605637ac55448b4f0ccca =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/c5/d57a859788aba84ef605637ac55448b4f0ccca
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f6/c802e9cdd297d3c8ec235b7e561f06132c19e5 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f6/c802e9cdd297d3c8ec235b7e561f06132c19e5
@@ -21455,6 +21640,16 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/e7/fe396ab49a4ddf4e0a567e92b38de5503ca283 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/e7/fe396ab49a4ddf4e0a567e92b38de5503ca283
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/46/1959ce1fd6be07f2bc5988dfcfdaed0bf93a7b =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/46/1959ce1fd6be07f2bc5988dfcfdaed0bf93a7b
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/2c/49beb5cb6756883026da36dccc1ad4deaaf708 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/2c/49beb5cb6756883026da36dccc1ad4deaaf708
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/2d/3c7b05d37ec5c73dd68e7adf693082ffc54fc7 =====
@@ -21547,9 +21742,24 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/82/157234ea53a6b9f74e79e7c3e140a3feb01299
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/82/c54976d9cd794cb0f5fa4f6205ad8113ab6ed3 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/82/c54976d9cd794cb0f5fa4f6205ad8113ab6ed3
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/40/813231c4a5a6ba0aef0763600f6091b4a13c7a =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/40/813231c4a5a6ba0aef0763600f6091b4a13c7a
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/40/5285b07bdbb6e876fa399f8212565ded9da519 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/40/5285b07bdbb6e876fa399f8212565ded9da519
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/40/4147f73fd7f8a198cb118295497b914e054081 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/40/4147f73fd7f8a198cb118295497b914e054081
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/2e/86e0782f7172c5adc8c1398325e99a2164ed44 =====
@@ -21605,6 +21815,8 @@ ddb85393093a9604f1cfbaf48a48f6599daf8c4e 733f08f0a47cf561d20b8b1971da3acd25c1b0c
 5165527ae5ba512a5360afe5cad0f4a8684c8be7 62fea5172a8ff0cae54622d670207cdde7afa2b4 Syed-qn <snassirodinquadri@gmail.com> 1749145790 +0400	commit: resume app admin
 62fea5172a8ff0cae54622d670207cdde7afa2b4 719554cacfce2de67166cf21c82bbd22a63986d2 Syed-qn <snassirodinquadri@gmail.com> 1749146173 +0400	commit: admin superuser signal
 719554cacfce2de67166cf21c82bbd22a63986d2 dc2704029fe6a5f027da96a23bd9a8cc84904c9b Syed-qn <snassirodinquadri@gmail.com> 1749146847 +0400	commit: ready conflict issue
+dc2704029fe6a5f027da96a23bd9a8cc84904c9b 6baae7a6a30304849ffcd72541cd325065b509cf Syed-qn <snassirodinquadri@gmail.com> 1749155198 +0400	commit: email login, icon alignment, limit prompt
+6baae7a6a30304849ffcd72541cd325065b509cf 5264081753ae9c7a32a65a2e925dc6f8d9d17b45 Syed-qn <snassirodinquadri@gmail.com> 1749155707 +0400	commit: libpongo dockerfile
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/logs/refs/heads/main =====
@@ -21629,6 +21841,8 @@ ddb85393093a9604f1cfbaf48a48f6599daf8c4e 733f08f0a47cf561d20b8b1971da3acd25c1b0c
 5165527ae5ba512a5360afe5cad0f4a8684c8be7 62fea5172a8ff0cae54622d670207cdde7afa2b4 Syed-qn <snassirodinquadri@gmail.com> 1749145790 +0400	commit: resume app admin
 62fea5172a8ff0cae54622d670207cdde7afa2b4 719554cacfce2de67166cf21c82bbd22a63986d2 Syed-qn <snassirodinquadri@gmail.com> 1749146173 +0400	commit: admin superuser signal
 719554cacfce2de67166cf21c82bbd22a63986d2 dc2704029fe6a5f027da96a23bd9a8cc84904c9b Syed-qn <snassirodinquadri@gmail.com> 1749146847 +0400	commit: ready conflict issue
+dc2704029fe6a5f027da96a23bd9a8cc84904c9b 6baae7a6a30304849ffcd72541cd325065b509cf Syed-qn <snassirodinquadri@gmail.com> 1749155198 +0400	commit: email login, icon alignment, limit prompt
+6baae7a6a30304849ffcd72541cd325065b509cf 5264081753ae9c7a32a65a2e925dc6f8d9d17b45 Syed-qn <snassirodinquadri@gmail.com> 1749155707 +0400	commit: libpongo dockerfile
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/logs/refs/remotes/origin/HEAD =====
@@ -21658,6 +21872,8 @@ cacaaaf81384146378f377e528d9de0d6dc39987 2d3da874e5154ab9c24854a43be73479f3963cf
 5165527ae5ba512a5360afe5cad0f4a8684c8be7 62fea5172a8ff0cae54622d670207cdde7afa2b4 Syed-qn <snassirodinquadri@gmail.com> 1749145791 +0400	update by push
 62fea5172a8ff0cae54622d670207cdde7afa2b4 719554cacfce2de67166cf21c82bbd22a63986d2 Syed-qn <snassirodinquadri@gmail.com> 1749146175 +0400	update by push
 719554cacfce2de67166cf21c82bbd22a63986d2 dc2704029fe6a5f027da96a23bd9a8cc84904c9b Syed-qn <snassirodinquadri@gmail.com> 1749146848 +0400	update by push
+dc2704029fe6a5f027da96a23bd9a8cc84904c9b 6baae7a6a30304849ffcd72541cd325065b509cf Syed-qn <snassirodinquadri@gmail.com> 1749155200 +0400	update by push
+6baae7a6a30304849ffcd72541cd325065b509cf 5264081753ae9c7a32a65a2e925dc6f8d9d17b45 Syed-qn <snassirodinquadri@gmail.com> 1749155708 +0400	update by push
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/hooks/commit-msg.sample =====
@@ -22586,7 +22802,7 @@ fi
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/refs/heads/main =====
 
-dc2704029fe6a5f027da96a23bd9a8cc84904c9b
+5264081753ae9c7a32a65a2e925dc6f8d9d17b45
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/refs/remotes/origin/HEAD =====
@@ -22596,7 +22812,7 @@ ref: refs/remotes/origin/main
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/refs/remotes/origin/main =====
 
-dc2704029fe6a5f027da96a23bd9a8cc84904c9b
+5264081753ae9c7a32a65a2e925dc6f8d9d17b45
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/media/resumes/AI_-_Syed_Nasirodin_Quadri_Resume.pdf =====

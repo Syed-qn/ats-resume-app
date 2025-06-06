@@ -40,7 +40,7 @@ from django.utils.timezone import now
 from django.views import View
 from django.views.decorators.http import require_http_methods
 from django.db import transaction
-from openai import OpenAI               # openai-python ≥ 1.3
+from .llm import get_llm_client              # openai-python ≥ 1.3
 from weasyprint import HTML
 
 # Task 10: Import email functionality
@@ -66,7 +66,7 @@ from django.contrib.auth.views import (
 
 
 logger = logging.getLogger(__name__)
-client = OpenAI(api_key=settings.OPENAI_API_KEY)
+llm_client, current_model = get_llm_client()
 
 # Target scores - must achieve both
 TARGET_ATS_SCORE = 92
@@ -140,7 +140,7 @@ def dashboard(request: HttpRequest) -> HttpResponse:
     """Single-page application entry point; requires login - Task 14."""
     
     # Check if user is admin and redirect to admin panel
-    if request.user.is_superuser or request.user.is_staff:
+    if (request.user.is_superuser or request.user.is_staff) and not request.GET.get('bypass_admin'):
         messages.info(request, f'Welcome Admin {request.user.username}! Redirecting to Admin Panel...')
         return redirect('admin_dashboard')
     
@@ -572,8 +572,8 @@ Return a detailed JSON object with the following structure:
 Be thorough and extract everything that could be relevant for resume optimization."""
 
     try:
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+        response = llm_client.chat.completions.create(
+            model=current_model,
             messages=[{"role": "user", "content": analysis_prompt}],
             temperature=0.1,
             max_tokens=2048,
@@ -1290,8 +1290,10 @@ def download_pdf_ajax(request: HttpRequest, resume_id: int) -> HttpResponse:
     • Filename sanitising
     """
     # ── 1. Resolve rate-limit caps ───────────────────────────────────────
-    LIMIT_15, LIMIT_MONTH = 3, 6            # safe defaults
-    if not request.user.is_superuser:
+    if request.user.is_superuser or request.user.is_staff:
+        LIMIT_15 = LIMIT_MONTH = float("inf")   # skip every quota check
+    else:
+        LIMIT_15, LIMIT_MONTH = 3, 6
         # a) user.profile fields (preferred – add IntegerFields to your profile model)
         if hasattr(request.user, "profile"):
             LIMIT_15 = request.user.profile.limit_15_days or LIMIT_15
@@ -2320,6 +2322,7 @@ def update_env_file(new_settings):
             'LLM_MAX_TOKENS': 'LLM_MAX_TOKENS',
             'LLM_TEMPERATURE': 'LLM_TEMPERATURE',
             'LLM_MAX_ITERATIONS': 'LLM_MAX_ITERATIONS',
+            'LLM_PROVIDER': 'LLM_PROVIDER',
         }
         
         # Update existing lines or add new ones

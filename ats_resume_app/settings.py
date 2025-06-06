@@ -71,7 +71,7 @@ DATABASES = {
 
 # ======= Backend for email ======
 AUTHENTICATION_BACKENDS = [
-    "django.contrib.auth.backends.ModelBackend",
+    # "django.contrib.auth.backends.ModelBackend",
     "resume.backends.EmailBackend",      # <-- add
 ]
 
@@ -249,6 +249,22 @@ PDF_CONFIG = {
 }
 
 # ====== DEEPSEEK LLM INTEGRATION ======
+
+# ───── LLM provider toggle ──────────────────────────────────────────────
+# `LLM_PROVIDER` is what the admin switch will change. Accepts “gpt” or
+# “deepseek” (case-insensitive).  Everything else picks its value from it.
+LLM_PROVIDER = config('LLM_PROVIDER', default='gpt').lower()
+LLM_TIMEOUT = config('LLM_TIMEOUT', default=30, cast=int)
+
+LLM_MODELS = {
+    'gpt':      config('OPENAI_MODEL',   default='gpt-3.5-turbo'),
+    'deepseek': config('DEEPSEEK_MODEL', default='deepseek-chat'),
+}
+
+# Helper used by the app everywhere a model name is required
+LLM_CURRENT_MODEL = LLM_MODELS[LLM_PROVIDER]
+
+
 LLM_CONFIG.update({
     "MODEL": "deepseek-chat",
     "BASE_URL": "https://api.deepseek.com",

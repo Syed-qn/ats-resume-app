@@ -464,7 +464,11 @@
 
             <div class="setting-group">
               <h4><i class="fas fa-robot"></i> LLM Configuration</h4>
-              
+              <label class="form-label fw-bold">LLM provider</label>
+              <select name="LLM_PROVIDER" class="form-select">
+                <option value="gpt"      {% if current_settings.LLM_PROVIDER == 'gpt' %}selected{% endif %}>OpenAI GPT</option>
+                <option value="deepseek" {% if current_settings.LLM_PROVIDER == 'deepseek' %}selected{% endif %}>DeepSeek</option>
+              </select>
               <div class="form-group">
                 <label class="form-label">Max Tokens</label>
                 <div class="current-value">Current: {{ settings.LLM_MAX_TOKENS }}</div>

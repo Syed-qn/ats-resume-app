@@ -1,30 +1,50 @@
-asgiref==3.8.1
-dj-database-url==3.0.0
+##############################################################################
+# ─── Core Framework & DB helpers ────────────────────────────────────────────
 Django==5.2.2
+djangorestframework==3.16.0
+dj-database-url==3.0.0
+python-decouple==3.8
+psycopg2-binary==2.9.10
+asgiref==3.8.1
+sqlparse==0.5.3
+
+##############################################################################
+# ─── Request / Response utilities ───────────────────────────────────────────
+django-cors-headers==4.3.1
+whitenoise[brotli]==6.6.0
+
+##############################################################################
+# ─── Internationalisation & user-input helpers ─────────────────────────────
+django-countries==7.6.1
+django-phonenumber-field[phonenumbers]==7.3.0
+phonenumbers==9.0.6
+
+##############################################################################
+# ─── File & Document processing ────────────────────────────────────────────
+Pillow==11.2.1
+PyPDF2==3.0.1
+docx2txt==0.9
+weasyprint==65.1
+beautifulsoup4==4.13.4
+
+##############################################################################
+# ─── AI / LLM integrations ────────────────────────────────────────────────
+openai==1.84.0
+pydantic==2.11.5
+
+##############################################################################
+# ─── Data science helpers (used in résumé-analysis utils) ──────────────────
 numpy==2.2.6
 pandas==2.3.0
-psycopg2-binary==2.9.10
-python-dateutil==2.9.0.post0
-pytz==2025.2
-setuptools==80.9.0
-six==1.17.0
-sqlparse==0.5.3
+
+##############################################################################
+# ─── Misc. runtime prerequisites ───────────────────────────────────────────
 typing_extensions==4.14.0
+typing-inspection==0.4.1
+six==1.17.0
+pytz==2025.2
 tzdata==2025.2
+setuptools==80.9.0
 wheel==0.45.1
-python-decouple==3.8 
-
-# ─── API & validation ───────────────────────────────────────────
-djangorestframework==3.16.0        # REST API engine  :contentReference[oaicite:0]{index=0}
-django-countries==7.6.1            # CountryField    :contentReference[oaicite:1]{index=1}
-phonenumbers==9.0.6                # Phone parsing   :contentReference[oaicite:2]{index=2}
-
-# ─── LLM & parsing ──────────────────────────────────────────────
-openai==1.84.0                     # OpenAI API      :contentReference[oaicite:3]{index=3}
-beautifulsoup4==4.13.4             # HTML scraping   :contentReference[oaicite:4]{index=4}
-
-# ─── Document / image IO ───────────────────────────────────────
-weasyprint==65.1                   # HTML→PDF        :contentReference[oaicite:5]{index=5}
-Pillow==11.2.1                     # Image handling  :contentReference[oaicite:6]{index=6}
-PyPDF2==3.0.1                      # PDF parsing     :contentReference[oaicite:7]{index=7}
-docx2txt==0.9                      # DOCX→text       :contentReference[oaicite:8]{index=8}
+gunicorn==22.0.0
+python-dateutil==2.9.0.post0

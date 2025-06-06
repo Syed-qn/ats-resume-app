@@ -5,6 +5,10 @@ from .models import (
     Resume, Template, ManualResume, Education, WorkExperience, 
     Project, Skill, Certification, Award, Language, VolunteerExperience
 )
+from django.conf import settings
+from django.http import HttpResponseRedirect
+from django.urls import path
+from django import forms
 
 @admin.register(Resume)
 class ResumeAdmin(admin.ModelAdmin):
@@ -17,6 +21,34 @@ class ResumeAdmin(admin.ModelAdmin):
 class TemplateAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
     search_fields = ('name',)
+
+class LLMSettingsForm(forms.Form):
+    llm_provider = forms.ChoiceField(
+        choices=[("gpt", "OpenAI GPT"), ("deepseek", "DeepSeek")],
+        initial=settings.LLM_PROVIDER,
+        widget=forms.RadioSelect,
+        label="Active LLM engine",
+    )
+
+@admin.register(type("LLMSettings", (), {}))  # dummy model-less admin page
+class LLMSettingsAdmin(admin.ModelAdmin):
+    change_form_template = "admin/llm_switch.html"
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom = [
+            path("switch/", self.admin_site.admin_view(self.switch_llm), name="llm-switch"),
+        ]
+        return custom + urls
+
+    def switch_llm(self, request):
+        form = LLMSettingsForm(request.POST)
+        if form.is_valid():
+            provider = form.cleaned_data["llm_provider"]
+            # Write to .env or a SystemSetting table – here we just patch settings at runtime
+            settings.LLM_PROVIDER = provider
+            self.message_user(request, f"LLM switched to {provider.upper()}")
+        return HttpResponseRedirect(request.META["HTTP_REFERER"])
 
 # Inline admin classes for related models
 class EducationInline(admin.TabularInline):

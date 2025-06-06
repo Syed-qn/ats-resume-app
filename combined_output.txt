@@ -149,7 +149,7 @@ tiktoken==0.5.1
 
 ##############################################################################
 # Data Handling
-pandas==2.1.3
+pandas==2.2.2
 numpy==1.24.3
 
 ##############################################################################
@@ -936,6 +936,30 @@ class VolunteerExperience(models.Model):
 
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/resume/llm.py =====
+
+from django.conf import settings
+from openai import OpenAI
+from .deepseek_client import client as deepseek_client  # already configured
+
+def get_llm_client():
+    """
+    Returns a tuple of (client_instance, model_name) according to
+    settings.LLM_PROVIDER so the rest of the code doesn’t care which
+    backend is active.
+    """
+    if settings.LLM_PROVIDER == 'deepseek':
+        # DeepSeek SDK is OpenAI-compatible – reuse as-is
+        return deepseek_client, settings.LLM_MODELS['deepseek']
+
+    # Default → OpenAI
+    client = OpenAI(
+        api_key=settings.OPENAI_API_KEY,
+        timeout=settings.LLM_TIMEOUT,
+    )
+    return client, settings.LLM_MODELS['gpt']
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/resume/apps.py =====
 
 # resume/apps.py
@@ -1583,23 +1607,31 @@ LanguageFormSet = inlineformset_factory(
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/resume/backends.py =====
 
-from django.contrib.auth import get_user_model
+# resume/backends.py
 from django.contrib.auth.backends import BaseBackend
+from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+
 class EmailBackend(BaseBackend):
+    """
+    Authenticate with *only* the user's e-mail address.
+    • `username` is completely ignored (it can be blank or duplicated).
+    • `email` must be unique and is matched case-insensitively.
+    """
+
     def authenticate(self, request, username=None, password=None, **kwargs):
-        login = username or kwargs.get("email")
-        if not login:
+        # Accept either `username` or explicit `email` kwarg – treat both as e-mail
+        email = username or kwargs.get("email")
+        if not email or not password:
             return None
+
         try:
-            user = User.objects.get(email__iexact=login)
+            user = User.objects.get(email__iexact=email)
         except User.DoesNotExist:
-            try:
-                user = User.objects.get(username__iexact=login)
-            except User.DoesNotExist:
-                return None
+            return None
+
         return user if user.check_password(password) else None
 
     def get_user(self, user_id):
@@ -2214,7 +2246,7 @@ from django.utils.timezone import now
 from django.views import View
 from django.views.decorators.http import require_http_methods
 from django.db import transaction
-from openai import OpenAI               # openai-python ≥ 1.3
+from .llm import get_llm_client              # openai-python ≥ 1.3
 from weasyprint import HTML
 
 # Task 10: Import email functionality
@@ -2240,7 +2272,7 @@ from django.contrib.auth.views import (
 
 
 logger = logging.getLogger(__name__)
-client = OpenAI(api_key=settings.OPENAI_API_KEY)
+llm_client, current_model = get_llm_client()
 
 # Target scores - must achieve both
 TARGET_ATS_SCORE = 92
@@ -2314,7 +2346,7 @@ def dashboard(request: HttpRequest) -> HttpResponse:
     """Single-page application entry point; requires login - Task 14."""
     
     # Check if user is admin and redirect to admin panel
-    if request.user.is_superuser or request.user.is_staff:
+    if (request.user.is_superuser or request.user.is_staff) and not request.GET.get('bypass_admin'):
         messages.info(request, f'Welcome Admin {request.user.username}! Redirecting to Admin Panel...')
         return redirect('admin_dashboard')
     
@@ -2746,8 +2778,8 @@ Return a detailed JSON object with the following structure:
 Be thorough and extract everything that could be relevant for resume optimization."""
 
     try:
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+        response = llm_client.chat.completions.create(
+            model=current_model,
             messages=[{"role": "user", "content": analysis_prompt}],
             temperature=0.1,
             max_tokens=2048,
@@ -3464,8 +3496,10 @@ def download_pdf_ajax(request: HttpRequest, resume_id: int) -> HttpResponse:
     • Filename sanitising
     """
     # ── 1. Resolve rate-limit caps ───────────────────────────────────────
-    LIMIT_15, LIMIT_MONTH = 3, 6            # safe defaults
-    if not request.user.is_superuser:
+    if request.user.is_superuser or request.user.is_staff:
+        LIMIT_15 = LIMIT_MONTH = float("inf")   # skip every quota check
+    else:
+        LIMIT_15, LIMIT_MONTH = 3, 6
         # a) user.profile fields (preferred – add IntegerFields to your profile model)
         if hasattr(request.user, "profile"):
             LIMIT_15 = request.user.profile.limit_15_days or LIMIT_15
@@ -4494,6 +4528,7 @@ def update_env_file(new_settings):
             'LLM_MAX_TOKENS': 'LLM_MAX_TOKENS',
             'LLM_TEMPERATURE': 'LLM_TEMPERATURE',
             'LLM_MAX_ITERATIONS': 'LLM_MAX_ITERATIONS',
+            'LLM_PROVIDER': 'LLM_PROVIDER',
         }
         
         # Update existing lines or add new ones
@@ -5043,6 +5078,11 @@ class Command(BaseCommand):
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/resume/__pycache__/views.cpython-311.pyc
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/resume/__pycache__/signals.cpython-311.pyc =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/resume/__pycache__/signals.cpython-311.pyc
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/resume/__pycache__/urls.cpython-311.pyc =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/resume/__pycache__/urls.cpython-311.pyc
@@ -5051,6 +5091,16 @@ class Command(BaseCommand):
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/resume/__pycache__/utils.cpython-311.pyc =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/resume/__pycache__/utils.cpython-311.pyc
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/resume/__pycache__/backends.cpython-311.pyc =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/resume/__pycache__/backends.cpython-311.pyc
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/resume/__pycache__/llm.cpython-311.pyc =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/resume/__pycache__/llm.cpython-311.pyc
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/resume/__pycache__/models.cpython-311.pyc =====
@@ -15632,10 +15682,11 @@ ul { margin-left: 18px; padding: 0; }
         </a>
       </div>
       <div class="nav-item">
-        <a href="{% url 'dashboard' %}" class="nav-link">
-          <i class="fas fa-home"></i>
-          <span>Main App</span>
+        <a class="btn btn-outline-primary w-100"
+          href="{% url 'dashboard' %}?bypass_admin=1">
+          <i class="fas fa-rocket"></i>  Main Application
         </a>
+
       </div>
       <div class="nav-item">
         <a href="{% url 'logout' %}" class="nav-link">
@@ -16711,20 +16762,12 @@ ul { margin-left: 18px; padding: 0; }
               
               <div class="form-group">
                 <label class="form-label">Downloads per 15 days</label>
-                <input type="number" 
-                       name="downloads_15_days" 
-                       class="form-control" 
-                       value="{{ custom_limits.per_15_days }}" 
-                       min="0" max="100">
+                <input type="number" name="downloads_15_days" class="form-control" value="{{ custom_limits.per_15_days }}" min="0">
               </div>
               
               <div class="form-group">
                 <label class="form-label">Downloads per month</label>
-                <input type="number" 
-                       name="downloads_month" 
-                       class="form-control" 
-                       value="{{ custom_limits.per_month }}" 
-                       min="0" max="100">
+                <input type="number" name="downloads_month" class="form-control" value="{{ custom_limits.per_month }}" min="0">
               </div>
               
               <button type="submit" class="btn btn-primary">
@@ -19578,7 +19621,11 @@ ul { margin-left: 18px; padding: 0; }
 
             <div class="setting-group">
               <h4><i class="fas fa-robot"></i> LLM Configuration</h4>
-              
+              <label class="form-label fw-bold">LLM provider</label>
+              <select name="LLM_PROVIDER" class="form-select">
+                <option value="gpt"      {% if current_settings.LLM_PROVIDER == 'gpt' %}selected{% endif %}>OpenAI GPT</option>
+                <option value="deepseek" {% if current_settings.LLM_PROVIDER == 'deepseek' %}selected{% endif %}>DeepSeek</option>
+              </select>
               <div class="form-group">
                 <label class="form-label">Max Tokens</label>
                 <div class="current-value">Current: {{ settings.LLM_MAX_TOKENS }}</div>
@@ -20137,6 +20184,18 @@ window.addEventListener('resize', function() {
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/logs/django.log =====
 
+INFO 2025-06-06 03:53:12,336 autoreload 68842 8435993600 Watching for file changes with StatReloader
+INFO 2025-06-06 03:54:14,395 autoreload 68842 8435993600 /Users/syed/Files/Host/ATS_RESUME_APP/ats_resume_app/settings.py changed, reloading.
+INFO 2025-06-06 03:54:15,090 autoreload 69028 8435993600 Watching for file changes with StatReloader
+INFO 2025-06-06 03:54:27,262 basehttp 69028 6157283328 "GET / HTTP/1.1" 200 34624
+WARNING 2025-06-06 03:54:28,103 log 69028 6174109696 Not Found: /apple-touch-icon-precomposed.png
+WARNING 2025-06-06 03:54:28,103 basehttp 69028 6174109696 "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 9127
+WARNING 2025-06-06 03:54:28,111 log 69028 6174109696 Not Found: /apple-touch-icon.png
+WARNING 2025-06-06 03:54:28,111 basehttp 69028 6174109696 "GET /apple-touch-icon.png HTTP/1.1" 404 9091
+INFO 2025-06-06 03:54:29,816 basehttp 69028 6157283328 "GET /login/ HTTP/1.1" 200 22991
+INFO 2025-06-06 03:54:31,605 basehttp 69028 6157283328 "POST /login/ HTTP/1.1" 200 23375
+INFO 2025-06-06 03:54:37,346 basehttp 69028 6157283328 "POST /login/ HTTP/1.1" 200 23376
+INFO 2025-06-06 03:54:43,598 basehttp 69028 6157283328 "POST /login/ HTTP/1.1" 200 23375
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/static/.DS_Store =====
@@ -20397,7 +20456,7 @@ DATABASES = {
 
 # ======= Backend for email ======
 AUTHENTICATION_BACKENDS = [
-    "django.contrib.auth.backends.ModelBackend",
+    # "django.contrib.auth.backends.ModelBackend",
     "resume.backends.EmailBackend",      # <-- add
 ]
 
@@ -20575,6 +20634,22 @@ PDF_CONFIG = {
 }
 
 # ====== DEEPSEEK LLM INTEGRATION ======
+
+# ───── LLM provider toggle ──────────────────────────────────────────────
+# `LLM_PROVIDER` is what the admin switch will change. Accepts “gpt” or
+# “deepseek” (case-insensitive).  Everything else picks its value from it.
+LLM_PROVIDER = config('LLM_PROVIDER', default='gpt').lower()
+LLM_TIMEOUT = config('LLM_TIMEOUT', default=30, cast=int)
+
+LLM_MODELS = {
+    'gpt':      config('OPENAI_MODEL',   default='gpt-3.5-turbo'),
+    'deepseek': config('DEEPSEEK_MODEL', default='deepseek-chat'),
+}
+
+# Helper used by the app everywhere a model name is required
+LLM_CURRENT_MODEL = LLM_MODELS[LLM_PROVIDER]
+
+
 LLM_CONFIG.update({
     "MODEL": "deepseek-chat",
     "BASE_URL": "https://api.deepseek.com",
@@ -20923,12 +20998,12 @@ Unnamed repository; edit this file 'description' to name the repository.
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/COMMIT_EDITMSG =====
 
-libpongo dockerfile
+llm toggle
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/FETCH_HEAD =====
 
-5264081753ae9c7a32a65a2e925dc6f8d9d17b45		branch 'main' of https://github.com/Syed-qn/ats-resume-app
+5702019b5d7b5e0c4fbd5b691afaf01b2debe670		branch 'main' of https://github.com/Syed-qn/ats-resume-app
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/0d/84287d8e8a67d4b1fe581bb315172cd01881fc =====
@@ -20949,6 +21024,16 @@ libpongo dockerfile
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/92/e333f6d48636f658ceeb6230175c85bc249a5d =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/92/e333f6d48636f658ceeb6230175c85bc249a5d
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/0c/5ba71b9117dac111ddbda7805c54042ae2ef57 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/0c/5ba71b9117dac111ddbda7805c54042ae2ef57
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/57/02019b5d7b5e0c4fbd5b691afaf01b2debe670 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/57/02019b5d7b5e0c4fbd5b691afaf01b2debe670
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/3b/0fa9bb7faa11883b9e6d6ffd86f9622fdebd68 =====
@@ -20999,6 +21084,11 @@ libpongo dockerfile
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/69/e11f148f7ebbc36ba34e5415643291302a6abe =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/69/e11f148f7ebbc36ba34e5415643291302a6abe
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/56/c5337053f602cc944fe51e121abb2ceeec27a7 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/56/c5337053f602cc944fe51e121abb2ceeec27a7
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/56/f1be8b29d0ceb0407457e5abb8edad098c7179 =====
@@ -21066,9 +21156,19 @@ libpongo dockerfile
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/b2/3e218ee5f26dbfa3c0e3cdb6e93064e0ec4a01
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/ad/98641a1d8f4170a5b833c9e494faf0d5b9a58e =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/ad/98641a1d8f4170a5b833c9e494faf0d5b9a58e
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/ad/39115f778ec8b336b2faea4b9578dc2baf682e =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/ad/39115f778ec8b336b2faea4b9578dc2baf682e
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/ad/4cff92921988826c5434f38e213b4e53045f43 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/ad/4cff92921988826c5434f38e213b4e53045f43
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/bb/4d56566af915e161dfc27a8cd6701cea2bf834 =====
@@ -21111,6 +21211,11 @@ libpongo dockerfile
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/a2/22a4bc238191ce2e80cc47e56b3953c107e6fb
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/a5/5ae6b7114f6ab75f046134755a855328865c88 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/a5/5ae6b7114f6ab75f046134755a855328865c88
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/d1/f219475642fb51ff9251288d264a06ec87533b =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/d1/f219475642fb51ff9251288d264a06ec87533b
@@ -21144,6 +21249,11 @@ libpongo dockerfile
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f4/ab955b6134fa623980cb0a9f6b673d2a8f9f81 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f4/ab955b6134fa623980cb0a9f6b673d2a8f9f81
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f3/aa056d50be3bd801ecedbdddb3ca73b2eca9f9 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f3/aa056d50be3bd801ecedbdddb3ca73b2eca9f9
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/eb/4741790f503d626675133c23e8af8f7a5250af =====
@@ -21231,6 +21341,11 @@ libpongo dockerfile
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/20/0c502f7f61e7bf5ce1839a346127a6b1ccfd45
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/20/038505f76e8304056eccde2768e3186e25f1f8 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/20/038505f76e8304056eccde2768e3186e25f1f8
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/18/3e032f2ebaedfba786be7379b5e290c1d97bc9 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/18/3e032f2ebaedfba786be7379b5e290c1d97bc9
@@ -21279,6 +21394,11 @@ libpongo dockerfile
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/73/3f08f0a47cf561d20b8b1971da3acd25c1b0c5 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/73/3f08f0a47cf561d20b8b1971da3acd25c1b0c5
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/80/9aeb3e7c9c2d96dae382e5a738581f095d4d7e =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/80/9aeb3e7c9c2d96dae382e5a738581f095d4d7e
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/80/00c86c2d97bd4707a7c30c7d4056f1020f1bb5 =====
@@ -21417,6 +21537,11 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/62/4d36fbe15f8f54670a250e97df69f806156d4d
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/62/62f7c3612f6827b0b654cfcf0f295f0ff64464 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/62/62f7c3612f6827b0b654cfcf0f295f0ff64464
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/96/0f81030ef7c1026bb45a9c804d5d63b3ce18c2 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/96/0f81030ef7c1026bb45a9c804d5d63b3ce18c2
@@ -21465,6 +21590,11 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/6d/587cc260e23569d007a52e64e5f70541a3efee =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/6d/587cc260e23569d007a52e64e5f70541a3efee
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/06/1ce3ea9a236f674a4de8b81258315998f50fc4 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/06/1ce3ea9a236f674a4de8b81258315998f50fc4
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/39/c0cc092b7dce6659e880f0a8337d985240bb0a =====
@@ -21547,6 +21677,11 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/db/3fec1a2c570403a5d14b20475e3f519f87b108
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/db/eae827fa7f7ee84498f032ee8218b6eb129e62 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/db/eae827fa7f7ee84498f032ee8218b6eb129e62
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/a8/c789e96c348a1745cf7ddf73278cb6cb61b318 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/a8/c789e96c348a1745cf7ddf73278cb6cb61b318
@@ -21570,6 +21705,11 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/c4/3ba22e5f3b1f35a2077fa11cd68f8b899ad222 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/c4/3ba22e5f3b1f35a2077fa11cd68f8b899ad222
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/cc/99efc6a0e1298bd5c9714f3b24e5db407cc137 =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/cc/99efc6a0e1298bd5c9714f3b24e5db407cc137
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/f9/76e09a5defde43ed123b528e43c996adf7808a =====
@@ -21640,6 +21780,11 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/e7/fe396ab49a4ddf4e0a567e92b38de5503ca283 =====
 
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/e7/fe396ab49a4ddf4e0a567e92b38de5503ca283
+
+
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/e0/cc42f99ee94267a835049263dc9e3d7676dd7b =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/e0/cc42f99ee94267a835049263dc9e3d7676dd7b
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/46/1959ce1fd6be07f2bc5988dfcfdaed0bf93a7b =====
@@ -21777,6 +21922,11 @@ P pack-7118053abd3e77d618f080441b62aaad024b4ca6.pack
 # Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/78/9ebb04d87ac7996e315c53a68ab3749a4733f8
 
 
+# ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/14/cfe00b18b377a251fad1120221b81b043ac78e =====
+
+# Skipped binary/unreadable file: /Users/syed/Files/Host/ATS_RESUME_APP/.git/objects/14/cfe00b18b377a251fad1120221b81b043ac78e
+
+
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/info/exclude =====
 
 # git ls-files --others --exclude-from=.git/info/exclude
@@ -21817,6 +21967,7 @@ ddb85393093a9604f1cfbaf48a48f6599daf8c4e 733f08f0a47cf561d20b8b1971da3acd25c1b0c
 719554cacfce2de67166cf21c82bbd22a63986d2 dc2704029fe6a5f027da96a23bd9a8cc84904c9b Syed-qn <snassirodinquadri@gmail.com> 1749146847 +0400	commit: ready conflict issue
 dc2704029fe6a5f027da96a23bd9a8cc84904c9b 6baae7a6a30304849ffcd72541cd325065b509cf Syed-qn <snassirodinquadri@gmail.com> 1749155198 +0400	commit: email login, icon alignment, limit prompt
 6baae7a6a30304849ffcd72541cd325065b509cf 5264081753ae9c7a32a65a2e925dc6f8d9d17b45 Syed-qn <snassirodinquadri@gmail.com> 1749155707 +0400	commit: libpongo dockerfile
+5264081753ae9c7a32a65a2e925dc6f8d9d17b45 5702019b5d7b5e0c4fbd5b691afaf01b2debe670 Syed-qn <snassirodinquadri@gmail.com> 1749182143 +0400	commit: llm toggle
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/logs/refs/heads/main =====
@@ -21843,6 +21994,7 @@ ddb85393093a9604f1cfbaf48a48f6599daf8c4e 733f08f0a47cf561d20b8b1971da3acd25c1b0c
 719554cacfce2de67166cf21c82bbd22a63986d2 dc2704029fe6a5f027da96a23bd9a8cc84904c9b Syed-qn <snassirodinquadri@gmail.com> 1749146847 +0400	commit: ready conflict issue
 dc2704029fe6a5f027da96a23bd9a8cc84904c9b 6baae7a6a30304849ffcd72541cd325065b509cf Syed-qn <snassirodinquadri@gmail.com> 1749155198 +0400	commit: email login, icon alignment, limit prompt
 6baae7a6a30304849ffcd72541cd325065b509cf 5264081753ae9c7a32a65a2e925dc6f8d9d17b45 Syed-qn <snassirodinquadri@gmail.com> 1749155707 +0400	commit: libpongo dockerfile
+5264081753ae9c7a32a65a2e925dc6f8d9d17b45 5702019b5d7b5e0c4fbd5b691afaf01b2debe670 Syed-qn <snassirodinquadri@gmail.com> 1749182143 +0400	commit: llm toggle
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/logs/refs/remotes/origin/HEAD =====
@@ -21874,6 +22026,7 @@ cacaaaf81384146378f377e528d9de0d6dc39987 2d3da874e5154ab9c24854a43be73479f3963cf
 719554cacfce2de67166cf21c82bbd22a63986d2 dc2704029fe6a5f027da96a23bd9a8cc84904c9b Syed-qn <snassirodinquadri@gmail.com> 1749146848 +0400	update by push
 dc2704029fe6a5f027da96a23bd9a8cc84904c9b 6baae7a6a30304849ffcd72541cd325065b509cf Syed-qn <snassirodinquadri@gmail.com> 1749155200 +0400	update by push
 6baae7a6a30304849ffcd72541cd325065b509cf 5264081753ae9c7a32a65a2e925dc6f8d9d17b45 Syed-qn <snassirodinquadri@gmail.com> 1749155708 +0400	update by push
+5264081753ae9c7a32a65a2e925dc6f8d9d17b45 5702019b5d7b5e0c4fbd5b691afaf01b2debe670 Syed-qn <snassirodinquadri@gmail.com> 1749182145 +0400	update by push
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/hooks/commit-msg.sample =====
@@ -22802,7 +22955,7 @@ fi
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/refs/heads/main =====
 
-5264081753ae9c7a32a65a2e925dc6f8d9d17b45
+5702019b5d7b5e0c4fbd5b691afaf01b2debe670
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/refs/remotes/origin/HEAD =====
@@ -22812,7 +22965,7 @@ ref: refs/remotes/origin/main
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/.git/refs/remotes/origin/main =====
 
-5264081753ae9c7a32a65a2e925dc6f8d9d17b45
+5702019b5d7b5e0c4fbd5b691afaf01b2debe670
 
 
 # ===== FILE: /Users/syed/Files/Host/ATS_RESUME_APP/media/resumes/AI_-_Syed_Nasirodin_Quadri_Resume.pdf =====

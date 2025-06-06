@@ -66,7 +66,8 @@ from django.contrib.auth.views import (
 
 
 logger = logging.getLogger(__name__)
-llm_client, current_model = get_llm_client()
+llm_client, current_model = get_llm_client()   # ← unified LLM entry-point
+client = llm_client  
 
 # Target scores - must achieve both
 TARGET_ATS_SCORE = 92
@@ -669,8 +670,8 @@ Return a detailed JSON object:
 Preserve all factual information exactly while identifying optimization opportunities."""
 
     try:
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+        response = llm_client.chat.completions.create(        # ← use wrapper
+            model=current_model,                      
             messages=[{"role": "user", "content": analysis_prompt}],
             temperature=0.1,
             max_tokens=2048,
@@ -883,8 +884,8 @@ Transform aggressively while preserving factual accuracy and achieving exact pag
                 )
             
             # Call LLM for intelligent optimization
-            response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
+            response = llm_client.chat.completions.create(     # ← wrapper
+                model=current_model,
                 messages=conversation_history,
                 temperature=0.1,
                 max_tokens=4096,
@@ -951,6 +952,7 @@ Transform aggressively while preserving factual accuracy and achieving exact pag
                 return _create_intelligent_fallback(resume_text, template_html, job_analysis, resume_analysis), 70, 50, 1
             else:
                 return best_resume, best_ats, best_job, iteration
+            pass
 
 
 def generate_improvement_strategy_with_pages(

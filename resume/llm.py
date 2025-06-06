@@ -1,6 +1,6 @@
 from django.conf import settings
 from openai import OpenAI
-from .deepseek_client import client as deepseek_client  # already configured
+from .deepseek_client import client as deepseek_client # already configured
 
 def get_llm_client():
     """
@@ -8,7 +8,9 @@ def get_llm_client():
     settings.LLM_PROVIDER so the rest of the code doesn’t care which
     backend is active.
     """
-    if settings.LLM_PROVIDER == 'deepseek':
+    provider = getattr(settings, "LLM_PROVIDER", "gpt").lower()
+
+     if provider == 'deepseek':
         # DeepSeek SDK is OpenAI-compatible – reuse as-is
         return deepseek_client, settings.LLM_MODELS['deepseek']
 

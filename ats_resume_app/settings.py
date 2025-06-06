@@ -229,6 +229,18 @@ RESUME_PROCESSING = {
 }
 
 # ====== LLM CONFIGURATION ======
+
+LLM_PROVIDER = config('LLM_PROVIDER', default='gpt').lower()
+LLM_TIMEOUT = config('LLM_TIMEOUT', default=30, cast=int)
+
+LLM_MODELS = {
+    'gpt':      config('OPENAI_MODEL',   default='gpt-3.5-turbo'),
+    'deepseek': config('DEEPSEEK_MODEL', default='deepseek-chat'),
+}
+
+OPENAI_MODEL   = config('OPENAI_MODEL', default='gpt-3.5-turbo')
+DEEPSEEK_MODEL = config('DEEPSEEK_MODEL', default='deepseek-chat')
+
 LLM_CONFIG = {
     'OPENAI_MODEL': config('LLM_MODEL', default='gpt-3.5-turbo'),
     'MAX_TOKENS': config('LLM_MAX_TOKENS', default=4096, cast=int),
@@ -253,13 +265,7 @@ PDF_CONFIG = {
 # ───── LLM provider toggle ──────────────────────────────────────────────
 # `LLM_PROVIDER` is what the admin switch will change. Accepts “gpt” or
 # “deepseek” (case-insensitive).  Everything else picks its value from it.
-LLM_PROVIDER = config('LLM_PROVIDER', default='gpt').lower()
-LLM_TIMEOUT = config('LLM_TIMEOUT', default=30, cast=int)
 
-LLM_MODELS = {
-    'gpt':      config('OPENAI_MODEL',   default='gpt-3.5-turbo'),
-    'deepseek': config('DEEPSEEK_MODEL', default='deepseek-chat'),
-}
 
 # Helper used by the app everywhere a model name is required
 LLM_CURRENT_MODEL = LLM_MODELS[LLM_PROVIDER]

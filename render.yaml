@@ -4,6 +4,8 @@ services:
     env: docker
     plan: free
     region: oregon
+    dockerBuildArgs:
+      CACHE_BUSTER: "2025-06-06"
     envVars:
       # ───── Required for Django itself ─────
       - key: DJANGO_SETTINGS_MODULE

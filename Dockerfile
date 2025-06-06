@@ -35,6 +35,7 @@ RUN set -eux; \
         libxml2 \
         libxslt1.1 \
         fonts-dejavu \
+        libffi8 \  
         shared-mime-info; \
     # pull latest security patches for slim-bookworm
     apt-get upgrade -y; \

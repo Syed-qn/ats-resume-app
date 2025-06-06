@@ -12,8 +12,7 @@ sqlparse==0.5.3
 typing_extensions==4.14.0
 tzdata==2025.2
 wheel==0.45.1
-djangorestframework
-
+python-decouple==3.8 
 
 # ─── API & validation ───────────────────────────────────────────
 djangorestframework==3.16.0        # REST API engine  :contentReference[oaicite:0]{index=0}

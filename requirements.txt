@@ -12,3 +12,20 @@ sqlparse==0.5.3
 typing_extensions==4.14.0
 tzdata==2025.2
 wheel==0.45.1
+djangorestframework
+
+
+# ─── API & validation ───────────────────────────────────────────
+djangorestframework==3.16.0        # REST API engine  :contentReference[oaicite:0]{index=0}
+django-countries==7.6.1            # CountryField    :contentReference[oaicite:1]{index=1}
+phonenumbers==9.0.6                # Phone parsing   :contentReference[oaicite:2]{index=2}
+
+# ─── LLM & parsing ──────────────────────────────────────────────
+openai==1.84.0                     # OpenAI API      :contentReference[oaicite:3]{index=3}
+beautifulsoup4==4.13.4             # HTML scraping   :contentReference[oaicite:4]{index=4}
+
+# ─── Document / image IO ───────────────────────────────────────
+weasyprint==65.1                   # HTML→PDF        :contentReference[oaicite:5]{index=5}
+Pillow==11.2.1                     # Image handling  :contentReference[oaicite:6]{index=6}
+PyPDF2==3.0.1                      # PDF parsing     :contentReference[oaicite:7]{index=7}
+docx2txt==0.9                      # DOCX→text       :contentReference[oaicite:8]{index=8}

@@ -42,6 +42,10 @@ RUN set -eux; \
     apt-get clean; \
     rm -rf /var/lib/apt/lists/*
 
+RUN apt-get update && apt-get install -y \
+    libpango-1.0-0 libcairo2 gdk-pixbuf2.0-0 && \
+    rm -rf /var/lib/apt/lists/*
+
 # ────────────────────────────
 #  Project setup
 # ────────────────────────────

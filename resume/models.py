@@ -67,6 +67,10 @@ class DownloadLog(models.Model):
         on_delete=models.CASCADE,
         related_name="downloads",
     )
+    # keeps a trail of which tailored PDF was downloaded
+    resume     = models.ForeignKey("Resume",           
+                                   on_delete=models.SET_NULL,
+                                   null=True, blank=True)
     downloaded = models.DateTimeField(auto_now_add=True)
 
     class Meta:

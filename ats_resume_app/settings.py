@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from decouple import config
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -63,10 +64,11 @@ WSGI_APPLICATION = 'ats_resume_app.wsgi.application'
 
 # ====== DATABASE CONFIGURATION ======
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    "default": dj_database_url.config(
+        default="postgresql://ats_database_user:5j7EOjYXCDG35N3etey0Bh7kVBO8cJzo@dpg-d11bqnmmcj7s73a2qam0-a/ats_database",
+        conn_max_age=600,
+        ssl_require=True,   # optional but recommended in production
+    )
 }
 
 # ======= Backend for email ======

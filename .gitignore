@@ -139,3 +139,4 @@ logs/*.log
 Thumbs.db.env
 *.sqlite3
 __pycache__/
+combined_output.txt

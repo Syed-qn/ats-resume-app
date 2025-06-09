@@ -150,7 +150,7 @@ class HardLogoutView(LogoutView):
         request.session.flush()
         return super().dispatch(request, *args, **kwargs)
 
-    next_page = settings.LOGIN_URL     # → /login/ by default
+    next_page = settings.LOGOUT_REDIRECT_URL     # → /login/ by default
 
 @login_required(login_url="login")
 def dashboard(request: HttpRequest) -> HttpResponse:

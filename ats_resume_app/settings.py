@@ -150,7 +150,7 @@ if DEBUG:
 # ====== AUTHENTICATION CONFIGURATION - Task 11 ======
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = 'dashboard'
-LOGOUT_REDIRECT_URL = 'landing'
+LOGOUT_REDIRECT_URL = "/login/"
 
 # Custom authentication settings
 AUTH_USER_MODEL = 'auth.User'  # Using default User model

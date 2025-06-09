@@ -31,19 +31,22 @@ services:
 
       # ───── Email Configuration ─────
       - key: EMAIL_HOST
-        value: ${EMAIL_HOST}             # e.g. "smtp.gmail.com"
+        value: "smtp.gmail.com"
       - key: EMAIL_PORT
-        value: ${EMAIL_PORT}             # e.g. "587"
+        value: "587"
       - key: EMAIL_USE_TLS
-        value: ${EMAIL_USE_TLS}          # e.g. "True"
+        value: "True"
       - key: EMAIL_HOST_USER
-        value: ${EMAIL_HOST_USER}        # e.g. "your_email@gmail.com"
+        value: "snassirodinquadri@gmail.com"
       - key: EMAIL_HOST_PASSWORD
-        value: ${EMAIL_HOST_PASSWORD}    # e.g. your app password
+        value: "nafs eieb pxgunveu"
       - key: DEFAULT_FROM_EMAIL
-        value: ${DEFAULT_FROM_EMAIL}     # e.g. "noreply@atsresume.com"
+        value: "snassirodinquadri@gmail.com"
       - key: ADMIN_EMAIL
-        value: ${ADMIN_EMAIL}            # e.g. "admin@yourdomain.com"
+        value: "snassirodinquadri@gmail.com"
+      - key: SERVER_EMAIL
+        value: "snassirodinquadri@gmail.com"
+
 
       # ───── File‐upload / S3 (if used) ─────
       - key: AWS_ACCESS_KEY_ID
@@ -85,7 +88,7 @@ services:
       - key: SEND_WELCOME_EMAIL
         value: "False"
       - key: SEND_RESUME_NOTIFICATION
-        value: "False"
+        value: "True"
       - key: NOTIFY_ADMIN_NEW_USER
         value: "True"
 

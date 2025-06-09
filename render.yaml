@@ -39,7 +39,7 @@ services:
       - key: EMAIL_HOST_USER
         value: "snassirodinquadri@gmail.com"
       - key: EMAIL_HOST_PASSWORD
-        value: "nafs eieb pxgunveu"
+        value: "nafs eieb pxgu nveu"
       - key: DEFAULT_FROM_EMAIL
         value: "snassirodinquadri@gmail.com"
       - key: ADMIN_EMAIL

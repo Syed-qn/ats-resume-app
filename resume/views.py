@@ -57,7 +57,7 @@ from .utils import clean_extracted_text, extract_text_from_file, validate_file
 from django.core.mail import EmailMessage, send_mail
 from django.template.loader import get_template
 from django.contrib.auth.views import LoginView
-
+from django.contrib import auth
 # Task 11: Password reset functionality
 from django.contrib.auth.views import (
     PasswordResetView, PasswordResetDoneView, 

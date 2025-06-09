@@ -89,6 +89,16 @@ class Profile(models.Model):
     city = models.CharField(max_length=100, blank=True)
     country = models.CharField(max_length=100, blank=True)
 
+    # NEW — per-user download quotas
+    limit_15_days = models.PositiveIntegerField(
+        default=getattr(settings, "DOWNLOADS_PER_15_DAYS", 3),
+        help_text="Max downloads in any rolling 15-day window"
+    )
+    limit_month = models.PositiveIntegerField(
+        default=getattr(settings, "DOWNLOADS_PER_MONTH", 6),
+        help_text="Max downloads in a calendar month"
+    )
+
     def __str__(self):
         return f"Profile({self.user.username})"
 

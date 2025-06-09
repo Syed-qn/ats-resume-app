@@ -63,7 +63,8 @@ from django.contrib.auth.views import (
     PasswordResetView, PasswordResetDoneView, 
     PasswordResetConfirmView, PasswordResetCompleteView
 )
-
+# resume/views.py  (near the other imports)
+from django.contrib.auth.views import LogoutView   # ← add this
 
 logger = logging.getLogger(__name__)
 llm_client, current_model = get_llm_client()   # ← unified LLM entry-point
@@ -110,6 +111,7 @@ def signup(request: HttpRequest) -> HttpResponse:
                 'city': form.cleaned_data.get('city'),
                 'country': form.cleaned_data.get('country'),
                 'signup_time': timezone.now().isoformat(),
+                'full_phone': f"+{form.cleaned_data['country_code']} {form.cleaned_data['phone_number']}",
             }
             
             # Store in cache with user ID as key for later retrieval
@@ -135,6 +137,10 @@ def signup(request: HttpRequest) -> HttpResponse:
 
 
 # ────────────────────────  SPA Dashboard  ───────────────────────
+class LogoutViewAllowGet(LogoutView):
+    """Django 5 made LogoutView POST-only; re-enable GET so <a> links still work."""
+    http_method_names = ["get", "head", "post"]     # <─ key line
+    next_page = "/login/"  
 
 @login_required(login_url="login")
 def dashboard(request: HttpRequest) -> HttpResponse:
@@ -150,82 +156,87 @@ def dashboard(request: HttpRequest) -> HttpResponse:
 
 # Task 10: Enhanced email notification function for first resume upload
 def send_first_resume_notification(user, resume_file, signup_data=None):
-    """Send comprehensive email notification when user uploads their first resume"""
+    """
+    Send an HTML e-mail to the admin when a user uploads their first résumé.
+    Includes signup form details (phone, city, country) with solid fall-backs.
+    """
     try:
-        # Get user profile information
-        profile = getattr(user, 'profile', None)
-        
-        # Get signup data from cache if not provided
+        # ── 1. Gather signup data ──────────────────────────────────────────
         if not signup_data:
-            signup_data = cache.get(f"signup_data_{user.id}", {})
-        
-        # Prepare comprehensive context for email template
+            signup_data = cache.get(f"signup_data_{user.id}", {}) or {}
+
+        profile = getattr(user, "profile", None)
+
+        # Helper to pull value → signup_data ➜ profile ➜ default
+        def pick(key, default="Not provided"):
+            return signup_data.get(key) or getattr(profile, key, "") or default
+
+        country_code = pick("country_code", "")
+        phone_number = pick("phone_number", "")
+        full_phone   = f"+{country_code.lstrip('+')} {phone_number}".strip() \
+                       if phone_number else "Not provided"
+
+        # ── 2. Build template context ─────────────────────────────────────
         context = {
-            'user': user,
-            'profile': profile,
-            'resume_filename': resume_file.name if resume_file else 'No file',
-            'resume_file_size': resume_file.size if resume_file else 0,
-            'upload_time': timezone.now(),
-            'admin_email': getattr(settings, 'ADMIN_EMAIL', 'admin@example.com'),
-            
-            # Signup form details
-            'signup_data': {
-                'username': signup_data.get('username', user.username),
-                'email': signup_data.get('email', user.email),
-                'phone_number': signup_data.get('phone_number', 'Not provided'),
-                'country_code': signup_data.get('country_code', 'Not provided'),
-                'city': signup_data.get('city', 'Not provided'),
-                'country': signup_data.get('country', 'Not provided'),
-                'signup_time': signup_data.get('signup_time', 'Unknown'),
-                'full_phone': f"{signup_data.get('country_code', '')}{signup_data.get('phone_number', '')}" if signup_data.get('phone_number') else 'Not provided'
+            "user": user,
+            "profile": profile,
+            "resume_filename": getattr(resume_file, "name", "No file"),
+            "resume_file_size": getattr(resume_file, "size", 0),
+            "upload_time": timezone.now(),
+            "admin_email": getattr(settings, "ADMIN_EMAIL", "admin@example.com"),
+
+            # Signup details
+            "signup_data": {
+                "username":     signup_data.get("username", user.username),
+                "email":        signup_data.get("email", user.email),
+                "phone_number": phone_number or "Not provided",
+                "country_code": country_code or "Not provided",
+                "city":         pick("city"),
+                "country":      pick("country"),
+                "signup_time":  signup_data.get("signup_time", "Unknown"),
+                "full_phone":   full_phone,
             },
-            
-            # Additional user info
-            'user_info': {
-                'date_joined': user.date_joined,
-                'last_login': user.last_login,
-                'is_staff': user.is_staff,
-                'is_active': user.is_active,
-            }
+
+            # Basic user flags
+            "user_info": {
+                "date_joined": user.date_joined,
+                "last_login":  user.last_login,
+                "is_staff":    user.is_staff,
+                "is_active":   user.is_active,
+            },
         }
-        
-        # Load email template
-        email_template = get_template('emails/first_resume_notification.html')
-        email_content = email_template.render(context)
-        
-        # Create email message
-        admin_email = getattr(settings, 'ADMIN_CONFIG', {}).get('EMAIL', 'admin@example.com')
-        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@atsresume.com')
-        
+
+        # ── 3. Render e-mail ──────────────────────────────────────────────
+        email_template = get_template("emails/first_resume_notification.html")
+        email_content  = email_template.render(context)
+
+        admin_email = getattr(settings, "ADMIN_CONFIG", {}).get(
+            "EMAIL", "admin@example.com"
+        )
+        from_email  = getattr(settings, "DEFAULT_FROM_EMAIL", "noreply@atsresume.com")
+
         email = EmailMessage(
-            subject=f'🎯 New User First Resume Upload - {user.username}',
+            subject=f"🎯 New User First Resume Upload - {user.username}",
             body=email_content,
             from_email=from_email,
             to=[admin_email],
             reply_to=[user.email],
         )
-        
-        # Set email as HTML
-        email.content_subtype = 'html'
-        
-        # Attach the resume file if it exists
-        if resume_file and hasattr(resume_file, 'path') and os.path.exists(resume_file.path):
-            try:
-                email.attach_file(resume_file.path)
-                logger.info(f"Resume file attached: {resume_file.path}")
-            except Exception as e:
-                logger.warning(f"Failed to attach resume file: {e}")
-        
-        # Send email
+        email.content_subtype = "html"
+
+        # Attach résumé if it exists on disk
+        if resume_file and hasattr(resume_file, "path") and os.path.exists(resume_file.path):
+            email.attach_file(resume_file.path)
+            logger.info(f"Resume file attached: {resume_file.path}")
+
         email.send(fail_silently=False)
         logger.info(f"First resume notification sent for user: {user.username}")
-        
-        # Clear signup data from cache after successful email
-        cache.delete(f"signup_data_{user.id}")
-        
-    except Exception as e:
-        logger.error(f"Failed to send first resume notification for user {user.username}: {e}")
 
+        # ── 4. House-keeping ──────────────────────────────────────────────
+        cache.delete(f"signup_data_{user.id}")
+
+    except Exception as exc:
+        logger.error(f"Failed to send first resume notification for {user.username}: {exc}")
 
 
 # ────────────────────────  Resume Upload  ───────────────────────
@@ -577,7 +588,7 @@ Be thorough and extract everything that could be relevant for resume optimizatio
             model=current_model,
             messages=[{"role": "user", "content": analysis_prompt}],
             temperature=0.1,
-            max_tokens=2048,
+            max_tokens=4096,
             response_format={"type": "json_object"}
         )
         
@@ -849,7 +860,15 @@ SPECIFIC REQUIREMENTS:
 6. Return clean HTML without any template conditionals
 7. Ensure every section is optimized for the target role
 8. MUST fill EXACTLY """ + str(num_pages or 1) + """ page(s) with NO blank space at bottom
-9. If content insufficient, ADD "Why Should You Hire Me?" section to fill remaining space
+9. **ALWAYS** append a <strong>"Why Should You Hire Me?"</strong> section  
+   • Place it after the <strong>Skills</strong> section (or as the final section).  
+   • Write 3–5 concise bullet points that summarize why this candidate is a strong fit for the job.
+   • Base these bullets on a full analysis of the **entire rewritten resume**, including work experience, projects, education, achievements, and any other relevant sections **and** the job description. 
+   • Each bullet must link a *specific* achievement / skill in the résumé to a top job requirement, using quantified results where possible.
+
+PAGE COUNT ENFORCEMENT:
+- Target: {num_pages} page(s) EXACTLY
+- If you exceed the target, tighten wording elsewhere—do **not** drop this section.
 
 PAGE COUNT ENFORCEMENT:
 - Target: """ + str(num_pages or 1) + """ page(s) EXACTLY
@@ -1286,72 +1305,90 @@ def _create_intelligent_fallback(resume_text: str, template_html: str, job_analy
 @login_required(login_url="login")
 def download_pdf_ajax(request: HttpRequest, resume_id: int) -> HttpResponse:
     """
-    Tailored-resume PDF download with:
-    • Per-user rate limits (configurable)
-    • Cache / session fallback
-    • Filename sanitising
+    Download a tailored-résumé PDF with per-user rate limits.
+
+    ── Quotas ───────────────────────────────────────────────────────────
+      • limit_15_days  – rolling 15-day window
+      • limit_month    – calendar-month window
+      • Staff/superusers bypass limits.
+      • Admin panel can set one-off overrides in request.session.
     """
-    # ── 1. Resolve rate-limit caps ───────────────────────────────────────
+    # ── 1. Resolve rate-limit caps ─────────────────────────────────────
     if request.user.is_superuser or request.user.is_staff:
-        LIMIT_15 = LIMIT_MONTH = float("inf")   # skip every quota check
+        LIMIT_15 = LIMIT_MONTH = float("inf")       # unlimited
     else:
-        LIMIT_15, LIMIT_MONTH = 3, 6
-        # a) user.profile fields (preferred – add IntegerFields to your profile model)
-        if hasattr(request.user, "profile"):
-            LIMIT_15 = request.user.profile.limit_15_days or LIMIT_15
-            LIMIT_MONTH = request.user.profile.limit_month or LIMIT_MONTH
-        # b) session override (set by your custom admin panel)
+        LIMIT_15, LIMIT_MONTH = 3, 6               # sane defaults
+
+        # a) persistent per-user columns (Profile model)
+        profile = getattr(request.user, "profile", None)
+        if profile:
+            LIMIT_15   = getattr(profile, "limit_15_days", LIMIT_15)   or LIMIT_15
+            LIMIT_MONTH = getattr(profile, "limit_month",   LIMIT_MONTH) or LIMIT_MONTH
+
+        # b) temporary session override set from custom admin panel
         sess_key = f"user_{request.user.id}_download_limits"
         if (custom := request.session.get(sess_key)):
             LIMIT_15   = custom.get("per_15_days", LIMIT_15)
-            LIMIT_MONTH = custom.get("per_month", LIMIT_MONTH)
+            LIMIT_MONTH = custom.get("per_month",  LIMIT_MONTH)
 
         # actual usage counters
-        past_15      = now() - timedelta(days=15)
-        month_start  = now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        count_15     = DownloadLog.objects.filter(user=request.user,
-                                                  downloaded__gte=past_15).count()
-        count_month  = DownloadLog.objects.filter(user=request.user,
-                                                  downloaded__gte=month_start).count()
+        past_15     = now() - timedelta(days=15)
+        month_start = now().replace(day=1, hour=0, minute=0, second=0,
+                                    microsecond=0)
+
+        count_15    = DownloadLog.objects.filter(
+            user=request.user, downloaded__gte=past_15
+        ).count()
+        count_month = DownloadLog.objects.filter(
+            user=request.user, downloaded__gte=month_start
+        ).count()
 
         if count_15 >= LIMIT_15 or count_month >= LIMIT_MONTH:
-            wa_number  = settings.WHATSAPP_PHONE_NUMBER
-            wa_msg     = settings.WHATSAPP_DEFAULT_MESSAGE
-            contact_url = f"https://wa.me/916303858671?text=Hi! Can you please increase my qouta?"
+            # hard stop – quota exceeded
+            wa_number   = settings.WHATSAPP_CONFIG["PHONE_NUMBER"]
+            wa_template = settings.WHATSAPP_CONFIG["DEFAULT_MESSAGE"]
+            contact_url = (
+                f"https://wa.me/{wa_number}?text={wa_template.replace(' ', '%20')}"
+            )
             return JsonResponse({
                 "message": (
-                    "🚫 You have crossed your free limit. "
-                    "Please contact us on WhatsApp to increase the quota."
+                    "🚫 Free download quota reached. "
+                    "Tap the WhatsApp button to request a higher limit."
                 ),
                 "contact_url": contact_url,
                 "limit_15": LIMIT_15,
                 "limit_month": LIMIT_MONTH,
             }, status=429)
 
-    # ── 2. Load pre-generated HTML (cache → session) ────────────────────
+    # ── 2. Load pre-generated HTML (cache ➜ session) ───────────────────
     cache_key   = f"tailored_resume_{request.user.id}_{resume_id}"
     session_key = "tailored_resume"
-    data        = cache.get(cache_key) or {"tailored_resume": request.session.get(session_key)}
+    data        = cache.get(cache_key) or {
+        "tailored_resume": request.session.get(session_key)
+    }
     html_resume = data.get("tailored_resume")
-
     if not html_resume:
         return JsonResponse({"error": "Generate resume first"}, status=400)
 
-    # ── 3. Ensure resume belongs to user ─────────────────────────────────
+    # ── 3. Ownership check ─────────────────────────────────────────────
     resume = get_object_or_404(Resume, id=resume_id, user=request.user)
 
-    # ── 4. Build safe filename -------------------------------------------------
-    safe = lambda s: re.sub(r"[^A-Za-z0-9 _-]+", "", s).strip().lower()
-    tpl_meta   = next((t for t in TEMPLATES_LIST if t["id"] == data.get("template_id")), None)
-    style_name = (tpl_meta["name"].split()[0] + " style") if tpl_meta else "style"
-    filename   = f"{safe(resume.user.username)} - {safe(style_name)} - llm-optimized.pdf"
+    # ── 4. Safe filename ───────────────────────────────────────────────
+    safe  = lambda s: re.sub(r"[^A-Za-z0-9 _-]+", "", s).strip().lower()
+    tpl   = next(
+        (t for t in TEMPLATES_LIST if t["id"] == data.get("template_id")),
+        None
+    )
+    style = (tpl["name"].split()[0] + " style") if tpl else "style"
+    filename = f"{safe(resume.user.username)} - {safe(style)}.pdf"
 
-    # ── 5. Render → PDF + log download ───────────────────────────────────
-    pdf_html  = render_to_string("resume/pdf_template.html", {"final_resume": html_resume})
+    # ── 5. Render ➜ PDF + log download ────────────────────────────────
+    pdf_html  = render_to_string("resume/pdf_template.html",
+                                 {"final_resume": html_resume})
     pdf_bytes = HTML(string=pdf_html).write_pdf()
-    DownloadLog.objects.create(user=request.user, resume=resume)  # keep a trail
+    DownloadLog.objects.create(user=request.user, resume=resume)    # audit trail
 
-    # ── 6. Ship it ───────────────────────────────────────────────────────
+    # ── 6. Ship it ────────────────────────────────────────────────────
     response = HttpResponse(pdf_bytes, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="{filename}"'
     return response

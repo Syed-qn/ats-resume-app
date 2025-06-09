@@ -5,12 +5,19 @@ from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.urls import path
 from django import forms
+from .models import Profile
 
 from .models import (
     Resume, Template, ManualResume, Education, WorkExperience,
     Project, Skill, Certification, Award, Language, VolunteerExperience
 )
 
+# ─────────────────────────  Limit changer  ─────────────────────────
+@admin.register(Profile)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display  = ("user", "limit_15_days", "limit_month", "country", "city")
+    list_editable = ("limit_15_days", "limit_month")
+    search_fields = ("user__username", "user__email")
 
 # ─────────────────────────  Core models  ─────────────────────────
 

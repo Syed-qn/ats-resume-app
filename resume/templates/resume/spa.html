@@ -9,6 +9,12 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <style>
+
+    .highlight-flash {
+      box-shadow: 0 0 0 4px rgba(63, 114, 175, 0.4);
+      transition: box-shadow 0.3s ease;
+    }
+
     /* -------------  GENERIC  ------------- */
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
     body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
@@ -648,6 +654,9 @@
               <button class="btn btn-secondary" onclick="prevStep()">
                 <i class="fas fa-arrow-left"></i> Back to templates
               </button>
+              <button class="btn btn-secondary" onclick="scrollToJobDescription()">
+                <i class="fas fa-pen"></i> Regenerate with another Job Description
+              </button>
             </div>
           </div>
         </section>
@@ -673,6 +682,19 @@
 
   <!-- ─────────── SCRIPT ─────────── -->
   <script>
+    function scrollToJobDescription() {
+      const jd = document.getElementById('jobDescription');
+      if (jd) {
+        goToStep(2);  // Reuse your existing function
+        setTimeout(() => {
+          jd.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          jd.focus({ preventScroll: true });
+          jd.classList.add('highlight-flash');
+          setTimeout(() => jd.classList.remove('highlight-flash'), 1000);
+        }, 300);
+      }
+    }
+
     /* CONFIG */
     let currentStep=1, currentResumeID=null, selectedTemplate=null;
     let deleteResumeId = null; // For tracking which resume to delete

@@ -29,7 +29,7 @@ urlpatterns = [
     
     # Task 11: Custom login view with admin redirect
     path('login/', views.CustomLoginView.as_view(), name='login'),
-    path('logout/', views.LogoutViewAllowGet.as_view(), name='logout'),
+    path("logout/", views.HardLogoutView.as_view(), name="logout"),
     path('signup/', views.signup, name='signup'),
     
     # ─────────────── Protected Application URLs - Task 14 ───────────────

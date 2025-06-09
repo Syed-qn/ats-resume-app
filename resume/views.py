@@ -137,10 +137,20 @@ def signup(request: HttpRequest) -> HttpResponse:
 
 
 # ────────────────────────  SPA Dashboard  ───────────────────────
-class LogoutViewAllowGet(LogoutView):
-    """Django 5 made LogoutView POST-only; re-enable GET so <a> links still work."""
-    http_method_names = ["get", "head", "post"]     # <─ key line
-    next_page = "/login/"  
+class HardLogoutView(LogoutView):
+    """
+    • Accepts GET / POST
+    • Flushes the entire session (guards against ‘back-button’ leaks)
+    • Redirects to LOGIN_URL (settings.py)
+    """
+    http_method_names = ["get", "head", "post"]
+
+    def dispatch(self, request: HttpRequest, *args, **kwargs):
+        auth.logout(request)           # clears session + auth cookies
+        request.session.flush()
+        return super().dispatch(request, *args, **kwargs)
+
+    next_page = settings.LOGIN_URL     # → /login/ by default
 
 @login_required(login_url="login")
 def dashboard(request: HttpRequest) -> HttpResponse:

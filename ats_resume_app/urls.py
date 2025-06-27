@@ -51,3 +51,11 @@ urlpatterns += [
     path('xmlrpc.php', block_wordpress_scans),
     path('wp-admin/<path:path>', block_wordpress_scans),
 ]
+
+def serve_icon(request, filename):
+    return HttpResponse(status=404)
+
+urlpatterns += [
+    path('apple-touch-icon-precomposed.png', serve_icon),
+    path('apple-touch-icon.png', serve_icon),
+]

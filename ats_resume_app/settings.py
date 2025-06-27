@@ -80,6 +80,12 @@ AUTHENTICATION_BACKENDS = [
     "resume.backends.EmailBackend",      # <-- add
 ]
 
+# settings.py
+CSRF_TRUSTED_ORIGINS = [
+    'https://scholars-ats.com',
+    'https://ats-resume-app.onrender.com'
+]
+
 # ====== PASSWORD VALIDATION ======
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -407,6 +413,11 @@ if DEBUG:
     
 else:
     # Production settings
+    # settings.py
+    CSRF_TRUSTED_ORIGINS = [
+        'https://scholars-ats.com',
+        'https://ats-resume-app.onrender.com'
+    ]
     DEBUG = False
     ALLOWED_HOSTS = config(
         'ALLOWED_HOSTS',

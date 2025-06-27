@@ -9,7 +9,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ====== SECURITY CONFIGURATION ======
 SECRET_KEY = config('SECRET_KEY', default="django-insecure-km%bn!syf*%57e!qzy-h%6bdz^tdutr31w&-l=6ezjl#d6_ib)")
 DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS','ats-resume-app.onrender.com','scholars-ats.com', default='localhost,127.0.0.1,0.0.0.0').split(',')
+ALLOWED_HOSTS = config(
+    'ALLOWED_HOSTS',
+    default='ats-resume-app.onrender.com,scholars-ats.com,localhost,127.0.0.1,0.0.0.0'
+).split(',')
 
 # ====== APPLICATION DEFINITION ======
 INSTALLED_APPS = [
@@ -405,7 +408,11 @@ if DEBUG:
 else:
     # Production settings
     DEBUG = False
-    ALLOWED_HOSTS = config('ALLOWED_HOSTS','ats-resume-app.onrender.com','scholars-ats.com', default='*').split(',')
+    ALLOWED_HOSTS = config(
+        'ALLOWED_HOSTS',
+        default='ats-resume-app.onrender.com,scholars-ats.com,localhost,127.0.0.1,0.0.0.0'
+    ).split(',')
+
     
     # Force HTTPS in production
     SECURE_SSL_REDIRECT = False

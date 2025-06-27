@@ -2,34 +2,248 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Why ATS-Friendly Résumés Matter</title>
-<link rel="stylesheet" href="{% static 'css/landing.css' %}">
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #E9ECEF 0%, #F8F9FA 100%);
+  color: #333333;
+  line-height: 1.6;
+}
+
+/* Hero Section */
+.hero {
+  background: linear-gradient(135deg, #2E5BBA, #1F4E79);
+  color: #FFFFFF;
+  padding: 100px 20px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/></svg>') repeat;
+  animation: float 20s infinite linear;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-100px); }
+}
+
+.hero h1 {
+  font-size: 3.5rem;
+  margin-bottom: 20px;
+  font-weight: 800;
+  position: relative;
+  z-index: 2;
+}
+
+.hero p {
+  font-size: 1.3rem;
+  margin-bottom: 40px;
+  opacity: 0.95;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  z-index: 2;
+}
+
+.cta {
+  display: inline-block;
+  background: #FF6B35;
+  color: #FFFFFF;
+  padding: 18px 40px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+  position: relative;
+  z-index: 2;
+}
+
+.cta:hover {
+  background: #E55A2B;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
+  color: #FFFFFF;
+}
+
+/* Info Section */
+.info {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 80px 20px;
+  background: #FFFFFF;
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(46, 91, 186, 0.1);
+  margin-top: -30px;
+  position: relative;
+  z-index: 3;
+}
+
+.info h2 {
+  font-size: 2.5rem;
+  color: #333333;
+  margin-bottom: 20px;
+  font-weight: 700;
+  margin-top: 40px;
+}
+
+.info h2:first-child {
+  margin-top: 0;
+}
+
+.info p {
+  font-size: 1.2rem;
+  color: #666666;
+  margin-bottom: 30px;
+  line-height: 1.7;
+}
+
+.info ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 30px;
+}
+
+.info li {
+  color: #333333;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+  position: relative;
+  padding-left: 30px;
+  line-height: 1.6;
+}
+
+.info li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #28A745;
+  font-weight: bold;
+  font-size: 1.3rem;
+}
+
+/* Footer */
+.footer {
+  background: #F8F9FA;
+  padding: 40px 20px;
+  text-align: center;
+  border-top: 1px solid #E9ECEF;
+}
+
+.footer a {
+  color: #2E5BBA;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin: 0 10px;
+  transition: color 0.3s ease;
+}
+
+.footer a:hover {
+  color: #1F4E79;
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 2.5rem;
+  }
+  
+  .hero p {
+    font-size: 1.1rem;
+  }
+  
+  .info {
+    margin-top: -20px;
+    padding: 60px 30px;
+  }
+  
+  .info h2 {
+    font-size: 2rem;
+  }
+  
+  .info p {
+    font-size: 1.1rem;
+  }
+  
+  .info li {
+    font-size: 1rem;
+  }
+
+  /* Mobile: Increase contrast by 35% */
+  .hero {
+    background: linear-gradient(135deg, #1F4E79, #2E5BBA);
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 60px 20px;
+  }
+  
+  .hero h1 {
+    font-size: 2rem;
+  }
+  
+  .cta {
+    padding: 15px 30px;
+    font-size: 1.1rem;
+  }
+  
+  .info {
+    padding: 40px 20px;
+    border-radius: 15px;
+  }
+  
+  .info h2 {
+    font-size: 1.8rem;
+  }
+}
+</style>
 </head>
 <body>
 <header class="hero">
-  <h1>Beat the ATS. Get the Interview.</h1>
-  <p>75% + of companies use Applicant Tracking Systems to filter résumés before a human ever sees them.
-     Our AI-powered builder optimises your résumé’s keywords, structure, and formatting so it passes every scan.</p>
-  <a href="{% url 'signup' %}" class="cta">Create Free Account</a>
+<h1>Beat the ATS. Get the Interview.</h1>
+<p>75% + of companies use Applicant Tracking Systems to filter résumés before a human ever sees them.
+ Our AI-powered builder optimises your résumé's keywords, structure, and formatting so it passes every scan.</p>
+<a href="{% url 'signup' %}" class="cta">Create Free Account</a>
 </header>
-
 <section class="info">
-  <h2>What is an ATS?</h2>
-  <p>An Applicant Tracking System parses each résumé, searching for job-specific keywords and clear headings.
-     If your résumé isn’t ATS-friendly it may be rejected in seconds—even if you’re a great fit.</p>
-  <h2>How We Help</h2>
-  <ul>
-    <li>Analyses the job description → extracts must-have keywords</li>
-    <li>Re-writes bullet points with measurable achievements</li>
-    <li>Uses university-approved, ATS-ready templates (Harvard, MIT …)</li>
-    <li>Gives you an ATS score & job-match score before you apply</li>
-  </ul>
+<h2>What is an ATS?</h2>
+<p>An Applicant Tracking System parses each résumé, searching for job-specific keywords and clear headings.
+ If your résumé isn't ATS-friendly it may be rejected in seconds—even if you're a great fit.</p>
+<h2>How We Help</h2>
+<ul>
+<li>Analyses the job description → extracts must-have keywords</li>
+<li>Re-writes bullet points with measurable achievements</li>
+<li>Uses university-approved, ATS-ready templates (Harvard, MIT …)</li>
+<li>Gives you an ATS score & job-match score before you apply</li>
+</ul>
 </section>
-
 <footer class="footer">
-  <a href="{% url 'login' %}">Log in</a> ·
-  <a href="{% url 'signup' %}">Create Account</a>
+<a href="{% url 'login' %}">Log in</a> ·
+<a href="{% url 'signup' %}">Create Account</a>
 </footer>
 </body>
 </html>

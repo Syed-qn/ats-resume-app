@@ -16,8 +16,8 @@
     
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #DBE2EF 0%, #F9F7F7 100%);
-      color: #112D4E;
+      background: linear-gradient(135deg, #E9ECEF 0%, #F8F9FA 100%);
+      color: #333333;
       line-height: 1.6;
     }
 
@@ -61,8 +61,8 @@
 
     /* Hero Section */
     .hero {
-      background: linear-gradient(135deg, #3F72AF, #112D4E);
-      color: #F9F7F7;
+      background: linear-gradient(135deg, #2E5BBA, #1F4E79);
+      color: #FFFFFF;
       padding: 100px 0;
       text-align: center;
       position: relative;
@@ -111,7 +111,7 @@
 
     .section-title {
       font-size: 2.5rem;
-      color: #112D4E;
+      color: #333333;
       text-align: center;
       margin-bottom: 20px;
       font-weight: 700;
@@ -119,7 +119,7 @@
 
     .section-subtitle {
       font-size: 1.2rem;
-      color: #3F72AF;
+      color: #666666;
       text-align: center;
       margin-bottom: 60px;
       max-width: 700px;
@@ -129,7 +129,7 @@
 
     /* Service Comparison */
     .service-comparison {
-      background: #F9F7F7;
+      background: #F8F9FA;
     }
 
     .comparison-grid {
@@ -141,7 +141,7 @@
 
     /* Main Services */
     .main-services {
-      background: linear-gradient(135deg, #DBE2EF, #F9F7F7);
+      background: linear-gradient(135deg, #E9ECEF, #F8F9FA);
     }
 
     .services-grid {
@@ -152,11 +152,11 @@
     }
 
     .service-card {
-      background: #F9F7F7;
+      background: #FFFFFF;
       padding: 50px 40px;
       border-radius: 25px;
-      box-shadow: 0 15px 40px rgba(17,45,78,0.1);
-      border: 1px solid #DBE2EF;
+      box-shadow: 0 15px 40px rgba(46, 91, 186, 0.1);
+      border: 1px solid #E9ECEF;
       transition: all 0.4s ease;
       position: relative;
       overflow: hidden;
@@ -169,7 +169,7 @@
       left: -50%;
       width: 200%;
       height: 200%;
-      background: linear-gradient(45deg, transparent, rgba(63,114,175,0.1), transparent);
+      background: linear-gradient(45deg, transparent, rgba(46, 91, 186, 0.1), transparent);
       transform: rotate(45deg);
       transition: all 0.6s ease;
       opacity: 0;
@@ -187,8 +187,8 @@
 
     .service-card:hover {
       transform: translateY(-10px);
-      box-shadow: 0 25px 60px rgba(17,45,78,0.2);
-      border-color: #3F72AF;
+      box-shadow: 0 25px 60px rgba(46, 91, 186, 0.2);
+      border-color: #2E5BBA;
     }
 
     .service-header {
@@ -200,26 +200,26 @@
 
     .service-icon {
       font-size: 4rem;
-      color: #3F72AF;
+      color: #2E5BBA;
       margin-bottom: 20px;
     }
 
     .service-title {
       font-size: 2rem;
-      color: #112D4E;
+      color: #333333;
       margin-bottom: 10px;
       font-weight: 700;
     }
 
     .service-tagline {
-      color: #3F72AF;
+      color: #666666;
       font-size: 1.1rem;
       font-style: italic;
       margin-bottom: 20px;
     }
 
     .service-description {
-      color: #3F72AF;
+      color: #666666;
       font-size: 1.1rem;
       line-height: 1.7;
       margin-bottom: 30px;
@@ -235,7 +235,7 @@
     }
 
     .service-features li {
-      color: #112D4E;
+      color: #333333;
       margin-bottom: 12px;
       font-size: 1rem;
       position: relative;
@@ -246,14 +246,14 @@
       content: '✓';
       position: absolute;
       left: 0;
-      color: #3F72AF;
+      color: #28A745;
       font-weight: bold;
       font-size: 1.2rem;
     }
 
     .service-pricing {
-      background: linear-gradient(135deg, #112D4E, #3F72AF);
-      color: #F9F7F7;
+      background: linear-gradient(135deg, #2E5BBA, #1F4E79);
+      color: #FFFFFF;
       padding: 20px;
       border-radius: 15px;
       text-align: center;
@@ -280,8 +280,8 @@
     }
 
     .service-btn {
-      background: linear-gradient(135deg, #3F72AF, #112D4E);
-      color: #F9F7F7;
+      background: #FF6B35;
+      color: #FFFFFF;
       padding: 15px 35px;
       border-radius: 12px;
       text-decoration: none;
@@ -298,63 +298,146 @@
     }
 
     .service-btn:hover {
+      background: #E55A2B;
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(63,114,175,0.4);
-      color: #F9F7F7;
+      box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
+      color: #FFFFFF;
     }
 
-    /* Premium Service Card */
+    /* Premium Job Application Service */
     .service-card.premium {
-      background: linear-gradient(135deg, #112D4E, #3F72AF);
-      color: #F9F7F7;
-      border: 2px solid #DBE2EF;
+      background: linear-gradient(135deg, #FFB700, #FF8C00);
+      color: #333333;
+      border: 3px solid #FFD700;
+      position: relative;
+      overflow: visible;
+      animation: premium-glow 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes premium-glow {
+      0% { box-shadow: 0 25px 60px rgba(255, 183, 0, 0.3), 0 0 30px rgba(255, 215, 0, 0.3); }
+      100% { box-shadow: 0 25px 60px rgba(255, 183, 0, 0.6), 0 0 50px rgba(255, 215, 0, 0.5); }
+    }
+
+    .service-card.premium::before {
+      content: '';
+      position: absolute;
+      top: -3px;
+      left: -3px;
+      right: -3px;
+      bottom: -3px;
+      background: linear-gradient(45deg, #FFD700, #FFA500, #FFD700, #FF8C00);
+      background-size: 400% 400%;
+      border-radius: 25px;
+      z-index: -1;
+      animation: gradient-shift 4s ease infinite;
+    }
+
+    @keyframes gradient-shift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     .service-card.premium .service-title,
     .service-card.premium .service-features li {
-      color: #F9F7F7;
+      color: #333333;
+      font-weight: 600;
     }
 
     .service-card.premium .service-description,
     .service-card.premium .service-tagline {
-      color: #DBE2EF;
+      color: #444444;
+      font-weight: 600;
     }
 
     .service-card.premium .service-features li::before {
-      color: #DBE2EF;
+      color: #333333;
+      content: '⭐';
     }
 
     .service-card.premium .service-btn {
-      background: linear-gradient(135deg, #F9F7F7, #DBE2EF);
-      color: #112D4E;
+      background: linear-gradient(135deg, #333333, #000000);
+      color: #FFD700;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border: 2px solid #FFD700;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .service-card.premium .service-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .service-card.premium .service-btn:hover::before {
+      left: 100%;
     }
 
     .service-card.premium .service-btn:hover {
-      background: linear-gradient(135deg, #DBE2EF, #F9F7F7);
-      color: #112D4E;
+      background: linear-gradient(135deg, #000000, #333333);
+      color: #FFD700;
+      box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5);
+      transform: translateY(-2px) scale(1.02);
     }
 
     .service-card.premium .service-icon {
-      color: #DBE2EF;
+      color: #333333;
+      filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.7));
     }
 
+    /* Premium Badge */
     .premium-badge {
       position: absolute;
-      top: 20px;
-      right: 20px;
-      background: linear-gradient(135deg, #DBE2EF, #F9F7F7);
-      color: #112D4E;
+      top: -10px;
+      right: -10px;
+      background: linear-gradient(135deg, #FF4444, #CC0000);
+      color: #FFFFFF;
       padding: 8px 15px;
       border-radius: 20px;
       font-size: 0.8rem;
-      font-weight: 600;
-      z-index: 3;
+      font-weight: 700;
+      text-transform: uppercase;
+      z-index: 10;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+    }
+
+    /* Glitter particles */
+    .service-card.premium::after {
+      content: '✨ ⭐ ✨ 💎 ⭐ ✨ ⭐ ✨';
+      position: absolute;
+      top: -20px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 1.2rem;
+      animation: sparkle 3s linear infinite;
+      z-index: 5;
+    }
+
+    @keyframes sparkle {
+      0%, 100% { opacity: 0; transform: translateY(0); }
+      50% { opacity: 1; transform: translateY(-10px); }
     }
 
     /* Process Section */
     .process-section {
-      background: linear-gradient(135deg, #112D4E, #3F72AF);
-      color: #F9F7F7;
+      background: linear-gradient(135deg, #2E5BBA, #1F4E79);
+      color: #FFFFFF;
     }
 
     .process-grid {
@@ -370,8 +453,8 @@
     }
 
     .process-number {
-      background: rgba(249, 247, 247, 0.2);
-      color: #F9F7F7;
+      background: rgba(255, 255, 255, 0.2);
+      color: #FFFFFF;
       width: 70px;
       height: 70px;
       border-radius: 50%;
@@ -382,7 +465,7 @@
       font-weight: 700;
       margin: 0 auto 25px;
       backdrop-filter: blur(10px);
-      border: 2px solid rgba(219, 226, 239, 0.3);
+      border: 2px solid rgba(255, 255, 255, 0.3);
     }
 
     .process-title {
@@ -392,13 +475,13 @@
     }
 
     .process-description {
-      color: #DBE2EF;
+      color: rgba(255, 255, 255, 0.9);
       line-height: 1.6;
     }
 
     /* Benefits Section */
     .benefits-section {
-      background: #F9F7F7;
+      background: #F8F9FA;
     }
 
     .benefits-grid {
@@ -409,42 +492,42 @@
     }
 
     .benefit-card {
-      background: linear-gradient(135deg, #DBE2EF, #F9F7F7);
+      background: #FFFFFF;
       padding: 30px 25px;
       border-radius: 15px;
       text-align: center;
-      box-shadow: 0 10px 30px rgba(17,45,78,0.1);
-      border: 1px solid #DBE2EF;
+      box-shadow: 0 10px 30px rgba(46, 91, 186, 0.1);
+      border: 1px solid #E9ECEF;
       transition: all 0.3s ease;
     }
 
     .benefit-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 15px 40px rgba(17,45,78,0.15);
+      box-shadow: 0 15px 40px rgba(46, 91, 186, 0.15);
     }
 
     .benefit-icon {
       font-size: 2.5rem;
-      color: #3F72AF;
+      color: #2E5BBA;
       margin-bottom: 20px;
     }
 
     .benefit-title {
       font-size: 1.3rem;
-      color: #112D4E;
+      color: #333333;
       margin-bottom: 15px;
       font-weight: 600;
     }
 
     .benefit-description {
-      color: #3F72AF;
+      color: #666666;
       line-height: 1.5;
     }
 
     /* Stats Section */
     .stats-section {
-      background: linear-gradient(135deg, #3F72AF, #112D4E);
-      color: #F9F7F7;
+      background: linear-gradient(135deg, #2E5BBA, #1F4E79);
+      color: #FFFFFF;
       padding: 80px 0;
     }
 
@@ -462,7 +545,7 @@
     .stat-number {
       font-size: 3.5rem;
       font-weight: 700;
-      color: #DBE2EF;
+      color: #FFFFFF;
       margin-bottom: 10px;
     }
 
@@ -473,21 +556,21 @@
 
     /* CTA Section */
     .cta-section {
-      background: linear-gradient(135deg, #DBE2EF, #F9F7F7);
+      background: linear-gradient(135deg, #E9ECEF, #F8F9FA);
       padding: 80px 0;
       text-align: center;
     }
 
     .cta-title {
       font-size: 2.5rem;
-      color: #112D4E;
+      color: #333333;
       margin-bottom: 20px;
       font-weight: 700;
     }
 
     .cta-description {
       font-size: 1.2rem;
-      color: #3F72AF;
+      color: #666666;
       margin-bottom: 40px;
       max-width: 600px;
       margin-left: auto;
@@ -514,28 +597,29 @@
     }
 
     .cta-btn.primary {
-      background: linear-gradient(135deg, #3F72AF, #112D4E);
-      color: #F9F7F7;
+      background: #FF6B35;
+      color: #FFFFFF;
     }
 
     .cta-btn.secondary {
       background: transparent;
-      color: #3F72AF;
-      border: 2px solid #3F72AF;
+      color: #2E5BBA;
+      border: 2px solid #2E5BBA;
     }
 
     .cta-btn:hover {
       transform: translateY(-3px);
-      box-shadow: 0 8px 25px rgba(63,114,175,0.3);
+      box-shadow: 0 8px 25px rgba(46, 91, 186, 0.3);
     }
 
     .cta-btn.primary:hover {
-      color: #F9F7F7;
+      background: #E55A2B;
+      color: #FFFFFF;
     }
 
     .cta-btn.secondary:hover {
-      background: #3F72AF;
-      color: #F9F7F7;
+      background: #2E5BBA;
+      color: #FFFFFF;
     }
 
     /* Responsive */
@@ -559,6 +643,17 @@
       
       .comparison-grid {
         grid-template-columns: 1fr;
+      }
+
+      /* Mobile: Increase contrast by 35% */
+      .hero {
+        background: linear-gradient(135deg, #1F4E79, #2E5BBA);
+      }
+      .stats-section {
+        background: linear-gradient(135deg, #1F4E79, #2E5BBA);
+      }
+      .process-section {
+        background: linear-gradient(135deg, #1F4E79, #2E5BBA);
       }
     }
   </style>
@@ -630,9 +725,9 @@
           </a>
         </div>
 
-        <!-- Job Application Service -->
+        <!-- Premium Job Application Service -->
         <div class="service-card premium">
-          <div class="premium-badge">Most Popular</div>
+          <div class="premium-badge">Most Popular ⭐</div>
           <div class="service-header">
             <i class="fas fa-handshake service-icon"></i>
             <h3 class="service-title">Done-For-You Job Applications</h3>
@@ -672,8 +767,8 @@
   <!-- Process Section -->
   <section class="section process-section">
     <div class="container">
-      <h2 class="section-title" style="color: #F9F7F7;">How Our Job Application Service Works</h2>
-      <p class="section-subtitle" style="color: #DBE2EF;">
+      <h2 class="section-title" style="color: #FFFFFF;">How Our Job Application Service Works</h2>
+      <p class="section-subtitle" style="color: rgba(255, 255, 255, 0.9);">
         A simple 4-step process that gets you interviews while you prepare
       </p>
       

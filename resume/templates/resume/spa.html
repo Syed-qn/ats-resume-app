@@ -394,25 +394,18 @@
     .template-description{color:#3F72AF;font-size:.9rem}
 
     /* -------------  UNIVERSITY LOGO STYLES  ------------- */
-    .template-icon-text {
-      width: 60px;
-      height: 60px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 1.1rem;
-      margin: 0 auto 15px;
-      color: white;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      transition: all 0.3s ease;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+    .template-logo{
+      width:60px;
+      height:60px;
+      object-fit:contain;
+      border-radius:12px;
+      margin:0 auto 15px;
+      box-shadow:0 4px 12px rgba(0,0,0,.15);
+      transition:all .3s ease;
     }
-    .template-icon-text:hover {
-      transform: scale(1.05);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    .template-logo:hover{
+      transform:scale(1.05);
+      box-shadow:0 6px 16px rgba(0,0,0,.20);
     }
     .logo-harvard { background: linear-gradient(135deg, #A41E22, #8B1A1A); }
     .logo-mit { background: linear-gradient(135deg, #8A8B8C, #6D6E70); }
@@ -910,50 +903,49 @@
     }
 
     /* TEMPLATE LIST */
-    async function loadTemplates(){
-      const grid=document.getElementById('templatesGrid');
-      grid.innerHTML='<p style="color:#3F72AF">Loading templates…</p>';
+    /* TEMPLATE LIST — shows the real PNG logos */
+    async function loadTemplates () {
+      const grid = document.getElementById('templatesGrid');
+      grid.innerHTML = '<p style="color:#3F72AF">Loading templates…</p>';
+
       try {
-        const res=await fetch('/templates/');
-        const data=await res.json();
-        grid.innerHTML='';
-        
-        // University branding data
-        const universityData = {
-          1: { text: 'H', class: 'logo-harvard', name: 'Harvard' },
-          2: { text: 'MIT', class: 'logo-mit', name: 'MIT' },
-          3: { text: 'CAM', class: 'logo-cambridge', name: 'Cambridge' },
-          4: { text: 'S', class: 'logo-stanford', name: 'Stanford' },
-          5: { text: 'W', class: 'logo-wharton', name: 'Wharton' },
-          6: { text: 'UC', class: 'logo-berkeley', name: 'Berkeley' }
-        };
-        
-        data.templates.forEach(t=>{
-          const card=document.createElement('div');
-          card.className='template-card';
-          card.dataset.id=t.id;
-          
-          const logoData = universityData[t.id] || { text: t.id, class: 'logo-harvard' };
-          
-          card.innerHTML=`
-            <div class="template-icon-text ${logoData.class}" title="${logoData.name} University">
-              ${logoData.text}
-            </div>
+        const res  = await fetch('/templates/');
+        const data = await res.json();
+        grid.innerHTML = '';
+
+        data.templates.forEach(t => {
+          /* 1. Build the card wrapper */
+          const card = document.createElement('div');
+          card.className  = 'template-card';
+          card.dataset.id = t.id;
+
+          /* 2. Build the logo URL — API gives "static/resume/logos/Harvard.png" */
+          const logoUrl = t.logo.startsWith('/') ? t.logo : '/' + t.logo;
+
+          /* 3. Inject markup */
+          card.innerHTML = `
+            <img src="${logoUrl}" alt="${t.name} logo" class="template-logo">
             <div class="template-name">${t.name}</div>
-            <div class="template-description">${t.description||''}</div>`;
-          
-          card.onclick=()=>{
-            document.querySelectorAll('.template-card').forEach(c=>c.classList.remove('selected'));
+            <div class="template-description">${t.description || ''}</div>
+          `;
+
+          /* 4. Click handler */
+          card.onclick = () => {
+            document.querySelectorAll('.template-card')
+                    .forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
-            selectedTemplate=t.id;
-            document.getElementById('nextStep3').disabled=false;
+            selectedTemplate = t.id;
+            document.getElementById('nextStep3').disabled = false;
           };
+
           grid.appendChild(card);
         });
       } catch {
-        grid.innerHTML='<p style="color:#112D4E">Failed to load templates</p>';
+        grid.innerHTML =
+          '<p style="color:#112D4E">Failed to load templates</p>';
       }
     }
+
 
     /* GENERATE RESUME WITH REAL-TIME PROGRESS */
     async function generateResume(){

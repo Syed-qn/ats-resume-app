@@ -41,3 +41,13 @@ urlpatterns = [
     # ====== FAVICON HANDLING ======
     path('favicon.ico', RedirectView.as_view(url='/static/favicon.ico', permanent=True)),
 ]
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+def block_wordpress_scans(request):
+    return HttpResponse(status=404)
+
+urlpatterns += [
+    path('wp-includes/<path:path>', block_wordpress_scans),
+    path('xmlrpc.php', block_wordpress_scans),
+    path('wp-admin/<path:path>', block_wordpress_scans),
+]

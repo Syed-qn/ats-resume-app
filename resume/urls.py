@@ -3,7 +3,8 @@
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from . import views
-
+from django.conf import settings
+from django.conf.urls.static import statice
 urlpatterns = [
     # ─────────────── Landing & Public Pages ───────────────
     path('', views.landing, name='landing'),
@@ -66,4 +67,6 @@ urlpatterns = [
     # Admin API endpoints
     path('admin-panel/api/stats/', views.admin_api_stats, name='admin_api_stats'),
     path('admin-panel/api/user/<int:user_id>/action/', views.admin_api_user_action, name='admin_api_user_action'),
+    
 ]
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -4,7 +4,7 @@ from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from . import views
 from django.conf import settings
-from django.conf.urls.static import statice
+from django.conf.urls.static import static
 urlpatterns = [
     # ─────────────── Landing & Public Pages ───────────────
     path('', views.landing, name='landing'),

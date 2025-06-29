@@ -4,75 +4,195 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>ATS Resume Optimizer</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
+  <meta name="description" content="Create ATS-optimized resumes that get you interviews. Beat the applicant tracking system with our AI-powered tool.">
+  <title>ATS Resume Optimizer - Beat the ATS System</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Icons & Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <style>
-
-    .highlight-flash {
-      box-shadow: 0 0 0 4px rgba(63, 114, 175, 0.4);
-      transition: box-shadow 0.3s ease;
+    /* CSS Reset & Base */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-
-    /* -------------  GENERIC  ------------- */
-    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
-         background:linear-gradient(135deg,#DBE2EF 0%,#F9F7F7 100%);
-         min-height:100vh;color:#112D4E;}
-    .container{max-width:1200px;margin:0 auto;padding:20px;}
-
-    /* Content below navigation */
+    
+    /* Design Tokens */
+    :root {
+      /* Colors - Ocean Professional */
+      --primary: #0066cc;
+      --primary-light: #0080ff;
+      --primary-dark: #004c99;
+      --accent: #00d4aa;
+      --accent-dark: #00a88a;
+      --gold: #ffb800;
+      --gold-dark: #e6a600;
+      --dark: #001f3f;
+      --dark-light: #003366;
+      --gray-100: #f8fafc;
+      --gray-200: #e9ecef;
+      --gray-300: #dee2e6;
+      --gray-400: #ced4da;
+      --gray-500: #adb5bd;
+      --gray-600: #6c757d;
+      --gray-700: #495057;
+      --gray-800: #343a40;
+      --gray-900: #212529;
+      --white: #ffffff;
+      --black: #000000;
+      
+      /* Typography Scale */
+      --fs-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --fs-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
+      --fs-base: clamp(1rem, 0.925rem + 0.375vw, 1.125rem);
+      --fs-lg: clamp(1.125rem, 1rem + 0.625vw, 1.25rem);
+      --fs-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
+      --fs-2xl: clamp(1.5rem, 1.25rem + 1.25vw, 2rem);
+      --fs-3xl: clamp(1.875rem, 1.5rem + 1.875vw, 2.5rem);
+      --fs-4xl: clamp(2.25rem, 1.75rem + 2.5vw, 3rem);
+      --fs-5xl: clamp(3rem, 2rem + 5vw, 4rem);
+      
+      /* Spacing Scale */
+      --space-xs: clamp(0.25rem, 0.2rem + 0.25vw, 0.5rem);
+      --space-sm: clamp(0.5rem, 0.4rem + 0.5vw, 0.75rem);
+      --space-md: clamp(1rem, 0.8rem + 1vw, 1.5rem);
+      --space-lg: clamp(1.5rem, 1.2rem + 1.5vw, 2rem);
+      --space-xl: clamp(2rem, 1.5rem + 2.5vw, 3rem);
+      --space-2xl: clamp(3rem, 2rem + 5vw, 4rem);
+      --space-3xl: clamp(4rem, 3rem + 5vw, 6rem);
+      
+      /* Shadows */
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+      --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+      --shadow-xl: 0 20px 25px rgba(0,0,0,0.1);
+      --shadow-2xl: 0 25px 50px rgba(0,0,0,0.15);
+      
+      /* Border Radius */
+      --radius-sm: 0.375rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+      --radius-xl: 1rem;
+      --radius-2xl: 1.5rem;
+      --radius-full: 9999px;
+      
+      /* Z-index */
+      --z-base: 0;
+      --z-dropdown: 10;
+      --z-sticky: 20;
+      --z-fixed: 30;
+      --z-modal-backdrop: 40;
+      --z-modal: 50;
+      --z-popover: 60;
+      --z-tooltip: 70;
+    }
+    
+    /* Base Styles */
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: var(--fs-base);
+      line-height: 1.6;
+      color: var(--gray-900);
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0fdf4 100%);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* Typography */
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--gray-900);
+    }
+    
+    /* Container */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 var(--space-md);
+    }
+    
+    /* Navigation Placeholder */
+    .nav-placeholder {
+      height: 80px;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: var(--z-fixed);
+    }
+    
+    /* Main Content */
     .main-content {
-      margin-top: 20px; /* Space for navigation */
+      margin-top: 100px;
+      padding-bottom: var(--space-3xl);
     }
-
-    /* WhatsApp Float Button - Task 12: RIGHT SIDE */
+    
+    /* WhatsApp Button */
     .whatsapp-float {
       position: fixed;
-      right: 20px;
+      right: var(--space-lg);
       top: 50%;
       transform: translateY(-50%);
-      width: 60px;
-      height: 60px;
-      background: linear-gradient(135deg, #25D366, #128C7E);
-      border-radius: 50%;
+      width: clamp(3.5rem, 4vw, 4.5rem);
+      height: clamp(3.5rem, 4vw, 4.5rem);
+      background: #25D366;
+      border-radius: var(--radius-full);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3);
-      z-index: 1000;
-      transition: all 0.3s ease;
-      animation: pulse 2s infinite;
+      box-shadow: var(--shadow-xl);
+      z-index: var(--z-fixed);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       text-decoration: none;
+      animation: pulse 2s infinite;
     }
-    .whatsapp-float:hover {
-      transform: translateY(-50%) scale(1.1);
-      box-shadow: 0 12px 35px rgba(37, 211, 102, 0.5);
-    }
-    .whatsapp-float i {
-      color: white;
-      font-size: 24px;
-    }
+    
     @keyframes pulse {
-      0% { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3); }
-      50% { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.6), 0 0 0 10px rgba(37, 211, 102, 0.1); }
-      100% { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3); }
+      0%, 100% { transform: translateY(-50%) scale(1); }
+      50% { transform: translateY(-50%) scale(1.05); }
     }
-
-    /* Welcome Banner for logged-in users */
+    
+    .whatsapp-float:hover {
+      transform: translateY(-50%) scale(1.1) rotate(5deg);
+      box-shadow: 0 15px 35px rgba(37, 211, 102, 0.4);
+    }
+    
+    .whatsapp-float i {
+      color: var(--white);
+      font-size: clamp(1.5rem, 2vw, 2rem);
+    }
+    
+    /* Welcome Banner */
     .welcome-banner {
-      background: linear-gradient(135deg, #3F72AF, #112D4E);
-      color: #F9F7F7;
-      padding: 30px 40px;
-      border-radius: 20px;
-      margin-bottom: 30px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: var(--white);
+      padding: var(--space-xl) var(--space-xl);
+      border-radius: var(--radius-2xl);
+      margin-bottom: var(--space-xl);
       text-align: center;
-      box-shadow: 0 10px 30px rgba(17,45,78,0.15);
+      box-shadow: var(--shadow-xl);
       position: relative;
       overflow: hidden;
     }
-
+    
     .welcome-banner::before {
       content: '';
       position: absolute;
@@ -83,228 +203,841 @@
       background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/></svg>') repeat;
       animation: float 20s infinite linear;
     }
-
+    
     @keyframes float {
       0% { transform: translateY(0px); }
       100% { transform: translateY(-100px); }
     }
-
+    
     .welcome-content {
       position: relative;
       z-index: 2;
     }
-
+    
     .welcome-banner h2 {
-      font-size: 2rem;
-      margin-bottom: 10px;
-      font-weight: 700;
+      font-size: var(--fs-3xl);
+      margin-bottom: var(--space-sm);
     }
-
+    
     .welcome-banner p {
-      font-size: 1.1rem;
+      font-size: var(--fs-lg);
       opacity: 0.9;
-      margin-bottom: 20px;
+      margin-bottom: var(--space-lg);
     }
-
+    
     .quick-actions {
       display: flex;
       justify-content: center;
-      gap: 15px;
+      gap: var(--space-md);
       flex-wrap: wrap;
     }
-
+    
     .quick-action-btn {
-      background: rgba(249, 247, 247, 0.2);
-      color: #F9F7F7;
-      border: 2px solid rgba(249, 247, 247, 0.3);
-      padding: 10px 20px;
-      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.2);
+      color: var(--white);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      padding: var(--space-sm) var(--space-lg);
+      border-radius: var(--radius-lg);
       text-decoration: none;
       font-weight: 600;
       transition: all 0.3s ease;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: var(--space-sm);
       backdrop-filter: blur(10px);
     }
-
+    
     .quick-action-btn:hover {
-      background: #F9F7F7;
-      color: #112D4E;
+      background: var(--white);
+      color: var(--primary);
       transform: translateY(-2px);
     }
-
-    /* -------------  HEADER  ------------- */
-    .header{text-align:center;margin-bottom:40px;color:#112D4E}
-    .header h1{font-size:3rem;margin-bottom:10px;text-shadow:0 2px 4px rgba(17,45,78,.3);color:#112D4E}
-    .header p{font-size:1.2rem;opacity:.8;color:#3F72AF}
-
-    /* -------------  CARD  ------------- */
-    .main-content-card{background:#F9F7F7;border-radius:20px;padding:40px;
-                  box-shadow:0 20px 40px rgba(17,45,78,.1);position:relative;overflow:hidden}
-    .main-content-card::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;
-                          background:linear-gradient(90deg,#3F72AF,#112D4E,#DBE2EF)}
-
-    /* -------------  STEPS  ------------- */
-    .step{display:none;animation:fadeIn .5s ease}
-    .step.active{display:block}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-
-    .step-header{display:flex;align-items:center;margin-bottom:30px;padding-bottom:20px;border-bottom:2px solid #DBE2EF}
-    .step-number{background:linear-gradient(135deg,#3F72AF,#112D4E);color:#F9F7F7;width:50px;height:50px;border-radius:50%;
-                 display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;margin-right:20px}
-    .step-title{font-size:1.8rem;color:#112D4E}
-
-    /* -------------  STEPPER DOTS  ------------- */
-    .step-indicator{display:flex;justify-content:center;margin-bottom:40px}
-    .step-dot{width:40px;height:40px;border-radius:50%;background:#DBE2EF;display:flex;
-              align-items:center;justify-content:center;margin:0 10px;cursor:pointer;position:relative;transition:.3s;color:#3F72AF}
-    .step-dot.active{background:#3F72AF;color:#F9F7F7}
-    .step-dot.completed{background:#112D4E;color:#F9F7F7}
-    .step-dot::after{content:'';position:absolute;top:50%;left:100%;width:20px;height:2px;
-                     background:#DBE2EF;transform:translateY(-50%)}
-    .step-dot:last-child::after{display:none}
-    .step-dot.completed::after{background:#112D4E}
-
-    /* -------------  UPLOAD AREA  ------------- */
-    .upload-area{border:3px dashed #3F72AF;border-radius:15px;padding:60px 40px;text-align:center;
-                 background:#F9F7F7;transition:.3s;cursor:pointer;position:relative}
-    .upload-area:hover{border-color:#112D4E;background:#DBE2EF;transform:translateY(-5px)}
-    .upload-area.dragover{border-color:#112D4E;background:#DBE2EF}
-    .upload-icon{font-size:4rem;color:#3F72AF;margin-bottom:20px}
-    .upload-text{font-size:1.2rem;color:#112D4E;margin-bottom:15px}
-    .file-input{display:none}
-    .uploaded-file{background:#DBE2EF;border:2px solid #3F72AF;border-radius:10px;padding:20px;margin-top:20px;display:none}
-    .file-info{display:flex;align-items:center;justify-content:space-between}
-    .file-details{display:flex;align-items:center}
-    .file-icon{font-size:2rem;color:#3F72AF;margin-right:15px}
-
-    /* -------------  MANUAL ENTRY SECTION  ------------- */
-    .entry-options{display:flex;gap:20px;margin-bottom:30px;flex-wrap:wrap}
-    .entry-option{flex:1;min-width:280px}
-    .manual-entry-card{border:2px solid #DBE2EF;border-radius:15px;padding:30px;text-align:center;
-                       transition:.3s;cursor:pointer;background:#F9F7F7}
-    .manual-entry-card:hover{border-color:#3F72AF;transform:translateY(-5px);box-shadow:0 10px 25px rgba(17,45,78,.1)}
-    .manual-entry-icon{font-size:3rem;color:#3F72AF;margin-bottom:15px}
-    .manual-entry-title{font-size:1.3rem;font-weight:600;margin-bottom:10px;color:#112D4E}
-    .manual-entry-description{color:#3F72AF;font-size:.9rem;line-height:1.4}
-
-    /* -------------  RESUME LIST ENHANCEMENTS  ------------- */
+    
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: var(--space-2xl);
+    }
+    
+    .header h1 {
+      font-size: var(--fs-4xl);
+      margin-bottom: var(--space-sm);
+      color: var(--gray-900);
+    }
+    
+    .header p {
+      font-size: var(--fs-lg);
+      color: var(--gray-600);
+    }
+    
+    /* Main Content Card */
+    .main-content-card {
+      background: var(--white);
+      border-radius: var(--radius-2xl);
+      padding: var(--space-2xl);
+      box-shadow: var(--shadow-2xl);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .main-content-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 50%, var(--gold) 100%);
+    }
+    
+    /* Premium Banner for each step */
+    .step-premium-banner {
+      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+      border: 2px solid var(--gold);
+      border-radius: var(--radius-xl);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-xl);
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .step-premium-banner::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(255, 184, 0, 0.1) 0%, transparent 70%);
+    }
+    
+    .premium-banner-icon {
+      font-size: var(--fs-3xl);
+      color: var(--gold-dark);
+      flex-shrink: 0;
+    }
+    
+    .premium-banner-content h3 {
+      font-size: var(--fs-xl);
+      margin-bottom: var(--space-xs);
+      color: var(--gray-900);
+    }
+    
+    .premium-banner-content p {
+      color: var(--gray-700);
+      margin-bottom: var(--space-sm);
+    }
+    
+    .premium-banner-timer {
+      background: rgba(255, 59, 48, 0.1);
+      color: #ff3b30;
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--radius-full);
+      font-size: var(--fs-sm);
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    
+    .btn-premium {
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+      color: var(--dark);
+      padding: var(--space-sm) var(--space-lg);
+      border-radius: var(--radius-lg);
+      text-decoration: none;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      transition: all 0.3s ease;
+      margin-top: var(--space-sm);
+    }
+    
+    .btn-premium:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(255, 184, 0, 0.4);
+    }
+    
+    /* Step Indicator */
+    .step-indicator {
+      display: flex;
+      justify-content: center;
+      margin-bottom: var(--space-2xl);
+      gap: var(--space-xs);
+    }
+    
+    .step-dot {
+      width: 3rem;
+      height: 3rem;
+      border-radius: var(--radius-full);
+      background: var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s ease;
+      color: var(--gray-600);
+      font-weight: 600;
+    }
+    
+    .step-dot.active {
+      background: var(--primary);
+      color: var(--white);
+      transform: scale(1.1);
+    }
+    
+    .step-dot.completed {
+      background: var(--accent);
+      color: var(--white);
+    }
+    
+    .step-dot::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 100%;
+      width: 30px;
+      height: 2px;
+      background: var(--gray-300);
+      transform: translateY(-50%);
+    }
+    
+    .step-dot:last-child::after {
+      display: none;
+    }
+    
+    .step-dot.completed::after {
+      background: var(--accent);
+    }
+    
+    /* Steps */
+    .step {
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    .step.active {
+      display: block;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .step-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: var(--space-xl);
+      padding-bottom: var(--space-lg);
+      border-bottom: 2px solid var(--gray-200);
+    }
+    
+    .step-number {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: var(--white);
+      width: 3.5rem;
+      height: 3.5rem;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--fs-xl);
+      font-weight: 700;
+      margin-right: var(--space-lg);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .step-title {
+      font-size: var(--fs-2xl);
+      color: var(--gray-900);
+    }
+    
+    /* Upload Area */
+    .entry-options {
+      display: grid;
+      gap: var(--space-lg);
+      margin-bottom: var(--space-xl);
+    }
+    
+    @media (min-width: 768px) {
+      .entry-options {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    
+    .entry-option {
+      height: 100%;
+    }
+    
+    .upload-area {
+      border: 3px dashed var(--primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl);
+      text-align: center;
+      background: var(--gray-100);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .upload-area:hover {
+      border-color: var(--primary-dark);
+      background: var(--gray-200);
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .upload-area.dragover {
+      border-color: var(--accent);
+      background: rgba(0, 212, 170, 0.1);
+    }
+    
+    .upload-icon {
+      font-size: var(--fs-5xl);
+      color: var(--primary);
+      margin-bottom: var(--space-lg);
+    }
+    
+    .upload-text {
+      font-size: var(--fs-lg);
+      color: var(--gray-900);
+      margin-bottom: var(--space-sm);
+      font-weight: 600;
+    }
+    
+    .file-input {
+      display: none;
+    }
+    
+    .manual-entry-card {
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl);
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      background: var(--white);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .manual-entry-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .manual-entry-icon {
+      font-size: var(--fs-5xl);
+      color: var(--primary);
+      margin-bottom: var(--space-lg);
+    }
+    
+    .manual-entry-title {
+      font-size: var(--fs-xl);
+      font-weight: 700;
+      margin-bottom: var(--space-sm);
+      color: var(--gray-900);
+    }
+    
+    .manual-entry-description {
+      color: var(--gray-600);
+      line-height: 1.6;
+    }
+    
+    /* Resume List */
+    .resume-list-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin: var(--space-xl) 0 var(--space-lg);
+    }
+    
+    .resume-list-header h3 {
+      font-size: var(--fs-xl);
+      color: var(--gray-900);
+      margin: 0;
+    }
+    
     .resume-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 15px 20px;
-      border: 2px solid #DBE2EF;
-      border-radius: 12px;
-      margin-bottom: 12px;
-      background: #F9F7F7;
+      padding: var(--space-lg);
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-md);
+      background: var(--white);
       transition: all 0.3s ease;
       cursor: pointer;
-      position: relative;
     }
-
+    
     .resume-item:hover {
-      border-color: #3F72AF;
+      border-color: var(--primary);
       transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(17,45,78,0.1);
+      box-shadow: var(--shadow-md);
     }
-
+    
     .resume-item.selected {
-      border-color: #28a745;
-      background: #f8f9fa;
-      box-shadow: 0 5px 15px rgba(40, 167, 69, 0.2);
+      border-color: var(--accent);
+      background: rgba(0, 212, 170, 0.05);
+      box-shadow: var(--shadow-lg);
     }
-
+    
     .resume-item-left {
       display: flex;
       align-items: center;
+      gap: var(--space-md);
       flex: 1;
     }
-
-    .resume-item-info {
-      margin-left: 15px;
+    
+    .file-icon {
+      font-size: var(--fs-2xl);
+      color: var(--primary);
     }
-
+    
+    .resume-item-info {
+      flex: 1;
+    }
+    
     .resume-item-name {
       font-weight: 600;
-      color: #112D4E;
-      font-size: 1rem;
-      margin-bottom: 4px;
+      color: var(--gray-900);
+      font-size: var(--fs-base);
+      margin-bottom: var(--space-xs);
     }
-
+    
     .resume-item-details {
-      font-size: 0.85rem;
-      color: #3F72AF;
-      opacity: 0.8;
+      font-size: var(--fs-sm);
+      color: var(--gray-600);
     }
-
+    
     .resume-item-actions {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: var(--space-md);
     }
-
+    
     .selected-indicator {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: #28a745;
-      color: white;
+      width: 2rem;
+      height: 2rem;
+      border-radius: var(--radius-full);
+      background: var(--accent);
+      color: var(--white);
       display: none;
       align-items: center;
       justify-content: center;
-      font-size: 0.9rem;
+      font-size: var(--fs-base);
       animation: checkmarkBounce 0.5s ease;
     }
-
+    
     .resume-item.selected .selected-indicator {
       display: flex;
     }
-
+    
     @keyframes checkmarkBounce {
       0% { transform: scale(0); }
       50% { transform: scale(1.2); }
       100% { transform: scale(1); }
     }
-
+    
     .btn-select {
-      background: linear-gradient(135deg, #3F72AF, #112D4E);
-      color: #F9F7F7;
+      background: var(--primary);
+      color: var(--white);
       border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-size: 0.9rem;
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-md);
+      font-size: var(--fs-sm);
       font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
     }
-
+    
     .btn-select:hover {
+      background: var(--primary-dark);
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(63,114,175,0.3);
+      box-shadow: var(--shadow-sm);
     }
-
+    
     .btn-delete {
       background: #dc3545;
-      color: white;
+      color: var(--white);
       border: none;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 0.9rem;
+      padding: var(--space-sm) var(--space-sm);
+      border-radius: var(--radius-md);
+      font-size: var(--fs-sm);
       cursor: pointer;
       transition: all 0.3s ease;
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: var(--space-xs);
     }
-
+    
     .btn-delete:hover {
       background: #c82333;
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+      box-shadow: var(--shadow-sm);
     }
-
+    
+    /* Uploaded File */
+    .uploaded-file {
+      background: var(--gray-100);
+      border: 2px solid var(--accent);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      margin-top: var(--space-lg);
+      display: none;
+    }
+    
+    .file-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-lg);
+    }
+    
+    .file-details {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    
+    /* Job Description Textarea */
+    .textarea-container {
+      margin: var(--space-xl) 0;
+    }
+    
+    .textarea-container label {
+      font-size: var(--fs-lg);
+      font-weight: 600;
+      margin-bottom: var(--space-sm);
+      color: var(--gray-900);
+      display: block;
+    }
+    
+    .job-description {
+      width: 100%;
+      min-height: 250px;
+      padding: var(--space-lg);
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      font-size: var(--fs-base);
+      font-family: inherit;
+      resize: vertical;
+      transition: all 0.3s ease;
+    }
+    
+    .job-description:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+    }
+    
+    .job-description.highlight-flash {
+      box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.4);
+    }
+    
+    .page-select {
+      margin-top: var(--space-lg);
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    
+    .page-select label {
+      font-weight: 600;
+      color: var(--gray-900);
+    }
+    
+    .page-select select {
+      padding: var(--space-sm) var(--space-md);
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      font-size: var(--fs-base);
+      transition: all 0.3s ease;
+    }
+    
+    .page-select select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    
+    /* Templates Grid */
+    .templates-grid {
+      display: grid;
+      gap: var(--space-lg);
+      margin: var(--space-xl) 0;
+    }
+    
+    @media (min-width: 768px) {
+      .templates-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (min-width: 1024px) {
+      .templates-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    
+    .template-card {
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: var(--white);
+    }
+    
+    .template-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .template-card.selected {
+      border-color: var(--primary);
+      background: rgba(0, 102, 204, 0.05);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .template-logo {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      border-radius: var(--radius-lg);
+      margin: 0 auto var(--space-lg);
+      box-shadow: var(--shadow-md);
+      transition: all 0.3s ease;
+    }
+    
+    .template-card:hover .template-logo {
+      transform: scale(1.05);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .template-name {
+      font-size: var(--fs-xl);
+      font-weight: 700;
+      margin-bottom: var(--space-sm);
+      color: var(--gray-900);
+    }
+    
+    .template-description {
+      color: var(--gray-600);
+      font-size: var(--fs-sm);
+      line-height: 1.5;
+    }
+    
+    /* Loading Section */
+    .loading {
+      text-align: center;
+      padding: var(--space-3xl);
+      display: none;
+    }
+    
+    .spinner {
+      border: 4px solid var(--gray-200);
+      border-top: 4px solid var(--primary);
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto var(--space-lg);
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .progress-container {
+      margin: var(--space-xl) 0;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 12px;
+      background: var(--gray-200);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+      width: 0;
+      transition: width 0.3s ease;
+    }
+    
+    .progress-text {
+      text-align: center;
+      margin-top: var(--space-md);
+      font-weight: 600;
+      color: var(--gray-700);
+    }
+    
+    /* Score Boxes */
+    .scores-container {
+      display: grid;
+      gap: var(--space-lg);
+      margin-bottom: var(--space-xl);
+    }
+    
+    @media (min-width: 768px) {
+      .scores-container {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    
+    .score-box {
+      padding: var(--space-xl);
+      border-radius: var(--radius-xl);
+      text-align: center;
+      color: var(--white);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .score-box.ats {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    }
+    
+    .score-box.job {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    }
+    
+    .score-number {
+      font-size: var(--fs-5xl);
+      font-weight: 800;
+      margin-bottom: var(--space-sm);
+    }
+    
+    .score-label {
+      font-size: var(--fs-xl);
+      opacity: 0.9;
+    }
+    
+    /* Resume Preview */
+    .resume-preview {
+      background: var(--white);
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+      max-height: 600px;
+      overflow-y: auto;
+      box-shadow: var(--shadow-md);
+    }
+    
+    /* Navigation Buttons */
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      margin-top: var(--space-xl);
+      gap: var(--space-lg);
+    }
+    
+    @media (max-width: 640px) {
+      .navigation {
+        flex-direction: column;
+      }
+    }
+    
+    /* Buttons */
+    .btn {
+      background: var(--primary);
+      color: var(--white);
+      border: none;
+      padding: var(--space-md) var(--space-xl);
+      border-radius: var(--radius-lg);
+      font-size: var(--fs-base);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    
+    .btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .btn:disabled {
+      background: var(--gray-300);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+      color: var(--gray-500);
+    }
+    
+    .btn-secondary {
+      background: var(--gray-200);
+      color: var(--gray-900);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--gray-300);
+    }
+    
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      gap: var(--space-md);
+      justify-content: center;
+      margin-top: var(--space-xl);
+      flex-wrap: wrap;
+    }
+    
+    /* Messages */
+    .error, .success {
+      padding: var(--space-md);
+      border-radius: var(--radius-lg);
+      margin: var(--space-lg) 0;
+      display: none;
+      font-weight: 600;
+    }
+    
+    .error {
+      background: #dc3545;
+      color: var(--white);
+    }
+    
+    .success {
+      background: var(--accent);
+      color: var(--white);
+    }
+    
+    /* Delete Modal */
     .delete-confirmation {
       position: fixed;
       top: 0;
@@ -315,159 +1048,119 @@
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 1000;
+      z-index: var(--z-modal);
+      padding: var(--space-lg);
     }
-
+    
     .delete-modal {
-      background: #F9F7F7;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 20px 40px rgba(17,45,78,0.2);
+      background: var(--white);
+      padding: var(--space-xl);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-2xl);
       max-width: 400px;
-      width: 90%;
+      width: 100%;
       text-align: center;
     }
-
+    
     .delete-modal h3 {
-      color: #112D4E;
-      margin-bottom: 15px;
-      font-size: 1.3rem;
+      color: var(--gray-900);
+      margin-bottom: var(--space-md);
+      font-size: var(--fs-xl);
     }
-
+    
     .delete-modal p {
-      color: #3F72AF;
-      margin-bottom: 25px;
+      color: var(--gray-600);
+      margin-bottom: var(--space-xl);
       line-height: 1.5;
     }
-
+    
     .delete-modal-actions {
       display: flex;
-      gap: 15px;
+      gap: var(--space-md);
       justify-content: center;
     }
-
+    
     .btn-cancel {
-      background: #6c757d;
-      color: white;
+      background: var(--gray-500);
+      color: var(--white);
       border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
+      padding: var(--space-sm) var(--space-lg);
+      border-radius: var(--radius-md);
       cursor: pointer;
       transition: all 0.3s ease;
+      font-weight: 600;
     }
-
+    
     .btn-cancel:hover {
-      background: #5a6268;
+      background: var(--gray-600);
     }
-
+    
     .btn-confirm-delete {
       background: #dc3545;
-      color: white;
+      color: var(--white);
       border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
+      padding: var(--space-sm) var(--space-lg);
+      border-radius: var(--radius-md);
       cursor: pointer;
       transition: all 0.3s ease;
+      font-weight: 600;
     }
-
+    
     .btn-confirm-delete:hover {
       background: #c82333;
     }
-
-    /* -------------  TEXTAREA / PAGE SELECT  ------------- */
-    .textarea-container{margin:30px 0}
-    .textarea-container label{font-size:1.1rem;font-weight:600;margin-bottom:10px;color:#112D4E;display:block}
-    .job-description{width:100%;min-height:200px;padding:20px;border:2px solid #DBE2EF;border-radius:10px;
-                     font-size:1rem;font-family:inherit;resize:vertical;transition:.3s}
-    .job-description:focus{outline:none;border-color:#3F72AF;box-shadow:0 0 0 3px rgba(63,114,175,.1)}
-    .page-select{margin-top:20px;display:flex;align-items:center;gap:10px}
-    .page-select label{font-weight:600;color:#112D4E}
-    .page-select select{padding:10px;border:2px solid #DBE2EF;border-radius:8px}
-
-    /* -------------  TEMPLATE GRID  ------------- */
-    .templates-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin:30px 0}
-    .template-card{border:2px solid #DBE2EF;border-radius:15px;padding:25px;text-align:center;cursor:pointer;
-                   transition:.3s;background:#F9F7F7}
-    .template-card:hover{border-color:#3F72AF;transform:translateY(-5px);box-shadow:0 10px 25px rgba(17,45,78,.1)}
-    .template-card.selected{border-color:#112D4E;background:#DBE2EF}
-    .template-name{font-size:1.2rem;font-weight:600;margin-bottom:10px;color:#112D4E}
-    .template-description{color:#3F72AF;font-size:.9rem}
-
-    /* -------------  UNIVERSITY LOGO STYLES  ------------- */
-    .template-logo{
-      width:60px;
-      height:60px;
-      object-fit:contain;
-      border-radius:12px;
-      margin:0 auto 15px;
-      box-shadow:0 4px 12px rgba(0,0,0,.15);
-      transition:all .3s ease;
+    
+    /* Focus States */
+    :focus {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
     }
-    .template-logo:hover{
-      transform:scale(1.05);
-      box-shadow:0 6px 16px rgba(0,0,0,.20);
+    
+    :focus:not(:focus-visible) {
+      outline: none;
     }
-    .logo-harvard { background: linear-gradient(135deg, #A41E22, #8B1A1A); }
-    .logo-mit { background: linear-gradient(135deg, #8A8B8C, #6D6E70); }
-    .logo-cambridge { background: linear-gradient(135deg, #003B5C, #002A42); }
-    .logo-stanford { background: linear-gradient(135deg, #8C1515, #6D1010); }
-    .logo-wharton { background: linear-gradient(135deg, #011F5B, #001640); }
-    .logo-berkeley { background: linear-gradient(135deg, #003262, #002247); }
-
-    /* -------------  BUTTONS  ------------- */
-    .btn{background:linear-gradient(135deg,#3F72AF,#112D4E);color:#F9F7F7;border:none;padding:15px 30px;border-radius:10px;
-         font-size:1.1rem;font-weight:600;cursor:pointer;transition:.3s;display:inline-flex;align-items:center;gap:10px}
-    .btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(63,114,175,.3)}
-    .btn:disabled{background:#DBE2EF;cursor:not-allowed;transform:none;box-shadow:none;color:#3F72AF}
-    .btn-secondary{background:#DBE2EF;color:#112D4E}.btn-secondary:hover{background:#3F72AF;color:#F9F7F7}
-    .btn-outline{background:transparent;color:#3F72AF;border:2px solid #3F72AF}
-    .btn-outline:hover{background:#3F72AF;color:#F9F7F7}
-
-    /* -------------  LOADING & SCORES  ------------- */
-    .loading{text-align:center;padding:40px;display:none}
-    .spinner{border:4px solid #DBE2EF;border-top:4px solid #3F72AF;border-radius:50%;width:60px;height:60px;
-             animation:spin 1s linear infinite;margin:0 auto 20px}
-    @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
-    .progress-container{margin:30px 0}
-    .progress-bar{width:100%;height:8px;background:#DBE2EF;border-radius:4px;overflow:hidden}
-    .progress-fill{height:100%;background:linear-gradient(90deg,#3F72AF,#112D4E);width:0;transition:width .3s}
-    .progress-text{text-align:center;margin-top:10px;font-weight:600;color:#3F72AF}
-    .score-box{padding:20px;border-radius:15px;text-align:center;margin-bottom:20px;color:#F9F7F7}
-    .score-number{font-size:3rem;font-weight:700}
-    .score-label{font-size:1.2rem;opacity:.9}
-    .ats{background:linear-gradient(135deg,#3F72AF,#112D4E)}
-    .job{background:linear-gradient(135deg,#DBE2EF,#3F72AF);color:#112D4E}
-
-    /* -------------  PREVIEW  ------------- */
-    .resume-preview{background:#F9F7F7;border:1px solid #DBE2EF;border-radius:15px;padding:30px;max-height:600px;overflow-y:auto}
-
-    /* -------------  NAV / MSGS  ------------- */
-    .action-buttons{display:flex;gap:15px;justify-content:center;margin-top:30px;flex-wrap:wrap}
-    .navigation{display:flex;justify-content:space-between;margin-top:30px}
-    .error,.success{padding:15px;border-radius:10px;margin:20px 0;display:none;color:#F9F7F7}
-    .error{background:#112D4E}.success{background:#3F72AF}
-
-    @media(max-width:768px){
-      .header h1{font-size:2rem}
-      .main-content-card{padding:20px;margin:10px}
-      .templates-grid{grid-template-columns:1fr}
-      .navigation{flex-direction:column;gap:15px}
-      .entry-options{flex-direction:column}
-      .resume-item{flex-direction:column;align-items:flex-start;gap:15px}
-      .resume-item-actions{align-self:stretch;justify-content:space-between}
-      .welcome-banner h2{font-size:1.6rem}
-      .quick-actions{flex-direction:column;align-items:center}
-      .quick-action-btn{width:100%;justify-content:center}
+    
+    /* Selection */
+    ::selection {
+      background: var(--primary);
+      color: var(--white);
+    }
+    
+    @media (max-width: 768px) {
+      .main-content-card {
+        padding: var(--space-lg);
+      }
+      
+      .step-premium-banner {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .premium-banner-icon {
+        font-size: var(--fs-2xl);
+      }
+      
+      .welcome-banner {
+        padding: var(--space-lg);
+      }
+      
+      .quick-actions {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- Task 13: Navigation Component -->
-  {% include 'components/navigation.html' %}
+  <!-- Navigation -->
+  <div class="nav-placeholder" id="navbar">
+    {% include 'components/navigation.html' %}
+  </div>
 
-  <!-- Task 12: WhatsApp Float Button - RIGHT SIDE -->
-  <a href="https://wa.me/916303858671?text=Hi! I'm interested in your job application service. Can you provide more details about pricing and process?" 
-     class="whatsapp-float" target="_blank" rel="noopener">
+  <!-- WhatsApp Float Button -->
+  <a href="https://wa.me/916303858671?text=Hi! I'm interested in your job application service." 
+     class="whatsapp-float" 
+     target="_blank" 
+     rel="noopener noreferrer">
     <i class="fab fa-whatsapp"></i>
   </a>
 
@@ -485,9 +1178,9 @@
             <a href="{% url 'our_services' %}" class="quick-action-btn">
               <i class="fas fa-star"></i> View All Services
             </a>
-            <a href="https://wa.me/916303858671?text=Hi! I'm interested in your job application service. Can you provide more details about pricing and process?" 
+            <a href="https://wa.me/916303858671?text=Hi! I'm interested in your premium job application service." 
                class="quick-action-btn" target="_blank">
-              <i class="fab fa-whatsapp"></i> Get Jobs Applied For Me
+              <i class="fab fa-whatsapp"></i> Get Premium Service
             </a>
           </div>
         </div>
@@ -499,7 +1192,7 @@
       </header>
 
       <main class="main-content-card">
-        <!-- ─────────── STEPPER ─────────── -->
+        <!-- STEPPER -->
         <nav class="step-indicator">
           <div class="step-dot active" data-step="1">1</div>
           <div class="step-dot" data-step="2">2</div>
@@ -517,13 +1210,30 @@
             <h2 class="step-title">Upload or Create a Resume</h2>
           </div>
 
+          <!-- Premium Banner for Step 1 -->
+          <div class="step-premium-banner">
+            <i class="fas fa-crown premium-banner-icon"></i>
+            <div class="premium-banner-content">
+              <h3>Skip the hassle! Let us handle everything</h3>
+              <p>Why spend hours optimizing resumes when our experts can apply to 50+ jobs daily for you?</p>
+              <div class="premium-banner-timer">
+                <i class="fas fa-clock"></i>
+                <span>🎯 4 Days FREE Trial - Offer ends soon!</span>
+              </div>
+              <a href="https://wa.me/916303858671?text=Hi! I want to try the 4-day free trial for job applications." 
+                 class="btn-premium" target="_blank">
+                <i class="fab fa-whatsapp"></i> Try Premium Service Free
+              </a>
+            </div>
+          </div>
+
           <!-- Entry Options -->
           <div class="entry-options">
             <div class="entry-option">
               <div class="upload-area" id="uploadArea">
                 <i class="fas fa-cloud-upload-alt upload-icon"></i>
                 <p class="upload-text"><strong>Upload Existing Resume</strong></p>
-                <p style="color:#3F72AF;margin-top:10px">PDF, DOC, DOCX (max 10 MB)</p>
+                <p style="color: var(--gray-600); margin-top: var(--space-sm);">PDF, DOC, DOCX (max 10 MB)</p>
                 <input type="file" class="file-input" id="fileInput" accept=".pdf,.doc,.docx">
               </div>
             </div>
@@ -539,9 +1249,10 @@
             </div>
           </div>
 
-          <h3 style="margin:30px 0 15px;color:#112D4E;font-size:1.3rem">
-            <i class="fas fa-history"></i> Previously uploaded resumes
-          </h3>
+          <div class="resume-list-header">
+            <i class="fas fa-history" style="color: var(--primary);"></i>
+            <h3>Previously uploaded resumes</h3>
+          </div>
           <div id="resumeList"></div>
           
           <div class="uploaded-file" id="uploadedFile">
@@ -549,8 +1260,8 @@
               <div class="file-details">
                 <i class="fas fa-file-alt file-icon"></i>
                 <div>
-                  <div id="fileName"></div>
-                  <div id="fileSize" style="color:#3F72AF;font-size:.9rem"></div>
+                  <div id="fileName" style="font-weight: 600; color: var(--gray-900);"></div>
+                  <div id="fileSize" style="color: var(--gray-600); font-size: var(--fs-sm);"></div>
                 </div>
               </div>
               <button class="btn btn-secondary" onclick="removeFile()">
@@ -558,6 +1269,7 @@
               </button>
             </div>
           </div>
+          
           <div class="navigation">
             <div></div>
             <button id="nextStep1" class="btn" onclick="nextStep()" disabled>
@@ -572,6 +1284,24 @@
             <div class="step-number">2</div>
             <h2 class="step-title">Paste Job Description & Select Pages</h2>
           </div>
+
+          <!-- Premium Banner for Step 2 -->
+          <div class="step-premium-banner">
+            <i class="fas fa-rocket premium-banner-icon"></i>
+            <div class="premium-banner-content">
+              <h3>We apply to jobs that match YOUR skills</h3>
+              <p>Our experts analyze hundreds of job descriptions daily and apply only to positions that fit your profile perfectly.</p>
+              <div class="premium-banner-timer">
+                <i class="fas fa-clock"></i>
+                <span>🎯 Save 40+ hours per week!</span>
+              </div>
+              <a href="https://wa.me/916303858671?text=Hi! Tell me more about how you match jobs to my profile." 
+                 class="btn-premium" target="_blank">
+                <i class="fab fa-whatsapp"></i> Get Expert Help
+              </a>
+            </div>
+          </div>
+
           <div class="textarea-container">
             <label for="jobDescription">Full job description:</label>
             <textarea id="jobDescription" class="job-description"
@@ -601,6 +1331,24 @@
             <div class="step-number">3</div>
             <h2 class="step-title">Choose a Template</h2>
           </div>
+
+          <!-- Premium Banner for Step 3 -->
+          <div class="step-premium-banner">
+            <i class="fas fa-trophy premium-banner-icon"></i>
+            <div class="premium-banner-content">
+              <h3>Get interviews, not just resumes!</h3>
+              <p>While you pick templates, we could be sending out 50+ applications with personalized cover letters.</p>
+              <div class="premium-banner-timer">
+                <i class="fas fa-clock"></i>
+                <span>🎯 15 days average to first interview!</span>
+              </div>
+              <a href="https://wa.me/916303858671?text=Hi! I want faster results with your premium service." 
+                 class="btn-premium" target="_blank">
+                <i class="fab fa-whatsapp"></i> Skip to Interviews
+              </a>
+            </div>
+          </div>
+
           <div id="templatesGrid" class="templates-grid"></div>
           <div class="navigation">
             <button class="btn btn-secondary" onclick="prevStep()">
@@ -618,6 +1366,24 @@
             <div class="step-number">4</div>
             <h2 class="step-title">Preview & Download</h2>
           </div>
+
+          <!-- Premium Banner for Step 4 -->
+          <div class="step-premium-banner">
+            <i class="fas fa-star premium-banner-icon"></i>
+            <div class="premium-banner-content">
+              <h3>Great resume! Now what?</h3>
+              <p>You've got the resume, but applying to hundreds of jobs is exhausting. Let our experts take over!</p>
+              <div class="premium-banner-timer">
+                <i class="fas fa-clock"></i>
+                <span>🎯 Join professionals who found jobs in 15 days!</span>
+              </div>
+              <a href="https://wa.me/916303858671?text=Hi! I have my resume ready. Help me with job applications." 
+                 class="btn-premium" target="_blank">
+                <i class="fab fa-whatsapp"></i> Let Us Apply For You
+              </a>
+            </div>
+          </div>
+
           <div id="loadingSection" class="loading">
             <div class="spinner"></div>
             <div class="progress-container">
@@ -628,13 +1394,15 @@
             </div>
           </div>
           <div id="resultContainer" style="display:none">
-            <div class="score-box ats">
-              <div id="atsScore" class="score-number">0</div>
-              <div class="score-label">ATS compatibility</div>
-            </div>
-            <div class="score-box job">
-              <div id="jobScore" class="score-number">0</div>
-              <div class="score-label">Job-match score</div>
+            <div class="scores-container">
+              <div class="score-box ats">
+                <div id="atsScore" class="score-number">0</div>
+                <div class="score-label">ATS Compatibility</div>
+              </div>
+              <div class="score-box job">
+                <div id="jobScore" class="score-number">0</div>
+                <div class="score-label">Job Match Score</div>
+              </div>
             </div>
             <div id="resumePreview" class="resume-preview"></div>
             <div class="action-buttons">
@@ -648,7 +1416,7 @@
                 <i class="fas fa-arrow-left"></i> Back to templates
               </button>
               <button class="btn btn-secondary" onclick="scrollToJobDescription()">
-                <i class="fas fa-pen"></i> Regenerate with another Job Description
+                <i class="fas fa-pen"></i> Try Another Job Description
               </button>
             </div>
           </div>
@@ -673,7 +1441,7 @@
     </div>
   </div>
 
-  <!-- ─────────── SCRIPT ─────────── -->
+  <!-- SCRIPT - Keeping all original functionality -->
   <script>
     function scrollToJobDescription() {
       const jd = document.getElementById('jobDescription');
@@ -775,7 +1543,7 @@
     /* PREVIOUS RESUMES WITH ENHANCED UI */
     async function loadPrevResumes(){
       const container=document.getElementById('resumeList');
-      container.innerHTML='<div style="color:#3F72AF;padding:20px;text-align:center"><i class="fas fa-spinner fa-spin"></i> Loading resumes...</div>';
+      container.innerHTML='<div style="color:var(--primary);padding:20px;text-align:center"><i class="fas fa-spinner fa-spin"></i> Loading resumes...</div>';
       try {
         const res=await fetch('/api/resumes/');
         const data=await res.json();
@@ -783,7 +1551,7 @@
         
         if(!data.resumes.length){
           container.innerHTML=`
-            <div style="color:#3F72AF;padding:30px;text-align:center;border:2px dashed #DBE2EF;border-radius:12px;background:#F9F7F7">
+            <div style="color:var(--gray-600);padding:30px;text-align:center;border:2px dashed var(--gray-300);border-radius:var(--radius-lg);background:var(--gray-100)">
               <i class="fas fa-folder-open" style="font-size:2rem;margin-bottom:15px;opacity:0.7"></i>
               <p style="margin:0;font-size:1.1rem">No previous resumes found</p>
               <p style="margin:5px 0 0;font-size:0.9rem;opacity:0.8">Upload your first resume or create one manually</p>
@@ -823,7 +1591,7 @@
         });
       } catch {
         container.innerHTML=`
-          <div style="color:#dc3545;padding:20px;text-align:center;border:2px solid #dc3545;border-radius:12px;background:#f8f9fa">
+          <div style="color:#dc3545;padding:20px;text-align:center;border:2px solid #dc3545;border-radius:var(--radius-lg);background:#f8f9fa">
             <i class="fas fa-exclamation-triangle" style="font-size:1.5rem;margin-bottom:10px"></i>
             <p style="margin:0">Failed to load resume list</p>
           </div>`;
@@ -906,7 +1674,7 @@
     /* TEMPLATE LIST — shows the real PNG logos */
     async function loadTemplates () {
       const grid = document.getElementById('templatesGrid');
-      grid.innerHTML = '<p style="color:#3F72AF">Loading templates…</p>';
+      grid.innerHTML = '<p style="color:var(--primary);text-align:center;">Loading templates…</p>';
 
       try {
         const res  = await fetch('/templates/');
@@ -942,7 +1710,7 @@
         });
       } catch {
         grid.innerHTML =
-          '<p style="color:#112D4E">Failed to load templates</p>';
+          '<p style="color:var(--gray-900);text-align:center;">Failed to load templates</p>';
       }
     }
 

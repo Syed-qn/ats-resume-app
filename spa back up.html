@@ -1,0 +1,1130 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>ATS Resume Optimizer</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+
+    .highlight-flash {
+      box-shadow: 0 0 0 4px rgba(63, 114, 175, 0.4);
+      transition: box-shadow 0.3s ease;
+    }
+
+    /* -------------  GENERIC  ------------- */
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+         background:linear-gradient(135deg,#DBE2EF 0%,#F9F7F7 100%);
+         min-height:100vh;color:#112D4E;}
+    .container{max-width:1200px;margin:0 auto;padding:20px;}
+
+    /* Content below navigation */
+    .main-content {
+      margin-top: 20px; /* Space for navigation */
+    }
+
+    /* WhatsApp Float Button - Task 12: RIGHT SIDE */
+    .whatsapp-float {
+      position: fixed;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3);
+      z-index: 1000;
+      transition: all 0.3s ease;
+      animation: pulse 2s infinite;
+      text-decoration: none;
+    }
+    .whatsapp-float:hover {
+      transform: translateY(-50%) scale(1.1);
+      box-shadow: 0 12px 35px rgba(37, 211, 102, 0.5);
+    }
+    .whatsapp-float i {
+      color: white;
+      font-size: 24px;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3); }
+      50% { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.6), 0 0 0 10px rgba(37, 211, 102, 0.1); }
+      100% { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3); }
+    }
+
+    /* Welcome Banner for logged-in users */
+    .welcome-banner {
+      background: linear-gradient(135deg, #3F72AF, #112D4E);
+      color: #F9F7F7;
+      padding: 30px 40px;
+      border-radius: 20px;
+      margin-bottom: 30px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(17,45,78,0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .welcome-banner::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/></svg>') repeat;
+      animation: float 20s infinite linear;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-100px); }
+    }
+
+    .welcome-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .welcome-banner h2 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .welcome-banner p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      margin-bottom: 20px;
+    }
+
+    .quick-actions {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .quick-action-btn {
+      background: rgba(249, 247, 247, 0.2);
+      color: #F9F7F7;
+      border: 2px solid rgba(249, 247, 247, 0.3);
+      padding: 10px 20px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      backdrop-filter: blur(10px);
+    }
+
+    .quick-action-btn:hover {
+      background: #F9F7F7;
+      color: #112D4E;
+      transform: translateY(-2px);
+    }
+
+    /* -------------  HEADER  ------------- */
+    .header{text-align:center;margin-bottom:40px;color:#112D4E}
+    .header h1{font-size:3rem;margin-bottom:10px;text-shadow:0 2px 4px rgba(17,45,78,.3);color:#112D4E}
+    .header p{font-size:1.2rem;opacity:.8;color:#3F72AF}
+
+    /* -------------  CARD  ------------- */
+    .main-content-card{background:#F9F7F7;border-radius:20px;padding:40px;
+                  box-shadow:0 20px 40px rgba(17,45,78,.1);position:relative;overflow:hidden}
+    .main-content-card::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;
+                          background:linear-gradient(90deg,#3F72AF,#112D4E,#DBE2EF)}
+
+    /* -------------  STEPS  ------------- */
+    .step{display:none;animation:fadeIn .5s ease}
+    .step.active{display:block}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+    .step-header{display:flex;align-items:center;margin-bottom:30px;padding-bottom:20px;border-bottom:2px solid #DBE2EF}
+    .step-number{background:linear-gradient(135deg,#3F72AF,#112D4E);color:#F9F7F7;width:50px;height:50px;border-radius:50%;
+                 display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;margin-right:20px}
+    .step-title{font-size:1.8rem;color:#112D4E}
+
+    /* -------------  STEPPER DOTS  ------------- */
+    .step-indicator{display:flex;justify-content:center;margin-bottom:40px}
+    .step-dot{width:40px;height:40px;border-radius:50%;background:#DBE2EF;display:flex;
+              align-items:center;justify-content:center;margin:0 10px;cursor:pointer;position:relative;transition:.3s;color:#3F72AF}
+    .step-dot.active{background:#3F72AF;color:#F9F7F7}
+    .step-dot.completed{background:#112D4E;color:#F9F7F7}
+    .step-dot::after{content:'';position:absolute;top:50%;left:100%;width:20px;height:2px;
+                     background:#DBE2EF;transform:translateY(-50%)}
+    .step-dot:last-child::after{display:none}
+    .step-dot.completed::after{background:#112D4E}
+
+    /* -------------  UPLOAD AREA  ------------- */
+    .upload-area{border:3px dashed #3F72AF;border-radius:15px;padding:60px 40px;text-align:center;
+                 background:#F9F7F7;transition:.3s;cursor:pointer;position:relative}
+    .upload-area:hover{border-color:#112D4E;background:#DBE2EF;transform:translateY(-5px)}
+    .upload-area.dragover{border-color:#112D4E;background:#DBE2EF}
+    .upload-icon{font-size:4rem;color:#3F72AF;margin-bottom:20px}
+    .upload-text{font-size:1.2rem;color:#112D4E;margin-bottom:15px}
+    .file-input{display:none}
+    .uploaded-file{background:#DBE2EF;border:2px solid #3F72AF;border-radius:10px;padding:20px;margin-top:20px;display:none}
+    .file-info{display:flex;align-items:center;justify-content:space-between}
+    .file-details{display:flex;align-items:center}
+    .file-icon{font-size:2rem;color:#3F72AF;margin-right:15px}
+
+    /* -------------  MANUAL ENTRY SECTION  ------------- */
+    .entry-options{display:flex;gap:20px;margin-bottom:30px;flex-wrap:wrap}
+    .entry-option{flex:1;min-width:280px}
+    .manual-entry-card{border:2px solid #DBE2EF;border-radius:15px;padding:30px;text-align:center;
+                       transition:.3s;cursor:pointer;background:#F9F7F7}
+    .manual-entry-card:hover{border-color:#3F72AF;transform:translateY(-5px);box-shadow:0 10px 25px rgba(17,45,78,.1)}
+    .manual-entry-icon{font-size:3rem;color:#3F72AF;margin-bottom:15px}
+    .manual-entry-title{font-size:1.3rem;font-weight:600;margin-bottom:10px;color:#112D4E}
+    .manual-entry-description{color:#3F72AF;font-size:.9rem;line-height:1.4}
+
+    /* -------------  RESUME LIST ENHANCEMENTS  ------------- */
+    .resume-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 20px;
+      border: 2px solid #DBE2EF;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      background: #F9F7F7;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .resume-item:hover {
+      border-color: #3F72AF;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(17,45,78,0.1);
+    }
+
+    .resume-item.selected {
+      border-color: #28a745;
+      background: #f8f9fa;
+      box-shadow: 0 5px 15px rgba(40, 167, 69, 0.2);
+    }
+
+    .resume-item-left {
+      display: flex;
+      align-items: center;
+      flex: 1;
+    }
+
+    .resume-item-info {
+      margin-left: 15px;
+    }
+
+    .resume-item-name {
+      font-weight: 600;
+      color: #112D4E;
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+
+    .resume-item-details {
+      font-size: 0.85rem;
+      color: #3F72AF;
+      opacity: 0.8;
+    }
+
+    .resume-item-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .selected-indicator {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #28a745;
+      color: white;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      animation: checkmarkBounce 0.5s ease;
+    }
+
+    .resume-item.selected .selected-indicator {
+      display: flex;
+    }
+
+    @keyframes checkmarkBounce {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    .btn-select {
+      background: linear-gradient(135deg, #3F72AF, #112D4E);
+      color: #F9F7F7;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-select:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(63,114,175,0.3);
+    }
+
+    .btn-delete {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn-delete:hover {
+      background: #c82333;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    }
+
+    .delete-confirmation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .delete-modal {
+      background: #F9F7F7;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 20px 40px rgba(17,45,78,0.2);
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+    }
+
+    .delete-modal h3 {
+      color: #112D4E;
+      margin-bottom: 15px;
+      font-size: 1.3rem;
+    }
+
+    .delete-modal p {
+      color: #3F72AF;
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+
+    .delete-modal-actions {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    }
+
+    .btn-cancel {
+      background: #6c757d;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-cancel:hover {
+      background: #5a6268;
+    }
+
+    .btn-confirm-delete {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-confirm-delete:hover {
+      background: #c82333;
+    }
+
+    /* -------------  TEXTAREA / PAGE SELECT  ------------- */
+    .textarea-container{margin:30px 0}
+    .textarea-container label{font-size:1.1rem;font-weight:600;margin-bottom:10px;color:#112D4E;display:block}
+    .job-description{width:100%;min-height:200px;padding:20px;border:2px solid #DBE2EF;border-radius:10px;
+                     font-size:1rem;font-family:inherit;resize:vertical;transition:.3s}
+    .job-description:focus{outline:none;border-color:#3F72AF;box-shadow:0 0 0 3px rgba(63,114,175,.1)}
+    .page-select{margin-top:20px;display:flex;align-items:center;gap:10px}
+    .page-select label{font-weight:600;color:#112D4E}
+    .page-select select{padding:10px;border:2px solid #DBE2EF;border-radius:8px}
+
+    /* -------------  TEMPLATE GRID  ------------- */
+    .templates-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin:30px 0}
+    .template-card{border:2px solid #DBE2EF;border-radius:15px;padding:25px;text-align:center;cursor:pointer;
+                   transition:.3s;background:#F9F7F7}
+    .template-card:hover{border-color:#3F72AF;transform:translateY(-5px);box-shadow:0 10px 25px rgba(17,45,78,.1)}
+    .template-card.selected{border-color:#112D4E;background:#DBE2EF}
+    .template-name{font-size:1.2rem;font-weight:600;margin-bottom:10px;color:#112D4E}
+    .template-description{color:#3F72AF;font-size:.9rem}
+
+    /* -------------  UNIVERSITY LOGO STYLES  ------------- */
+    .template-logo{
+      width:60px;
+      height:60px;
+      object-fit:contain;
+      border-radius:12px;
+      margin:0 auto 15px;
+      box-shadow:0 4px 12px rgba(0,0,0,.15);
+      transition:all .3s ease;
+    }
+    .template-logo:hover{
+      transform:scale(1.05);
+      box-shadow:0 6px 16px rgba(0,0,0,.20);
+    }
+    .logo-harvard { background: linear-gradient(135deg, #A41E22, #8B1A1A); }
+    .logo-mit { background: linear-gradient(135deg, #8A8B8C, #6D6E70); }
+    .logo-cambridge { background: linear-gradient(135deg, #003B5C, #002A42); }
+    .logo-stanford { background: linear-gradient(135deg, #8C1515, #6D1010); }
+    .logo-wharton { background: linear-gradient(135deg, #011F5B, #001640); }
+    .logo-berkeley { background: linear-gradient(135deg, #003262, #002247); }
+
+    /* -------------  BUTTONS  ------------- */
+    .btn{background:linear-gradient(135deg,#3F72AF,#112D4E);color:#F9F7F7;border:none;padding:15px 30px;border-radius:10px;
+         font-size:1.1rem;font-weight:600;cursor:pointer;transition:.3s;display:inline-flex;align-items:center;gap:10px}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(63,114,175,.3)}
+    .btn:disabled{background:#DBE2EF;cursor:not-allowed;transform:none;box-shadow:none;color:#3F72AF}
+    .btn-secondary{background:#DBE2EF;color:#112D4E}.btn-secondary:hover{background:#3F72AF;color:#F9F7F7}
+    .btn-outline{background:transparent;color:#3F72AF;border:2px solid #3F72AF}
+    .btn-outline:hover{background:#3F72AF;color:#F9F7F7}
+
+    /* -------------  LOADING & SCORES  ------------- */
+    .loading{text-align:center;padding:40px;display:none}
+    .spinner{border:4px solid #DBE2EF;border-top:4px solid #3F72AF;border-radius:50%;width:60px;height:60px;
+             animation:spin 1s linear infinite;margin:0 auto 20px}
+    @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+    .progress-container{margin:30px 0}
+    .progress-bar{width:100%;height:8px;background:#DBE2EF;border-radius:4px;overflow:hidden}
+    .progress-fill{height:100%;background:linear-gradient(90deg,#3F72AF,#112D4E);width:0;transition:width .3s}
+    .progress-text{text-align:center;margin-top:10px;font-weight:600;color:#3F72AF}
+    .score-box{padding:20px;border-radius:15px;text-align:center;margin-bottom:20px;color:#F9F7F7}
+    .score-number{font-size:3rem;font-weight:700}
+    .score-label{font-size:1.2rem;opacity:.9}
+    .ats{background:linear-gradient(135deg,#3F72AF,#112D4E)}
+    .job{background:linear-gradient(135deg,#DBE2EF,#3F72AF);color:#112D4E}
+
+    /* -------------  PREVIEW  ------------- */
+    .resume-preview{background:#F9F7F7;border:1px solid #DBE2EF;border-radius:15px;padding:30px;max-height:600px;overflow-y:auto}
+
+    /* -------------  NAV / MSGS  ------------- */
+    .action-buttons{display:flex;gap:15px;justify-content:center;margin-top:30px;flex-wrap:wrap}
+    .navigation{display:flex;justify-content:space-between;margin-top:30px}
+    .error,.success{padding:15px;border-radius:10px;margin:20px 0;display:none;color:#F9F7F7}
+    .error{background:#112D4E}.success{background:#3F72AF}
+
+    @media(max-width:768px){
+      .header h1{font-size:2rem}
+      .main-content-card{padding:20px;margin:10px}
+      .templates-grid{grid-template-columns:1fr}
+      .navigation{flex-direction:column;gap:15px}
+      .entry-options{flex-direction:column}
+      .resume-item{flex-direction:column;align-items:flex-start;gap:15px}
+      .resume-item-actions{align-self:stretch;justify-content:space-between}
+      .welcome-banner h2{font-size:1.6rem}
+      .quick-actions{flex-direction:column;align-items:center}
+      .quick-action-btn{width:100%;justify-content:center}
+    }
+  </style>
+</head>
+<body>
+  <!-- Task 13: Navigation Component -->
+  {% include 'components/navigation.html' %}
+
+  <!-- Task 12: WhatsApp Float Button - RIGHT SIDE -->
+  <a href="https://wa.me/916303858671?text=Hi! I'm interested in your job application service. Can you provide more details about pricing and process?" 
+     class="whatsapp-float" target="_blank" rel="noopener">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+
+  <div class="container">
+    <div class="main-content">
+      <!-- Welcome Banner for logged-in users -->
+      <div class="welcome-banner">
+        <div class="welcome-content">
+          <h2>Welcome back, {{ user.username }}! 🎯</h2>
+          <p>Ready to create an ATS-optimized resume that gets you interviews? Let's make your career goals a reality.</p>
+          <div class="quick-actions">
+            <a href="{% url 'ats_details' %}" class="quick-action-btn">
+              <i class="fas fa-robot"></i> Learn About ATS
+            </a>
+            <a href="{% url 'our_services' %}" class="quick-action-btn">
+              <i class="fas fa-star"></i> View All Services
+            </a>
+            <a href="https://wa.me/916303858671?text=Hi! I'm interested in your job application service. Can you provide more details about pricing and process?" 
+               class="quick-action-btn" target="_blank">
+              <i class="fab fa-whatsapp"></i> Get Jobs Applied For Me
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <header class="header">
+        <h1><i class="fas fa-file-alt"></i> ATS Resume Optimizer</h1>
+        <p>Transform your resume so it perfectly matches any job description.</p>
+      </header>
+
+      <main class="main-content-card">
+        <!-- ─────────── STEPPER ─────────── -->
+        <nav class="step-indicator">
+          <div class="step-dot active" data-step="1">1</div>
+          <div class="step-dot" data-step="2">2</div>
+          <div class="step-dot" data-step="3">3</div>
+          <div class="step-dot" data-step="4">4</div>
+        </nav>
+
+        <div id="errorMessage" class="error"></div>
+        <div id="successMessage" class="success"></div>
+
+        <!-- STEP 1 -->
+        <section class="step active" id="step1">
+          <div class="step-header">
+            <div class="step-number">1</div>
+            <h2 class="step-title">Upload or Create a Resume</h2>
+          </div>
+
+          <!-- Entry Options -->
+          <div class="entry-options">
+            <div class="entry-option">
+              <div class="upload-area" id="uploadArea">
+                <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                <p class="upload-text"><strong>Upload Existing Resume</strong></p>
+                <p style="color:#3F72AF;margin-top:10px">PDF, DOC, DOCX (max 10 MB)</p>
+                <input type="file" class="file-input" id="fileInput" accept=".pdf,.doc,.docx">
+              </div>
+            </div>
+            
+            <div class="entry-option">
+              <div class="manual-entry-card" onclick="goToManualEntry()">
+                <i class="fas fa-edit manual-entry-icon"></i>
+                <div class="manual-entry-title">Enter Details Manually</div>
+                <div class="manual-entry-description">
+                  Create your resume from scratch using our guided form with all the essential sections
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h3 style="margin:30px 0 15px;color:#112D4E;font-size:1.3rem">
+            <i class="fas fa-history"></i> Previously uploaded resumes
+          </h3>
+          <div id="resumeList"></div>
+          
+          <div class="uploaded-file" id="uploadedFile">
+            <div class="file-info">
+              <div class="file-details">
+                <i class="fas fa-file-alt file-icon"></i>
+                <div>
+                  <div id="fileName"></div>
+                  <div id="fileSize" style="color:#3F72AF;font-size:.9rem"></div>
+                </div>
+              </div>
+              <button class="btn btn-secondary" onclick="removeFile()">
+                <i class="fas fa-trash"></i> Remove
+              </button>
+            </div>
+          </div>
+          <div class="navigation">
+            <div></div>
+            <button id="nextStep1" class="btn" onclick="nextStep()" disabled>
+              Next <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </section>
+
+        <!-- STEP 2 -->
+        <section class="step" id="step2">
+          <div class="step-header">
+            <div class="step-number">2</div>
+            <h2 class="step-title">Paste Job Description & Select Pages</h2>
+          </div>
+          <div class="textarea-container">
+            <label for="jobDescription">Full job description:</label>
+            <textarea id="jobDescription" class="job-description"
+              placeholder="Include responsibilities, must-have skills, qualifications…"></textarea>
+          </div>
+          <div class="page-select">
+            <label for="numPages">Desired resume length:</label>
+            <select id="numPages">
+              <option value="1">1 page</option>
+              <option value="2" selected>2 pages</option>
+              <option value="3">3 pages</option>
+            </select>
+          </div>
+          <div class="navigation">
+            <button class="btn btn-secondary" onclick="prevStep()">
+              <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <button id="nextStep2" class="btn" onclick="nextStep()" disabled>
+              Next <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </section>
+
+        <!-- STEP 3 -->
+        <section class="step" id="step3">
+          <div class="step-header">
+            <div class="step-number">3</div>
+            <h2 class="step-title">Choose a Template</h2>
+          </div>
+          <div id="templatesGrid" class="templates-grid"></div>
+          <div class="navigation">
+            <button class="btn btn-secondary" onclick="prevStep()">
+              <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <button id="nextStep3" class="btn" onclick="generateResume()" disabled>
+              Generate Resume <i class="fas fa-magic"></i>
+            </button>
+          </div>
+        </section>
+
+        <!-- STEP 4 -->
+        <section class="step" id="step4">
+          <div class="step-header">
+            <div class="step-number">4</div>
+            <h2 class="step-title">Preview & Download</h2>
+          </div>
+          <div id="loadingSection" class="loading">
+            <div class="spinner"></div>
+            <div class="progress-container">
+              <div class="progress-bar">
+                <div id="progressFill" class="progress-fill"></div>
+              </div>
+              <div id="progressText" class="progress-text">Analyzing your resume…</div>
+            </div>
+          </div>
+          <div id="resultContainer" style="display:none">
+            <div class="score-box ats">
+              <div id="atsScore" class="score-number">0</div>
+              <div class="score-label">ATS compatibility</div>
+            </div>
+            <div class="score-box job">
+              <div id="jobScore" class="score-number">0</div>
+              <div class="score-label">Job-match score</div>
+            </div>
+            <div id="resumePreview" class="resume-preview"></div>
+            <div class="action-buttons">
+              <button class="btn" onclick="downloadPDF()">
+                <i class="fas fa-download"></i> Download PDF
+              </button>
+              <button class="btn btn-secondary" onclick="startOver()">
+                <i class="fas fa-redo"></i> Start over
+              </button>
+              <button class="btn btn-secondary" onclick="prevStep()">
+                <i class="fas fa-arrow-left"></i> Back to templates
+              </button>
+              <button class="btn btn-secondary" onclick="scrollToJobDescription()">
+                <i class="fas fa-pen"></i> Regenerate with another Job Description
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="delete-confirmation" id="deleteConfirmation">
+    <div class="delete-modal">
+      <h3><i class="fas fa-exclamation-triangle" style="color:#dc3545;margin-right:10px"></i>Confirm Delete</h3>
+      <p>Are you sure you want to delete this resume? This action cannot be undone.</p>
+      <div class="delete-modal-actions">
+        <button class="btn-cancel" onclick="cancelDelete()">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+        <button class="btn-confirm-delete" onclick="confirmDelete()">
+          <i class="fas fa-trash"></i> Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────── SCRIPT ─────────── -->
+  <script>
+    function scrollToJobDescription() {
+      const jd = document.getElementById('jobDescription');
+      if (jd) {
+        goToStep(2);  // Reuse your existing function
+        setTimeout(() => {
+          jd.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          jd.focus({ preventScroll: true });
+          jd.classList.add('highlight-flash');
+          setTimeout(() => jd.classList.remove('highlight-flash'), 1000);
+        }, 300);
+      }
+    }
+
+    /* CONFIG */
+    let currentStep=1, currentResumeID=null, selectedTemplate=null;
+    let deleteResumeId = null; // For tracking which resume to delete
+    const csrftoken='{{ csrf_token }}';
+
+    /* INIT */
+    document.addEventListener('DOMContentLoaded',()=>{
+      hookStepper();
+      loadPrevResumes();
+      loadTemplates();
+      setupUpload();
+      document.getElementById('jobDescription').addEventListener('input',()=>validateNext());
+    });
+
+    /* MANUAL ENTRY */
+    function goToManualEntry() {
+      window.location.href = '/manual-resume/create/';
+    }
+
+    /* STEPPER */
+    function goToStep(n){
+      document.querySelectorAll('.step').forEach(s=>s.classList.toggle('active',s.id==='step'+n));
+      document.querySelectorAll('.step-dot').forEach(d=>{
+        const idx=+d.dataset.step;
+        d.classList.remove('active','completed');
+        if(idx===n)d.classList.add('active');
+        else if(idx<n)d.classList.add('completed');
+      });
+      currentStep=n;
+    }
+    function nextStep(){ if(currentStep<4) goToStep(currentStep+1) }
+    function prevStep(){ if(currentStep>1) goToStep(currentStep-1) }
+    function hookStepper(){
+      document.querySelectorAll('.step-dot').forEach(d=>
+        d.addEventListener('click',()=>goToStep(+d.dataset.step))
+      );
+    }
+
+    /* UPLOAD */
+    function setupUpload(){
+      const area=document.getElementById('uploadArea');
+      const input=document.getElementById('fileInput');
+      area.addEventListener('click',()=>input.click());
+      input.addEventListener('change',e=>handleFile(e.target.files[0]));
+      ['dragover','dragleave','drop'].forEach(ev=>
+        area.addEventListener(ev,e=>{ e.preventDefault(); })
+      );
+      area.addEventListener('dragover',()=>area.classList.add('dragover'));
+      area.addEventListener('dragleave',()=>area.classList.remove('dragover'));
+      area.addEventListener('drop',e=>{
+        area.classList.remove('dragover');
+        handleFile(e.dataTransfer.files[0]);
+      });
+    }
+    async function handleFile(file){
+      if(!file) return;
+      const ext='.'+file.name.split('.').pop().toLowerCase();
+      if(!['.pdf','.doc','.docx'].includes(ext)) return showError('Please upload PDF/DOC/DOCX');
+      if(file.size>10*1024*1024) return showError('File must be under 10 MB');
+      const fd=new FormData(); fd.append('file',file);
+      showSuccess('Uploading resume…');
+      const res=await fetch('/api/upload/',{ method:'POST', body:fd, headers:{'X-CSRFToken':csrftoken} });
+      const data=await res.json();
+      if(!res.ok) return showError(data.error||'Upload failed');
+      currentResumeID=data.resume_id;
+      document.getElementById('fileName').textContent=file.name;
+      document.getElementById('fileSize').textContent=(file.size/1024/1024).toFixed(1)+' MB';
+      document.getElementById('uploadedFile').style.display='block';
+      document.getElementById('nextStep1').disabled=false;
+      showSuccess('Upload complete!');
+      loadPrevResumes(); // Refresh the list
+    }
+    function removeFile(){
+      currentResumeID=null;
+      document.getElementById('uploadedFile').style.display='none';
+      document.getElementById('fileInput').value='';
+      document.getElementById('nextStep1').disabled=true;
+      
+      // Clear selection from resume list
+      document.querySelectorAll('.resume-item').forEach(item => {
+        item.classList.remove('selected');
+      });
+    }
+
+    /* PREVIOUS RESUMES WITH ENHANCED UI */
+    async function loadPrevResumes(){
+      const container=document.getElementById('resumeList');
+      container.innerHTML='<div style="color:#3F72AF;padding:20px;text-align:center"><i class="fas fa-spinner fa-spin"></i> Loading resumes...</div>';
+      try {
+        const res=await fetch('/api/resumes/');
+        const data=await res.json();
+        container.innerHTML='';
+        
+        if(!data.resumes.length){
+          container.innerHTML=`
+            <div style="color:#3F72AF;padding:30px;text-align:center;border:2px dashed #DBE2EF;border-radius:12px;background:#F9F7F7">
+              <i class="fas fa-folder-open" style="font-size:2rem;margin-bottom:15px;opacity:0.7"></i>
+              <p style="margin:0;font-size:1.1rem">No previous resumes found</p>
+              <p style="margin:5px 0 0;font-size:0.9rem;opacity:0.8">Upload your first resume or create one manually</p>
+            </div>`;
+          return;
+        }
+        
+        data.resumes.forEach(r=>{
+          const item = document.createElement('div');
+          item.className = 'resume-item';
+          item.dataset.resumeId = r.id;
+          
+          item.innerHTML = `
+            <div class="resume-item-left">
+              <i class="fas fa-file-alt file-icon"></i>
+              <div class="resume-item-info">
+                <div class="resume-item-name">${r.filename}</div>
+                <div class="resume-item-details">
+                  Uploaded ${new Date(r.created_at).toLocaleDateString()} • ${r.file_size}
+                </div>
+              </div>
+            </div>
+            <div class="resume-item-actions">
+              <div class="selected-indicator">
+                <i class="fas fa-check"></i>
+              </div>
+              <button class="btn-select" onclick="selectResume(${r.id}, this)">
+                <i class="fas fa-mouse-pointer"></i> Select
+              </button>
+              <button class="btn-delete" onclick="deleteResume(${r.id})" title="Delete Resume">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          `;
+          
+          container.appendChild(item);
+        });
+      } catch {
+        container.innerHTML=`
+          <div style="color:#dc3545;padding:20px;text-align:center;border:2px solid #dc3545;border-radius:12px;background:#f8f9fa">
+            <i class="fas fa-exclamation-triangle" style="font-size:1.5rem;margin-bottom:10px"></i>
+            <p style="margin:0">Failed to load resume list</p>
+          </div>`;
+      }
+    }
+
+    /* RESUME SELECTION WITH GREEN TICK */
+    function selectResume(resumeId, buttonElement) {
+      // Clear all previous selections
+      document.querySelectorAll('.resume-item').forEach(item => {
+        item.classList.remove('selected');
+      });
+      
+      // Select the current item
+      const resumeItem = buttonElement.closest('.resume-item');
+      resumeItem.classList.add('selected');
+      
+      // Update current resume ID
+      currentResumeID = resumeId;
+      
+      // Enable next step
+      document.getElementById('nextStep1').disabled = false;
+      
+      // Hide uploaded file section if showing
+      document.getElementById('uploadedFile').style.display = 'none';
+      
+      showSuccess('Resume selected! You can now proceed to the next step.');
+    }
+
+    /* RESUME DELETION */
+    function deleteResume(resumeId) {
+      deleteResumeId = resumeId;
+      document.getElementById('deleteConfirmation').style.display = 'flex';
+    }
+
+    function cancelDelete() {
+      deleteResumeId = null;
+      document.getElementById('deleteConfirmation').style.display = 'none';
+    }
+
+    async function confirmDelete() {
+      if (!deleteResumeId) return;
+      
+      try {
+        const res = await fetch(`/api/resumes/${deleteResumeId}/`, {
+          method: 'DELETE',
+          headers: {'X-CSRFToken': csrftoken}
+        });
+        
+        if (res.ok) {
+          showSuccess('Resume deleted successfully!');
+          
+          // If this was the selected resume, clear selection
+          if (currentResumeID === deleteResumeId) {
+            currentResumeID = null;
+            document.getElementById('nextStep1').disabled = true;
+          }
+          
+          // Reload the resume list
+          loadPrevResumes();
+        } else {
+          const data = await res.json();
+          showError(data.error || 'Failed to delete resume');
+        }
+      } catch (error) {
+        showError('Failed to delete resume. Please try again.');
+      }
+      
+      // Close modal
+      cancelDelete();
+    }
+
+    /* JOB DESCRIPTION VALIDATION */
+    function validateNext(){
+      const ok=document.getElementById('jobDescription').value.trim().length>50;
+      document.getElementById('nextStep2').disabled=!ok;
+    }
+
+    /* TEMPLATE LIST */
+    /* TEMPLATE LIST — shows the real PNG logos */
+    async function loadTemplates () {
+      const grid = document.getElementById('templatesGrid');
+      grid.innerHTML = '<p style="color:#3F72AF">Loading templates…</p>';
+
+      try {
+        const res  = await fetch('/templates/');
+        const data = await res.json();
+        grid.innerHTML = '';
+
+        data.templates.forEach(t => {
+          /* 1. Build the card wrapper */
+          const card = document.createElement('div');
+          card.className  = 'template-card';
+          card.dataset.id = t.id;
+
+          /* 2. Build the logo URL — API gives "static/resume/logos/Harvard.png" */
+          const logoUrl = t.logo.startsWith('/') ? t.logo : '/' + t.logo;
+
+          /* 3. Inject markup */
+          card.innerHTML = `
+            <img src="${logoUrl}" alt="${t.name} logo" class="template-logo">
+            <div class="template-name">${t.name}</div>
+            <div class="template-description">${t.description || ''}</div>
+          `;
+
+          /* 4. Click handler */
+          card.onclick = () => {
+            document.querySelectorAll('.template-card')
+                    .forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedTemplate = t.id;
+            document.getElementById('nextStep3').disabled = false;
+          };
+
+          grid.appendChild(card);
+        });
+      } catch {
+        grid.innerHTML =
+          '<p style="color:#112D4E">Failed to load templates</p>';
+      }
+    }
+
+
+    /* GENERATE RESUME WITH REAL-TIME PROGRESS */
+    async function generateResume(){
+      if(!currentResumeID||!selectedTemplate) return;
+      
+      nextStep();
+      document.getElementById('loadingSection').style.display='block';
+      document.getElementById('resultContainer').style.display='none';
+      
+      // Reset progress
+      document.getElementById('progressFill').style.width = '0%';
+      document.getElementById('progressText').textContent = 'Starting resume generation...';
+
+      const payload={
+        job_description:document.getElementById('jobDescription').value,
+        num_pages:+document.getElementById('numPages').value
+      };
+      
+      try {
+        // Start generation
+        const res = await fetch(`/api/generate/${currentResumeID}/${selectedTemplate}/`,{
+          method:'POST',
+          headers:{'Content-Type':'application/json','X-CSRFToken':csrftoken},
+          body:JSON.stringify(payload)
+        });
+        
+        const data = await res.json();
+        if(!res.ok) throw new Error(data.error||'Generation failed');
+        
+        if(data.task_id) {
+          // Start polling for progress
+          pollProgress(data.task_id);
+        } else {
+          // Fallback to old method
+          handleGenerationComplete(data);
+        }
+        
+      } catch(err){
+        showError(err.message||'Failed to generate');
+        prevStep();
+      }
+    }
+
+    async function pollProgress(taskId) {
+      const pollInterval = 1000; // Poll every second
+      const maxPolls = 120; // Max 2 minutes
+      let pollCount = 0;
+      
+      const poll = async () => {
+        try {
+          const res = await fetch(`/api/progress/${taskId}/`);
+          const progress = await res.json();
+          
+          if (!res.ok) {
+            throw new Error(progress.error || 'Progress check failed');
+          }
+          
+          // Update progress bar
+          document.getElementById('progressFill').style.width = `${progress.progress}%`;
+          document.getElementById('progressText').textContent = progress.message;
+          
+          if (progress.completed) {
+            if (progress.error) {
+              throw new Error(progress.error);
+            } else if (progress.result) {
+              handleGenerationComplete(progress.result);
+            }
+            return;
+          }
+          
+          // Continue polling if not completed
+          pollCount++;
+          if (pollCount < maxPolls) {
+            setTimeout(poll, pollInterval);
+          } else {
+            throw new Error('Generation timeout - please try again');
+          }
+          
+        } catch (error) {
+          showError(error.message || 'Progress check failed');
+          prevStep();
+        }
+      };
+      
+      // Start polling
+      poll();
+    }
+
+    function handleGenerationComplete(data) {
+      // Update scores and preview
+      document.getElementById('atsScore').textContent = data.ats_score + '%';
+      document.getElementById('jobScore').textContent = data.job_score + '%';
+      document.getElementById('resumePreview').innerHTML = data.final_resume;
+      
+      // Show success animation
+      document.getElementById('progressFill').style.width = '100%';
+      document.getElementById('progressText').textContent = 'Resume generated successfully!';
+      
+      // Hide loading and show results after brief delay
+      setTimeout(() => {
+        document.getElementById('loadingSection').style.display = 'none';
+        document.getElementById('resultContainer').style.display = 'block';
+        
+        // Add success animation to scores
+        const scoreBoxes = document.querySelectorAll('.score-box');
+        scoreBoxes.forEach((box, index) => {
+          setTimeout(() => {
+            box.style.animation = 'scoreReveal 0.6s ease-out forwards';
+            box.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+              box.style.transform = 'scale(1)';
+            }, 600);
+          }, index * 200);
+        });
+      }, 800);
+    }
+
+    /* DOWNLOAD PDF */
+    async function downloadPDF () {
+      if (!currentResumeID) return;
+
+      try {
+        const res = await fetch(`/api/download/${currentResumeID}/`);
+
+        /* ----- 1. Handle non-200 responses ----- */
+        if (!res.ok) {
+          // Try to parse the JSON error payload; fallback to plain-text
+          let payload = {};
+          try { payload = await res.json(); } catch (_) { /* ignore */ }
+
+          // 429 from our quota guard
+          if (payload.contact_url) {
+            return Swal.fire({
+              icon: 'warning',
+              title: 'Download limit reached',
+              text: payload.message || 'You have crossed your free limit.',
+              confirmButtonText: 'Contact on WhatsApp',
+              confirmButtonColor: '#25D366'
+            }).then(() => window.open(payload.contact_url, '_blank'));
+          }
+
+          // Any other error → generic handler
+          return showError(payload.error || 'Download failed');
+        }
+
+        /* ----- 2. Success: stream the PDF to the user ----- */
+        const contentDisp = res.headers.get('Content-Disposition') || '';
+        const match      = contentDisp.match(/filename="?([^"]+)"?/i);
+        const filename   = match ? match[1] : 'resume.pdf';
+
+        const blob = await res.blob();
+        const url  = URL.createObjectURL(blob);
+
+        const a    = document.createElement('a');
+        a.href     = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+      catch (err) {
+        console.error(err);
+        showError('Network error while downloading PDF');
+      }
+    }
+
+    /* UTILS */
+    function startOver(){ location.reload(); }
+    function showError(msg){
+      const e=document.getElementById('errorMessage');
+      e.textContent=msg; e.style.display='block';
+      setTimeout(()=>e.style.display='none',5000);
+    }
+    function showSuccess(msg){
+      const e=document.getElementById('successMessage');
+      e.textContent=msg; e.style.display='block';
+      setTimeout(()=>e.style.display='none',3000);
+    }
+  </script>
+</body>
+</html>

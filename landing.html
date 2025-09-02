@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexus AI Partners | Strategic AI & Data Science Transformation</title>
+
+<!-- Icons & Animations CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"> <!-- :contentReference[oaicite:0]{index=0} -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">                 <!-- :contentReference[oaicite:1]{index=1} -->
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+/* ----------  Root tokens ---------- */
+:root{
+  --clr-bg:#0a0a0a;
+  --clr-card:#191919;
+  --clr-card-glass:rgba(26,26,26,.8);
+  --clr-primary-100:#00d4ff;
+  --clr-primary-200:#0066ff;
+  --clr-primary-300:#8a2be2;
+  --clr-text:#e2e8f0;
+  --clr-text-alt:#94a3b8;
+  --radius:20px;
+  --trans:all .3s ease;
+  --shadow-lg:0 25px 50px rgba(0,212,255,.15);
+  --shadow-md:0 15px 40px rgba(0,212,255,.25);
+}
+/* ----------  Reset ---------- */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  line-height:1.6;background:var(--clr-bg);color:var(--clr-text);
+  overflow-x:hidden;
+}
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-track{background:#1a1a1a}
+::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,var(--clr-primary-100),var(--clr-primary-200));
+  border-radius:4px;
+}
+/* ----------  Utility ---------- */
+.container{max-width:1200px;margin-inline:auto;padding-inline:20px}
+.img-placeholder{
+  min-height:220px;display:flex;align-items:center;justify-content:center;
+  border:2px dashed rgba(0,212,255,.35);border-radius:12px;color:var(--clr-primary-100);
+  font-weight:600;background:linear-gradient(135deg,rgba(0,212,255,.06),rgba(0,102,255,.06));
+}
+.section-title{
+  font-size:3rem;font-weight:800;margin-bottom:1rem;
+  background:linear-gradient(135deg,#fff,var(--clr-primary-100));-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  text-align:center
+}
+.section-sub{max-width:800px;margin:0 auto 3rem;text-align:center;color:var(--clr-text-alt);font-size:1.1rem}
+[data-aos]{opacity:0;transition:.6s ease !important}
+/* ----------  Background embellishments ---------- */
+.bg-animation{
+  position:fixed;inset:0;z-index:-2;
+  background:
+    radial-gradient(circle at 15% 85%,rgba(0,212,255,.12)0%,transparent 50%),
+    radial-gradient(circle at 85% 15%,rgba(0,102,255,.12)0%,transparent 50%),
+    radial-gradient(circle at 45% 45%,rgba(138,43,226,.08)0%,transparent 50%);
+}
+.particles{
+  position:fixed;inset:0;z-index:-1;opacity:.6;pointer-events:none;
+}
+/* ----------  Header ---------- */
+header{
+  position:fixed;top:0;inset-inline:0;background:rgba(10,10,10,.9);
+  backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,212,255,.25);
+  transition:var(--trans);z-index:1000
+}
+header.scrolled{background:rgba(10,10,10,.98);border-bottom-color:rgba(0,212,255,.4)}
+nav{display:flex;justify-content:space-between;align-items:center;padding-block:1rem}
+.logo{
+  font-size:1.8rem;font-weight:800;letter-spacing:-.5px;user-select:none;
+  background:linear-gradient(135deg,var(--clr-primary-100),var(--clr-primary-200),var(--clr-primary-300));
+  background-size:200% 200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:gradientShift 3s ease-in-out infinite;
+}
+.nav-links{display:flex;gap:2rem;list-style:none}
+.nav-links a{color:var(--clr-text);text-decoration:none;font-weight:500;padding:.5rem 1rem;border-radius:8px;position:relative;transition:var(--trans)}
+.nav-links a::before{
+  content:'';position:absolute;inset-x:50% 0 auto 50%;bottom:0;height:2px;
+  background:linear-gradient(90deg,var(--clr-primary-100),var(--clr-primary-200));
+  width:0;transform:translateX(-50%);transition:var(--trans)
+}
+.nav-links a:hover{color:var(--clr-primary-100);transform:translateY(-2px)}
+.nav-links a:hover::before{width:100%}
+.hamburger{display:none;flex-direction:column;gap:4px;cursor:pointer}
+.hamburger span{width:25px;height:3px;border-radius:2px;background:linear-gradient(90deg,var(--clr-primary-100),var(--clr-primary-200));transition:.3s}
+/* ----------  Hero ---------- */
+.hero{min-height:100vh;display:flex;align-items:center;padding:120px 0 80px;position:relative;overflow:hidden}
+.hero-badge{
+  display:inline-block;background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.35);
+  color:var(--clr-primary-100);padding:6px 16px;border-radius:20px;font-size:.9rem;font-weight:600;margin-bottom:1.6rem
+}
+.hero h1{
+  font-size:3.8rem;line-height:1.1;font-weight:800;margin-bottom:1.6rem;
+  background:linear-gradient(135deg,#fff,var(--clr-primary-100),var(--clr-primary-200));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:gradientShift 4s ease-in-out infinite;
+}
+.hero p{font-size:1.35rem;color:var(--clr-text-alt);margin-bottom:3rem}
+.cta-buttons{display:flex;gap:1.5rem;flex-wrap:wrap}
+.btn{
+  display:inline-block;font-weight:600;font-size:1.05rem;padding:16px 32px;border-radius:12px;cursor:pointer;
+  transition:var(--trans);position:relative;overflow:hidden;text-decoration:none
+}
+.btn--primary{
+  background:linear-gradient(135deg,var(--clr-primary-100),var(--clr-primary-200));color:#fff;
+  box-shadow:0 10px 30px rgba(0,212,255,.3)
+}
+.btn--primary::before{
+  content:'';position:absolute;inset:0;left:-100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);transition:.5s
+}
+.btn--primary:hover::before{left:100%}
+.btn--primary:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
+.btn--ghost{border:2px solid var(--clr-primary-100);color:var(--clr-primary-100);background:transparent}
+.btn--ghost:hover{background:var(--clr-primary-100);color:var(--clr-bg);transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,212,255,.25)}
+/* ----------  Value cards ---------- */
+.value-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem;margin-top:3.5rem}
+.value-card{
+  background:var(--clr-card-glass);border-radius:var(--radius);border:1px solid rgba(0,212,255,.2);
+  padding:2.5rem;position:relative;transition:var(--trans);backdrop-filter:blur(20px)
+}
+.value-card:hover{transform:translateY(-8px);border-color:rgba(0,212,255,.45);box-shadow:var(--shadow-lg)}
+.value-icon{
+  width:70px;height:70px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--clr-primary-100),var(--clr-primary-200));margin-bottom:1.5rem;
+  position:relative;isolation:isolate;
+}
+.value-icon::before{
+  content:'';position:absolute;inset:0;border-radius:inherit;background:inherit;opacity:.35;transform:scale(1.25);animation:pulse 2s infinite
+}
+.value-card h3{font-size:1.35rem;font-weight:700;margin-bottom:.8rem}
+.value-card p{font-size:1rem;color:var(--clr-text-alt)}
+.metric{display:flex;align-items:center;margin-top:1.4rem;padding:1rem;border-radius:12px;
+        background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25)}
+.metric-number{font-size:1.8rem;font-weight:800;color:var(--clr-primary-100);margin-right:.8rem}
+/* ----------  Consulting grid ---------- */
+.consulting-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:2.5rem;margin-top:3rem}
+.consult-card{
+  background:var(--clr-card-glass);border:1px solid rgba(0,212,255,.2);border-radius:var(--radius);
+  padding:2.5rem;transition:var(--trans);backdrop-filter:blur(20px);position:relative
+}
+.consult-card:hover{transform:translateY(-6px);border-color:rgba(0,212,255,.4);box-shadow:var(--shadow-lg)}
+.consult-card h3{font-size:1.35rem;font-weight:700;margin-bottom:1rem}
+.consult-card ul{list-style:none;padding-left:0;margin-top:1.4rem}
+.consult-card ul li{position:relative;padding-left:1.4rem;color:var(--clr-text);margin-bottom:.6rem;font-size:.95rem}
+.consult-card ul li::before{content:'▸';position:absolute;left:0;color:var(--clr-primary-100);font-weight:bold}
+/* ----------  ROI stats ---------- */
+.roi-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:2rem;margin-top:3rem
+}
+.roi-card{
+  text-align:center;padding:2.2rem;background:var(--clr-card-glass);border-radius:16px;border:1px solid rgba(0,212,255,.2);transition:var(--trans)
+}
+.roi-card:hover{transform:translateY(-4px);border-color:rgba(0,212,255,.45);box-shadow:var(--shadow-md)}
+.roi-num{font-size:2.4rem;font-weight:800;
+  background:linear-gradient(135deg,var(--clr-primary-100),var(--clr-primary-200));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.4rem
+}
+.roi-label{font-size:.9rem;text-transform:uppercase;letter-spacing:.5px;color:var(--clr-text-alt);font-weight:600}
+.roi-desc{font-size:.85rem;color:#667285;margin-top:.4rem}
+/* ----------  Roadmap ---------- */
+.roadmap-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:2rem;margin-top:3.2rem}
+.step{
+  background:var(--clr-card-glass);border:1px solid rgba(0,212,255,.2);border-radius:var(--radius);
+  padding:2.5rem;position:relative;transition:var(--trans)
+}
+.step:hover{transform:translateY(-4px);border-color:rgba(0,212,255,.45)}
+.step-number{
+  position:absolute;top:-15px;left:22px;width:42px;height:42px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;
+  background:linear-gradient(135deg,var(--clr-primary-100),var(--clr-primary-200))
+}
+/* ----------  Industry grid ---------- */
+.industry-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:2.5rem;margin-top:3rem}
+.industry-card{
+  background:var(--clr-card-glass);border:1px solid rgba(0,212,255,.2);border-radius:var(--radius);
+  padding:2.5rem;position:relative;overflow:hidden;transition:var(--trans);backdrop-filter:blur(20px)
+}
+.industry-card::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(0,212,255,.07),transparent);transform:translateX(-100%);transition:.8s}
+.industry-card:hover::before{transform:translateX(100%)}
+.industry-card:hover{transform:translateY(-8px);border-color:rgba(0,212,255,.45);box-shadow:var(--shadow-lg)}
+.industry-header{display:flex;align-items:center;margin-bottom:1.6rem}
+.industry-icon{width:58px;height:58px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-right:1.2rem;
+               background:linear-gradient(135deg,var(--clr-primary-100),var(--clr-primary-200))}
+.industry-card h3{font-size:1.3rem;font-weight:700}
+.industry-card ul{list-style:none;margin-top:1.2rem;padding-left:1.4rem}
+.industry-card ul li{color:var(--clr-text-alt);margin-bottom:.6rem;position:relative}
+.industry-card ul li::before{content:'•';position:absolute;left:-1.2rem;color:var(--clr-primary-100);font-size:1.2rem}
+/* ----------  Contact ---------- */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;margin-top:3rem}
+form{display:grid;gap:1.4rem}
+label{display:block;margin-bottom:.5rem;font-weight:600;color:var(--clr-text)}
+input,select,textarea{
+  width:100%;padding:14px;border-radius:12px;border:1px solid rgba(0,212,255,.22);background:rgba(15,15,15,.8);
+  color:var(--clr-text);font-size:1rem;transition:var(--trans)
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--clr-primary-100);box-shadow:0 0 18px rgba(0,212,255,.2)}
+textarea{min-height:120px;resize:vertical}
+.submit-btn{margin-top:4px}@media(max-width:980px){.contact-grid{grid-template-columns:1fr}}
+/* ----------  Footer ---------- */
+footer{background:#050505;padding:4rem 0;border-top:1px solid rgba(0,212,255,.2)}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:2.8rem}
+footer a{color:var(--clr-text-alt);text-decoration:none;display:block;margin-bottom:.6rem;transition:var(--trans)}
+footer a:hover{color:var(--clr-primary-100)}
+.footer-grid h4{margin-bottom:1.2rem;color:var(--clr-primary-100);font-weight:700}
+.footer-brand p{color:var(--clr-text-alt);margin-bottom:1.1rem}
+.footer-bottom{text-align:center;border-top:1px solid rgba(0,212,255,.12);padding-top:1.5rem;color:#667285;font-size:.9rem}
+@media(max-width:768px){
+  .nav-links{display:none;flex-direction:column;position:absolute;top:100%;left:0;width:100%;
+             background:rgba(10,10,10,.96);padding:1.6rem 0;border-top:1px solid rgba(0,212,255,.25)}
+  .nav-links.active{display:flex}
+  .hamburger{display:flex}
+  .hero h1{font-size:2.8rem}.hero p{font-size:1.15rem}.footer-grid{grid-template-columns:1fr;text-align:center}
+}
+/* ----------  Animations ---------- */
+@keyframes gradientShift{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:.7}}
+</style>
+</head>
+<body>
+
+<!-- Background layers -->
+<div class="bg-animation"></div>
+<canvas id="particles-canvas" class="particles"></canvas>
+
+<!-- ========= HEADER ========= -->
+<header id="header">
+  <nav class="container">
+    <div class="logo">Nexus&nbsp;AI&nbsp;Partners</div>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#value">Business&nbsp;Value</a></li>
+      <li><a href="#strategy">Strategy</a></li>
+      <li><a href="#solutions">Solutions</a></li>
+      <li><a href="#roi">ROI&nbsp;Impact</a></li>
+      <li><a href="#contact">Get&nbsp;Started</a></li>
+    </ul>
+    <div class="hamburger" id="hamburger">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+</header>
+
+<!-- ========= HERO ========= -->
+<section id="home" class="hero">
+  <div class="container" data-aos="fade-up">
+    <span class="hero-badge">Trusted by Fortune 500 Leaders</span>
+    <h1>Strategic AI Transformation&nbsp;That&nbsp;Delivers Measurable ROI</h1>
+    <p>We architect competitive advantage through data-driven insights, intelligent automation, and digital marketing excellence.</p>
+    <div class="cta-buttons">
+      <a href="#contact" class="btn btn--primary">Schedule Strategy Assessment</a>
+      <a href="#roi" class="btn btn--ghost">View ROI Framework</a>
+    </div>
+  </div>
+</section>
+
+<!-- ========= VALUE ========= -->
+<section id="value" class="container" style="padding:110px 0">
+  <h2 class="section-title" data-aos="fade-up">The Competitive Imperative</h2>
+  <p class="section-sub" data-aos="fade-up" data-aos-delay="100">
+    Organizations that fail to adopt strategic AI risk being outmaneuvered by competitors who leverage intelligent automation for superior experiences and market insight.
+  </p>
+  <div class="value-grid">
+    <!-- Repeat for each value prop -->
+    <div class="value-card" data-aos="zoom-in">
+      <div class="value-icon"><i class="fas fa-chess-knight fa-xl"></i></div>
+      <h3>Strategic Market Advantage</h3>
+      <p>Predictive analytics and market intelligence enable faster, more informed decisions—yielding first-mover advantages.</p>
+      <div class="metric"><span class="metric-number">40%</span> faster time-to-market</div>
+    </div>
+    <div class="value-card" data-aos="zoom-in" data-aos-delay="100">
+      <div class="value-icon"><i class="fas fa-cogs fa-xl"></i></div>
+      <h3>Operational Excellence</h3>
+      <p>Intelligent automation eliminates bottlenecks and human error, operating at machine speed with human oversight.</p>
+      <div class="metric"><span class="metric-number">65%</span> cost reduction</div>
+    </div>
+    <div class="value-card" data-aos="zoom-in" data-aos-delay="200">
+      <div class="value-icon"><i class="fas fa-lightbulb fa-xl"></i></div>
+      <h3>Innovation Acceleration</h3>
+      <p>AI-driven R&D optimizes resources and discovers opportunities, turning reactive processes into predictive advantage.</p>
+      <div class="metric"><span class="metric-number">3×</span> faster cycles</div>
+    </div>
+    <div class="value-card" data-aos="zoom-in" data-aos-delay="300">
+      <div class="value-icon"><i class="fas fa-users fa-xl"></i></div>
+      <h3>Customer Intelligence</h3>
+      <p>Deep-learning models personalize experiences at scale, boosting lifetime value and reducing acquisition costs.</p>
+      <div class="metric"><span class="metric-number">200%</span> CLV growth</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========= STRATEGY / CONSULTING ========= -->
+<section id="strategy" style="padding:110px 0;background:linear-gradient(180deg,rgba(0,0,0,.5),rgba(10,10,10,.85))">
+  <div class="container">
+    <h2 class="section-title" data-aos="fade-up">C-Level Strategic AI Consulting</h2>
+    <p class="section-sub" data-aos="fade-up" data-aos-delay="100">
+      We align AI initiatives with business objectives, ensuring measurable results that impact the bottom line.
+    </p>
+    <div class="consulting-grid">
+      <!-- Card -->
+      <div class="consult-card" data-aos="fade-up">
+        <div class="value-icon"><i class="fas fa-road fa-xl"></i></div>
+        <h3>AI Strategy &amp; Roadmap</h3>
+        <p>Multi-year strategic planning that prioritizes high-impact initiatives and sustains competitive advantage.</p>
+        <ul>
+          <li>Executive alignment workshops</li>
+          <li>Competitive AI landscape analysis</li>
+          <li>ROI-driven prioritization</li>
+          <li>Technology stack architecture</li>
+        </ul>
+      </div>
+      <div class="consult-card" data-aos="fade-up" data-aos-delay="100">
+        <div class="value-icon"><i class="fas fa-sync-alt fa-xl"></i></div>
+        <h3>Digital Transformation</h3>
+        <p>End-to-end integration of AI across all functions—structuring your organization for AI-native success.</p>
+        <ul>
+          <li>Data governance frameworks</li>
+          <li>AI literacy for executives</li>
+          <li>Cross-functional centers of excellence</li>
+        </ul>
+      </div>
+      <div class="consult-card" data-aos="fade-up" data-aos-delay="200">
+        <div class="value-icon"><i class="fas fa-balance-scale fa-xl"></i></div>
+        <h3>AI Governance &amp; Ethics</h3>
+        <p>Responsible AI practices that reduce risk, ensure compliance, and build stakeholder trust.</p>
+        <ul>
+          <li>Ethics committees &amp; policies</li>
+          <li>Bias detection/mitigation</li>
+          <li>Transparent explainability</li>
+        </ul>
+      </div>
+      <div class="consult-card" data-aos="fade-up" data-aos-delay="300">
+        <div class="value-icon"><i class="fas fa-chart-line fa-xl"></i></div>
+        <h3>Investment Strategy</h3>
+        <p>Guidance on AI investments, vendor selection, and talent acquisition to maximize returns.</p>
+        <ul>
+          <li>Vendor &amp; platform evaluation</li>
+          <li>Budget optimization</li>
+          <li>Innovation lab setup</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========= ROI ========= -->
+<section id="roi" style="padding:110px 0">
+  <div class="container" data-aos="fade-up">
+    <h2 class="section-title" style="text-align:left">Proven ROI Framework</h2>
+    <p class="section-sub" style="text-align:left;margin-bottom:3rem">
+      We prioritize high-impact, low-risk initiatives that deliver immediate value while building the foundation for long-term transformation.
+    </p>
+    <div class="img-placeholder" style="margin-bottom:2rem">[ ROI Methodology Diagram ]</div>
+    <div class="roi-grid" data-aos="fade-up" data-aos-delay="100">
+      <div class="roi-card"><div class="roi-num">$2.4M</div><div class="roi-label">First-Year Savings</div><div class="roi-desc">Cost reduction via automation</div></div>
+      <div class="roi-card"><div class="roi-num">320%</div><div class="roi-label">Average ROI</div><div class="roi-desc">Within 18 months</div></div>
+      <div class="roi-card"><div class="roi-num">45%</div><div class="roi-label">Productivity Lift</div><div class="roi-desc">Intelligent automation</div></div>
+      <div class="roi-card"><div class="roi-num">6&nbsp;Mo</div><div class="roi-label">Time to Value</div><div class="roi-desc">Pilot payback</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========= ROADMAP ========= -->
+<section style="padding:110px 0;background:linear-gradient(180deg,rgba(0,212,255,.03),rgba(0,102,255,.035))">
+  <div class="container">
+    <h2 class="section-title" data-aos="fade-up">Strategic Implementation Process</h2>
+    <p class="section-sub" data-aos="fade-up" data-aos-delay="100">
+      A phased methodology delivering value at every step while minimizing operational disruption.
+    </p>
+    <div class="roadmap-grid">
+      <div class="step" data-aos="fade-right"><span class="step-number">1</span><h3>Strategic Assessment</h3><p>Evaluate capabilities, data maturity, and readiness to define a prioritized roadmap.</p></div>
+      <div class="step" data-aos="fade-right" data-aos-delay="100"><span class="step-number">2</span><h3>Foundation Building</h3><p>Establish data infrastructure and governance to support scalable AI.</p></div>
+      <div class="step" data-aos="fade-right" data-aos-delay="200"><span class="step-number">3</span><h3>Pilot Implementation</h3><p>Deploy high-impact pilots to demonstrate value and refine approach.</p></div>
+      <div class="step" data-aos="fade-right" data-aos-delay="300"><span class="step-number">4</span><h3>Scale &amp; Optimize</h3><p>Expand successful pilots and continuously improve performance.</p></div>
+      <div class="step" data-aos="fade-right" data-aos-delay="400"><span class="step-number">5</span><h3>Innovation Culture</h3><p>Embed AI-native practices for ongoing advancement and growth.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========= INDUSTRY SOLUTIONS ========= -->
+<section id="solutions" style="padding:110px 0;background:linear-gradient(180deg,rgba(0,0,0,.8),rgba(10,10,10,.9))">
+  <div class="container">
+    <h2 class="section-title" data-aos="fade-up">Industry-Specific AI Solutions</h2>
+    <p class="section-sub" data-aos="fade-up" data-aos-delay="100">
+      Deep expertise in regulated and complex sectors ensures solutions that maximize impact within compliance constraints.
+    </p>
+    <div class="industry-grid">
+      <!-- Finance -->
+      <div class="industry-card" data-aos="fade-up">
+        <div class="industry-header">
+          <div class="industry-icon"><i class="fas fa-coins fa-lg"></i></div>
+          <h3>Financial Services</h3>
+        </div>
+        <p>Risk analytics, algorithmic trading, and AI-driven compliance streamline operations and protect assets.</p>
+        <ul>
+          <li>Real-time fraud detection</li><li>Credit risk assessment</li><li>RegTech reporting automation</li><li>Personalized wealth management</li>
+        </ul>
+      </div>
+      <!-- Healthcare -->
+      <div class="industry-card" data-aos="fade-up" data-aos-delay="100">
+        <div class="industry-header">
+          <div class="industry-icon"><i class="fas fa-heartbeat fa-lg"></i></div>
+          <h3>Healthcare&nbsp;&amp;&nbsp;Life Sciences</h3>
+        </div>
+        <p>AI diagnostics, drug discovery acceleration, and predictive patient care improve outcomes and reduce costs.</p>
+        <ul>
+          <li>Medical imaging assistance</li><li>Clinical trial optimization</li><li>Predictive patient risk scoring</li>
+        </ul>
+      </div>
+      <!-- Manufacturing -->
+      <div class="industry-card" data-aos="fade-up" data-aos-delay="200">
+        <div class="industry-header">
+          <div class="industry-icon"><i class="fas fa-industry fa-lg"></i></div>
+          <h3>Manufacturing&nbsp;&amp;&nbsp;Supply Chain</h3>
+        </div>
+        <p>Predictive maintenance and quality control deliver Industry 4.0 efficiency and reduced downtime.</p>
+        <ul>
+          <li>Equipment failure prediction</li><li>Automated defect detection</li><li>Demand forecasting</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========= CONTACT ========= -->
+<section id="contact" style="padding:110px 0">
+  <div class="container">
+    <h2 class="section-title" data-aos="fade-up">Begin Your AI Transformation</h2>
+    <div class="contact-grid">
+      <!-- Form -->
+      <div data-aos="fade-right">
+        <h3 style="margin-bottom:1.6rem">Strategic Assessment Request</h3>
+        <form id="contact-form">
+          <div>
+            <label for="name">Executive Name</label>
+            <input type="text" id="name" required>
+          </div>
+          <div>
+            <label for="title">Title</label>
+            <input type="text" id="title" placeholder="CEO, CTO, etc." required>
+          </div>
+          <div>
+            <label for="email">Corporate Email</label>
+            <input type="email" id="email" required>
+          </div>
+          <div>
+            <label for="company">Organization</label>
+            <input type="text" id="company" required>
+          </div>
+          <div>
+            <label for="industry">Industry</label>
+            <select id="industry" required>
+              <option value="">Select Industry</option>
+              <option>Financial Services</option><option>Healthcare &amp; Life Sciences</option>
+              <option>Manufacturing</option><option>Retail &amp; E-commerce</option>
+              <option>Energy &amp; Utilities</option><option>Technology &amp; SaaS</option><option>Other</option>
+            </select>
+          </div>
+          <div>
+            <label for="objectives">Strategic Objectives</label>
+            <textarea id="objectives" placeholder="Describe your business goals&hellip;" required></textarea>
+          </div>
+          <button class="btn btn--primary submit-btn" type="submit">Request Assessment</button>
+        </form>
+      </div>
+      <!-- Info -->
+      <div data-aos="fade-left" data-aos-delay="200">
+        <h3>Executive AI Strategy Session</h3>
+        <p style="margin:1.2rem 0 2rem;color:var(--clr-text-alt)">
+          Schedule a confidential consultation to explore how AI can transform your organization. Expect a preliminary assessment and tailored recommendations within 24 hours.
+        </p>
+        <div style="display:grid;gap:1.6rem">
+          <div style="display:flex;gap:1.1rem;align-items:center">
+            <i class="fas fa-envelope fa-lg" style="color:var(--clr-primary-100)"></i>
+            <span>strategy@nexusai.partners</span>
+          </div>
+          <div style="display:flex;gap:1.1rem;align-items:center">
+            <i class="fas fa-phone-alt fa-lg" style="color:var(--clr-primary-100)"></i>
+            <span>+1 (555) AI-STRATEGY</span>
+          </div>
+          <div style="display:flex;gap:1.1rem;align-items:center">
+            <i class="fas fa-map-marker-alt fa-lg" style="color:var(--clr-primary-100)"></i>
+            <span>Silicon Valley HQ</span>
+          </div>
+          <div style="display:flex;gap:1.1rem;align-items:center">
+            <i class="fas fa-clock fa-lg" style="color:var(--clr-primary-100)"></i>
+            <span>24-hour executive response</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========= FOOTER ========= -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h4>Nexus AI Partners</h4>
+        <p>Strategic AI consulting for enterprise transformation. Trusted advisor to Fortune 500 leaders worldwide.</p>
+      </div>
+      <div>
+        <h4>Strategic Services</h4>
+        <a href="#strategy">AI Strategy Development</a>
+        <a href="#strategy">Digital Transformation</a>
+        <a href="#strategy">Executive Advisory</a>
+        <a href="#strategy">Governance &amp; Ethics</a>
+      </div>
+      <div>
+        <h4>Industry Solutions</h4>
+        <a href="#solutions">Financial Services</a>
+        <a href="#solutions">Healthcare &amp; Life Sciences</a>
+        <a href="#solutions">Manufacturing</a>
+        <a href="#solutions">Retail &amp; E-commerce</a>
+      </div>
+      <div>
+        <h4>Resources</h4>
+        <a href="#roi">ROI Framework</a>
+        <a href="#value">Case Studies</a>
+        <a href="#contact">Executive Assessment</a>
+      </div>
+    </div>
+    <div class="footer-bottom">&copy; 2025 Nexus AI Partners. All rights reserved.</div>
+  </div>
+</footer>
+
+<!-- ========= SCRIPTS ========= -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script> <!-- :contentReference[oaicite:2]{index=2} -->
+<script>
+AOS.init({once:true,duration:700,easing:'ease-out-cubic'});
+
+/* Header scroll effect */
+const header=document.getElementById('header');
+window.addEventListener('scroll',()=>{header.classList.toggle('scrolled',window.scrollY>100)});
+
+/* Mobile nav toggle */
+const hamburger=document.getElementById('hamburger'),navLinks=document.getElementById('nav-links');
+hamburger.addEventListener('click',()=>navLinks.classList.toggle('active'));
+
+/* Smooth scroll + close mobile nav */
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const target=document.querySelector(a.getAttribute('href'));
+    if(target){e.preventDefault();window.scrollTo({top:target.offsetTop-header.offsetHeight,behavior:'smooth'});}
+    navLinks.classList.remove('active');
+  });
+});
+
+/* Simple particle canvas */
+const canvas=document.getElementById('particles-canvas'),ctx=canvas.getContext('2d');
+let particles=[];
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight}
+function createParticle(){return{x:Math.random()*canvas.width,y:Math.random()*canvas.height,
+  s:Math.random()*2+.5,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,o:Math.random()*.5+.15,
+  c:Math.random()>.7?'#00d4ff':'#0066ff'};}
+function init(){particles=[...Array(100)].map(createParticle);}
+function update(){
+  particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;});
+}
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    ctx.globalAlpha=p.o;ctx.fillStyle=p.c;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.s,0,Math.PI*2);ctx.fill();
+  });
+  /* subtle lines */
+  particles.forEach((p,i)=>{
+    particles.slice(i+1).forEach(p2=>{
+      const d=Math.hypot(p.x-p2.x,p.y-p2.y);
+      if(d<120){ctx.globalAlpha=(120-d)/120*.1;ctx.strokeStyle='#00d4ff';ctx.lineWidth=.25;
+        ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p2.x,p2.y);ctx.stroke();}
+    });
+  });
+}
+function loop(){update();draw();requestAnimationFrame(loop);}
+resize();init();loop();addEventListener('resize',()=>{resize();init();});
+
+/* Form fake submit */
+document.getElementById('contact-form').addEventListener('submit',e=>{
+  e.preventDefault();
+  const btn=e.target.querySelector('.submit-btn');
+  btn.textContent='Scheduling…';btn.disabled=true;
+  setTimeout(()=>{
+    alert('Thank you! Our consultants will reach out within 24 hours.');
+    e.target.reset();btn.textContent='Request Assessment';btn.disabled=false;
+  },1600);
+});
+</script>
+</body>
+</html>
